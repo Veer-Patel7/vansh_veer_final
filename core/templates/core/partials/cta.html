@@ -1,0 +1,61 @@
+{% load static %}
+<section class="py-32 relative overflow-hidden">
+    <div class="container mx-auto px-4 relative z-10">
+        <div
+            class="glass-panel p-12 md:p-24 rounded-[4rem] border-white/60 dark:border-white/10 bg-white dark:bg-slate-900 shadow-2xl relative overflow-hidden text-center lg:text-left">
+            <!-- Background Glows -->
+            <div
+                class="absolute top-0 right-0 w-[600px] h-[600px] bg-primary-500/10 rounded-full blur-[120px] translate-x-1/2 -translate-y-1/2">
+            </div>
+
+            <div class="flex flex-col lg:flex-row items-center gap-20 relative z-10">
+                <div class="flex-1 space-y-8">
+                    <h2
+                        class="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-slate-900 dark:text-white leading-tight">
+                        Experience the Future of <span
+                            class="text-primary-500 underline decoration-primary-500/30">Hospitality</span>
+                    </h2>
+                    <p class="text-slate-500 dark:text-slate-400 text-xl leading-relaxed max-w-2xl">
+                        Join 1,000+ property managers who have Already increased their revenue by 40%. Start your 14-day
+                        free trial today.
+                    </p>
+                    <div class="flex flex-wrap items-center justify-center lg:justify-start gap-8">
+                        <div class="flex items-center gap-3">
+                            <div class="w-2 h-2 rounded-full bg-emerald-500"></div>
+                            <span class="text-sm font-bold text-slate-400 uppercase tracking-widest">No Card
+                                Required</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="w-2 h-2 rounded-full bg-primary-500"></div>
+                            <span class="text-sm font-bold text-slate-400 uppercase tracking-widest">Setup in 10
+                                Mins</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="w-full lg:w-auto min-w-[360px]">
+                    <div
+                        class="bg-slate-50 dark:bg-white/5 p-10 rounded-[2.5rem] border border-slate-200 dark:border-white/10 shadow-inner">
+                        <div class="space-y-6">
+                            <div class="space-y-2">
+                                <label
+                                    class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Business
+                                    Email</label>
+                                <input type="email" placeholder="name@hotel.com" required
+                                    class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-2xl px-6 py-5 text-slate-900 dark:text-white focus:outline-none focus:ring-4 focus:ring-primary-500/10 transition-all">
+                            </div>
+                            <a href="{% url 'account:hotel_login' %}"
+                                class="w-full py-5 bg-primary-500 hover:bg-primary-600 text-white rounded-2xl font-bold text-lg transition-all hover:shadow-2xl hover:shadow-primary-500/40 active:scale-95 flex items-center justify-center gap-3">
+                                Get Started Free <i class="fas fa-arrow-right text-sm"></i>
+                            </a>
+                        </div>
+                        <p class="text-[10px] text-slate-400 mt-6 text-center leading-relaxed">
+                            By joining, you agree to our <a href="#" class="underline">Terms</a> and <a href="#"
+                                class="underline">Privacy Policy</a>.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

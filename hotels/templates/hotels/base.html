@@ -83,6 +83,81 @@
     </div>
 
     {% block extra_scripts %}{% endblock %}
+
+    <!-- Global Elite Document Dossier Previewer (Supports Images, Video, PDF) -->
+    <div id="lightboxModal" style="display: none;">
+        <div class="dossier-viewer-container">
+            <!-- Professional Header ToolBar -->
+            <div class="viewer-header">
+                <div class="viewer-file-info">
+                    <div class="viewer-icon-box">
+                        <i class="fas fa-file-shield"></i>
+                    </div>
+                    <div class="viewer-text-meta">
+                        <span id="lightboxCaption" class="viewer-filename">verification_dossier.pdf</span>
+                        <div class="viewer-status-row">
+                            <span class="viewer-status-badge"><i class="fas fa-shield-check"></i> SECURE PREVIEW</span>
+                            <span class="viewer-audit-token" id="viewer-token">TOKEN: AUTH-8829-PX</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="viewer-actions">
+                    <button type="button" class="viewer-action-btn" onclick="window.print()" title="Print Dossier">
+                        <i class="fas fa-print"></i>
+                    </button>
+                    <button type="button" class="viewer-action-btn close-dossier-btn" onclick="closeLightbox()"
+                        title="Return to Onboarding">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="lightbox-content-wrapper">
+                <div class="lightbox-nav lightbox-prev" onclick="changeSlide(-1)"><i class="fas fa-chevron-left"></i>
+                </div>
+                <div class="lightbox-stage">
+                    <img id="lightboxImage" class="lightbox-content" src="" style="display:none;">
+                    <video id="lightboxVideo" class="lightbox-content" controls style="display:none;"></video>
+                    <iframe id="lightboxPDF" class="lightbox-content" src=""
+                        style="display:none; width: 100%; height: 100%; border: none;"></iframe>
+                </div>
+                <div class="lightbox-nav lightbox-next" onclick="changeSlide(1)"><i class="fas fa-chevron-right"></i>
+                </div>
+            </div>
+
+            <!-- Professional Footer -->
+            <div class="viewer-footer">
+                <i class="fas fa-lock"></i> End-to-End Encrypted Document Streaming • HotelPro Secure Cloud
+            </div>
+        </div>
+    </div>
+    <!-- Custom JavaScript for Theme Management -->
+    <script>
+        // Professional Theme Slider JS
+        const html = document.documentElement;
+
+        if (window.matchMedia('(prefers-color-scheme: dark)').matches && !localStorage.getItem('theme')) {
+            html.classList.add('dark');
+        } else if (localStorage.getItem('theme') === 'dark') {
+            html.classList.add('dark');
+        }
+
+        // Add theme-slider event listeners if they exist (they might be in partials)
+        document.addEventListener('DOMContentLoaded', () => {
+            const themeSlider = document.getElementById('theme-slider-container');
+            const themeSliderMobile = document.getElementById('theme-slider-mobile');
+
+            const toggleTheme = () => {
+                html.classList.toggle('dark');
+                const isDark = html.classList.contains('dark');
+                localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            };
+
+            if (themeSlider) themeSlider.addEventListener('click', toggleTheme);
+            if (themeSliderMobile) themeSliderMobile.addEventListener('click', toggleTheme);
+        });
+    </script>
 </body>
 
 </html>

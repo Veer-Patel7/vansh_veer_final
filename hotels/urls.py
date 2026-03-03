@@ -1,12 +1,19 @@
 from django.urls import path, include
-
+from rest_framework.routers import DefaultRouter
 from . import views
 
+# REST API Router
+router = DefaultRouter()
+router.register(r'api/hotels', views.HotelViewSet, basename='hotel-api')
+router.register(r'api/rooms', views.RoomTypeViewSet, basename='room-api')
+router.register(r'api/gallery', views.GalleryViewSet, basename='gallery-api')
 
 app_name = 'hotels'
 # URL Patterns
 urlpatterns = [
-   
+    # REST API endpoints
+    path('api/', include(router.urls)),
+
     # Template-based views
     path('register/', views.add_hotel, name='hotelregister'),
     path('dashboard/<int:hotel_id>/', views.hotel_dashboard, name='hotel_dashboard'),
@@ -28,18 +35,18 @@ urlpatterns = [
     path('admin/offers/', views.admin_offer_list, name='admin_offer_list'),
     path('admin/offers/review/<int:offer_id>/', views.admin_review_offer, name='admin_review_offer'),
 
-    # Sidebar Views
-    path('owner/bookings/', views.bookings_view, name='bookings'),
-    path('owner/insights/', views.insights_view, name='insights'),
-    
-    # REVIEW
-    path("reviews/", views.hotel_reviews, name="hotel_reviews"),
-    path("request-delete/<int:id>/", views.request_delete_review, name="request_delete_review"),
-    
-    path('owner/settings/', views.settings_view, name='settings'),
-    
     # Property Edit Workflow
     path('edit-detail/<int:hotel_id>/<str:category>/', views.property_edit_detail, name='property_edit_detail'),
     path('edit-submit/<int:hotel_id>/<str:category>/', views.submit_edit_request, name='submit_edit_request'),
 
+    # Sidebar Views
+    path('owner/bookings/', views.bookings_view, name='bookings'),
+    path('owner/insights/', views.insights_view, name='insights'),
+    path('owner/reviews/', views.reviews_view, name='reviews'),
+    path('owner/settings/', views.settings_view, name='settings'),
+    
+    # Location History APIs
+    path('api/location-history/', views.get_location_history, name='get_location_history'),
+    path('api/location-history/add/', views.add_location_history, name='add_location_history'),
+    path('api/location-history/bulk/', views.bulk_action_location_history, name='bulk_action_location_history'),
 ]

@@ -8,12 +8,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const createServicePill = (name) => {
         const label = document.createElement('label');
-        label.className = 'pill-label active';
+        label.className = 'pill-label';
         label.style.animation = 'pillFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1)';
 
         label.innerHTML = `
-            <input type="checkbox" name="services" value="${name}" checked>
-            <i class="fas fa-concierge-bell"></i>
+            <input type="checkbox" name="services" value="${name}" checked style="display: none;">
+            <i class="fas fa-check-circle" style="color: var(--secondary);"></i>
             ${name}
         `;
 

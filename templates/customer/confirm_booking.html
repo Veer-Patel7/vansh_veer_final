@@ -1,0 +1,42 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Confirm Booking | HotelPro</title>
+    <link rel="stylesheet" href="{% static 'customer/confirm_booking.css' %}">
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <div class="navbar">HotelPro</div>
+
+    <!-- CENTER CARD -->
+    <div class="confirm-wrapper">
+        <div class="confirm-card">
+
+            <h2>Confirm Booking</h2>
+
+            <div class="booking-details">
+                <p><span>Hotel</span> <strong>{{ hotel.hotel_name }}</strong></p>
+                <p><span>Room</span> <strong>{{ room.room_type }}</strong></p>
+                <p><span>Check-in</span> <strong>{{ data.checkin_date }}</strong></p>
+                <p><span>Check-out</span> <strong>{{ data.checkout_date }}</strong></p>
+                <p><span>Guests</span> <strong>{{ data.total_guests }}</strong></p>
+                <p><span>Adults</span> <strong>{{ data.adults }}</strong></p>
+                <p><span>Children</span> <strong>{{ data.children }}</strong></p>
+                <p><span>Payment</span> <strong>{{ data.payment_method }}</strong></p>
+            </div>
+
+            <form method="POST">
+                {% csrf_token %}
+                <button type="submit" class="confirm-btn">
+                    Confirm Booking
+                </button>
+            </form>
+
+        </div>
+    </div>
+
+</body>
+</html>

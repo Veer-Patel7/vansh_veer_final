@@ -1,7 +1,7 @@
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.core.files.uploadedfile import SimpleUploadedFile
-from user_access.models import User
+from account.models import User
 from .models import Hotel, RoomType, HotelImage
 
 class HotelOnboardingTest(TestCase):
@@ -89,3 +89,4 @@ class HotelOnboardingTest(TestCase):
         # Check HotelImages
         self.assertEqual(hotel.images.count(), 2)
         self.assertTrue(hotel.images.filter(is_primary=True).exists())
+

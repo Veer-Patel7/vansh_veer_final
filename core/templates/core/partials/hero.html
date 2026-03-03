@@ -1,0 +1,159 @@
+{% load static %}
+<section class="relative pt-32 pb-32 overflow-hidden" id="platform">
+    <div class="container mx-auto px-4 relative z-10">
+        <div class="flex flex-col lg:flex-row items-center gap-16 lg:gap-24">
+            <!-- Hero Content -->
+            <div class="flex-1 text-center lg:text-left space-y-10">
+                <div
+                    class="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-sm font-bold animate-in fade-in slide-in-from-bottom-4 duration-700">
+                    <span class="flex h-2 w-2 rounded-full bg-primary-500 shadow-[0_0_8px_#3B82F6]"></span>
+                    Enterprise Grade Hotel AI
+                </div>
+
+                <h1
+                    class="text-5xl md:text-6xl lg:text-7xl font-display font-bold tracking-tight leading-[1.05] text-slate-900 dark:text-white">
+                    Increase Your <span class="text-primary-500">Hotel Revenue</span> with Smart AI Management
+                </h1>
+
+                <p class="text-xl text-slate-500 dark:text-slate-400 leading-relaxed max-w-2xl mx-auto lg:mx-0">
+                    The ultimate platform for modern hospitality. Automate operations, track occupancy in real-time, and
+                    drive profit growth with data-driven AI intelligence.
+                </p>
+
+                <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-5">
+                    <a href="{% url 'account:hotel_login' %}"
+                        class="w-full sm:w-auto px-10 py-5 bg-primary-500 text-white rounded-2xl font-bold text-lg hover:bg-primary-600 transition-all hover:shadow-2xl hover:shadow-primary-500/40 active:scale-95 flex items-center justify-center gap-3">
+                        Start Free Trial <i class="fas fa-arrow-right text-sm"></i>
+                    </a>
+                    <a href="#"
+                        class="w-full sm:w-auto px-10 py-5 bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800 rounded-2xl font-bold text-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-all active:scale-95 flex items-center justify-center gap-3 text-slate-700 dark:text-slate-300">
+                        Book a Demo <i class="fas fa-calendar-check text-sm"></i>
+                    </a>
+                </div>
+
+                <!-- Trust Elements -->
+                <div
+                    class="flex flex-wrap items-center justify-center lg:justify-start gap-8 pt-8 opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
+                    <span
+                        class="uppercase tracking-widest text-[10px] font-bold text-slate-400 block w-full lg:w-auto mb-4 lg:mb-0">Trusted
+                        by Global Brands</span>
+                    <i class="fab fa-hooli text-2xl"></i>
+                    <i class="fab fa-pied-piper-alt text-2xl"></i>
+                    <i class="fab fa-buffer text-2xl"></i>
+                </div>
+            </div>
+
+            <!-- Dashboard Mockup Side -->
+            <div class="flex-1 relative w-full max-w-2xl lg:max-w-none">
+                <!-- Premium Hero Graphic Overlay -->
+                <div class="absolute -inset-10 -z-10 opacity-40 dark:opacity-20 blur-2xl transform rotate-3">
+                    <img src="{% static 'core/images/hero_bg.png' %}" class="w-full h-full object-cover rounded-[5rem]"
+                        alt="Premium Graphic">
+                </div>
+
+                <div
+                    class="relative glass-panel rounded-[3rem] p-4 md:p-8 shadow-[0_32px_128px_-16px_rgba(0,0,0,0.1)] border-white/60 dark:border-white/10 overflow-hidden animate-float">
+
+                    <!-- Dashboard Interior -->
+                    <div
+                        class="bg-white/80 dark:bg-slate-950/80 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-inner overflow-hidden">
+                        <!-- Top Bar -->
+                        <div
+                            class="px-8 py-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                            <div class="flex gap-2">
+                                <div class="w-2.5 h-2.5 rounded-full bg-blue-400"></div>
+                                <div class="w-2.5 h-2.5 rounded-full bg-indigo-400"></div>
+                                <div class="w-2.5 h-2.5 rounded-full bg-emerald-400"></div>
+                            </div>
+                            <div class="text-[11px] font-bold text-slate-400 tracking-widest uppercase">Analytics
+                                Dashboard v4.2</div>
+                            <div
+                                class="w-8 h-8 rounded-lg bg-slate-50 dark:bg-slate-900 flex items-center justify-center border border-slate-200 dark:border-slate-800 text-slate-400">
+                                <i class="fas fa-ellipsis-h text-xs"></i>
+                            </div>
+                        </div>
+
+                        <!-- Stats Grid -->
+                        <div class="p-8 space-y-8">
+                            <div>
+                                <div class="flex justify-between items-end mb-4">
+                                    <div class="space-y-1">
+                                        <div class="text-xs font-bold text-slate-400 uppercase tracking-widest">
+                                            Occupancy Rate</div>
+                                        <div class="text-4xl font-display font-bold text-slate-900 dark:text-white">
+                                            84.2%</div>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="text-[10px] font-bold text-emerald-500 uppercase">+12% vs last month
+                                        </div>
+                                        <div
+                                            class="h-1.5 w-32 bg-slate-100 dark:bg-slate-800 rounded-full mt-2 overflow-hidden">
+                                            <div class="h-full bg-primary-500 w-[84%]"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 lg:grid-cols-3 gap-6">
+                                <div
+                                    class="p-6 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                                    <div class="text-[10px] font-bold text-slate-400 uppercase mb-2">Check-ins</div>
+                                    <div class="text-2xl font-bold text-slate-800 dark:text-white">42</div>
+                                </div>
+                                <div
+                                    class="p-6 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                                    <div class="text-[10px] font-bold text-slate-400 uppercase mb-2">Bookings</div>
+                                    <div class="text-2xl font-bold text-slate-800 dark:text-white">128</div>
+                                </div>
+                                <div
+                                    class="p-6 rounded-2xl bg-primary-500/5 border border-primary-500/20 col-span-2 lg:col-span-1">
+                                    <div class="text-[10px] font-bold text-primary-500 uppercase mb-2">Cleaned Status
+                                    </div>
+                                    <div class="text-2xl font-bold text-primary-600">31/40</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Red Performance Badge -->
+                    <div class="absolute top-12 -right-12 glass-panel p-6 rounded-3xl shadow-2xl border-white/60 animate-bounce group hover:animate-none transition-all duration-500 z-20"
+                        style="animation-duration: 5s;">
+                        <div class="flex items-center gap-4">
+                            <div
+                                class="w-14 h-14 rounded-2xl bg-primary-500 flex items-center justify-center text-white shadow-xl shadow-primary-500/40">
+                                <i class="fas fa-chart-line text-2xl"></i>
+                            </div>
+                            <div>
+                                <div class="text-[10px] font-bold text-slate-400 uppercase mb-0.5">Performance</div>
+                                <div class="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">+40% <span
+                                        class="text-sm font-normal text-slate-400 ml-1">Revenue</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Satisfaction Badge -->
+                    <div class="absolute bottom-12 -left-12 glass-panel p-6 rounded-3xl shadow-2xl border-white/60 animate-bounce group hover:animate-none transition-all duration-500 z-20"
+                        style="animation-duration: 6s; animation-delay: 2s;">
+                        <div class="flex items-center gap-4">
+                            <div
+                                class="w-14 h-14 rounded-2xl bg-indigo-500 flex items-center justify-center text-white shadow-xl shadow-indigo-500/40">
+                                <i class="fas fa-star-shooting text-2xl"></i>
+                            </div>
+                            <div>
+                                <div class="text-[10px] font-bold text-slate-400 uppercase mb-0.5">Guest Satisfaction
+                                </div>
+                                <div class="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">98% <span
+                                        class="text-sm font-normal text-slate-400 ml-1">Rating</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Decor Background -->
+                <div
+                    class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[140%] h-[140%] -z-10 bg-primary-500/5 rounded-full blur-[120px]">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

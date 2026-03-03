@@ -75,6 +75,31 @@ class Hotel(models.Model):
     submitted_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    @property
+    def total_revenue(self):
+        """Total revenue from all bookings for this hotel"""
+        from bookings.models import Booking
+        from django.db.models import Sum
+        return Booking.objects.filter(hotel=self).aggregate(total=Sum('total_price'))['total'] or 0
+
+    @property
+    def avg_rating(self):
+        """Average rating from all reviews for this hotel"""
+        from reviews.models import Review
+        from django.db.models import Avg
+        return Review.objects.filter(hotel=self).aggregate(avg=Avg('rating'))['avg'] or 5.0
+
+    @property
+    def image(self):
+        """Returns the primary image for the hotel, or the first one if no primary is set."""
+        primary = self.images.filter(is_primary=True).first()
+        if primary:
+            return primary.image_path
+        first = self.images.first()
+        if first:
+            return first.image_path
+        return None
+
     def __str__(self):
         return f"{self.hotel_name} ({self.city})"
 
@@ -91,8 +116,9 @@ class RoomType(models.Model):
     hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE, related_name='rooms')
     room_category_name = models.CharField(max_length=100, help_text="e.g. Deluxe Garden View", null=True, blank=True)
     room_type = models.CharField(max_length=20, choices=ROOM_CATEGORIES)
-    price_per_night = models.PositiveIntegerField(default=0)  # Simplified from weekday/weekend to match UI
-    max_guests = models.PositiveIntegerField(default=2)
+    price_per_night = models.PositiveIntegerField(default=0, verbose_name="Price per Night")
+    max_guest = models.PositiveIntegerField(default=2, verbose_name="Max Guests")
+    room_size = models.PositiveIntegerField(default=0, help_text="Room size in sqft", verbose_name="Room Size")
     total_rooms = models.PositiveIntegerField(help_text="Inventory count for this specific type")
     room_image = models.ImageField(upload_to='room_categories/', null=True, blank=True)
     amenities = models.JSONField(default=list, blank=True)
@@ -196,11 +222,12 @@ class Offer(models.Model):
                 self.status = 'SCHEDULED'
             else:
                 self.status = 'LIVE'
-        
+
         return self.status
 
     @property
     def is_currently_active(self):
+        """Returns True if offer is live"""
         self.update_status()
         return self.status == 'LIVE'
 
@@ -227,3 +254,28 @@ class ChangeRequest(models.Model):
 
     def __str__(self):
         return f"Edit Request: {self.category} for {self.hotel.hotel_name}"
+
+class LocationHistory(models.Model):
+    """Stores a history of verified geo-locations during onboarding."""
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='location_history')
+    lat = models.DecimalField(max_digits=12, decimal_places=9)
+    lng = models.DecimalField(max_digits=12, decimal_places=9)
+    formatted_address = models.TextField()
+    city = models.CharField(max_length=100, null=True, blank=True)
+    
+    # Contextual Metadata
+    location_name = models.CharField(max_length=255, null=True, blank=True)
+    category = models.CharField(max_length=100, null=True, blank=True)
+    rating = models.DecimalField(max_digits=3, decimal_places=1, null=True, blank=True)
+    review_count = models.PositiveIntegerField(default=0)
+    image_reference = models.URLField(max_length=500, null=True, blank=True)
+    
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-timestamp']
+        verbose_name_plural = "Location Histories"
+
+    def __str__(self):
+        return f"{self.location_name or self.city or 'Unknown Area'} - {self.user.email}"
+

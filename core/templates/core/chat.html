@@ -1,0 +1,284 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}AI Concierge | HotelPro Enterprise Intelligence{% endblock %}
+
+{% block extra_css %}
+<style>
+    .chat-height {
+        height: calc(100vh - 250px);
+        min-height: 600px;
+    }
+
+    .glass-sidebar {
+        background: rgba(15, 23, 42, 0.8);
+        backdrop-filter: blur(20px);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="min-h-screen py-12 relative overflow-hidden bg-slate-50 dark:bg-slate-950">
+    <!-- Background Decor -->
+    <div class="absolute inset-0 pointer-events-none opacity-30">
+        <div class="absolute top-0 right-0 w-[800px] h-[800px] bg-primary-500/10 rounded-full blur-[120px]"></div>
+        <div class="absolute bottom-0 left-0 w-[600px] h-[600px] bg-indigo-500/10 rounded-full blur-[100px]"></div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 relative z-10">
+        <div class="flex flex-col lg:flex-row gap-8 chat-height">
+
+            <!-- Sidebar: Performance & Presets -->
+            <div class="w-full lg:w-80 flex flex-shrink-0 flex-col gap-6">
+                <!-- Status Card -->
+                <div class="glass-panel p-6 rounded-3xl border-white/20 shadow-xl">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div
+                            class="w-12 h-12 rounded-xl bg-primary-500/10 flex items-center justify-center text-primary-500 border border-primary-500/20">
+                            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 3L14.4 9.6L21 12L14.4 14.4L12 21L9.6 14.4L3 12L9.6 9.6L12 3Z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="font-display font-bold text-slate-900 dark:text-white">AI Engine v2.4</h3>
+                            <p
+                                class="text-[10px] text-emerald-500 font-bold uppercase tracking-widest mt-0.5 flex items-center">
+                                <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full mr-2 animate-pulse"></span>
+                                Fully Operational
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div
+                            class="p-4 rounded-2xl bg-slate-900/5 dark:bg-white/5 border border-slate-200 dark:border-white/5 group hover:border-primary-500/30 transition-colors">
+                            <div class="text-[10px] text-slate-400 font-bold uppercase mb-1">Response Latency</div>
+                            <div class="text-lg font-bold text-slate-800 dark:text-white">42ms</div>
+                        </div>
+                        <div
+                            class="p-4 rounded-2xl bg-slate-900/5 dark:bg-white/5 border border-slate-200 dark:border-white/5">
+                            <div class="text-[10px] text-slate-400 font-bold uppercase mb-1">Data Pipeline</div>
+                            <div class="text-sm font-bold text-slate-600 dark:text-slate-300">Synchronized (Live)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Suggested Actions -->
+                <div class="glass-panel p-6 rounded-3xl border-white/20 shadow-xl flex-1 flex flex-col">
+                    <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-6">Suggested Actions</h4>
+                    <div class="space-y-3">
+                        <button
+                            class="w-full text-left p-4 rounded-2xl bg-white/50 dark:bg-white/5 border border-white/20 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-all active:scale-95 shadow-sm">
+                            Generate Occupancy Report
+                        </button>
+                        <button
+                            class="w-full text-left p-4 rounded-2xl bg-white/50 dark:bg-white/5 border border-white/20 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-all active:scale-95 shadow-sm">
+                            Run Yield Optimization
+                        </button>
+                        <button
+                            class="w-full text-left p-4 rounded-2xl bg-white/50 dark:bg-white/5 border border-white/20 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-all active:scale-95 shadow-sm">
+                            Analyze Guest Feedback
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Chat Interface -->
+            <div
+                class="flex-1 glass-panel rounded-[3rem] border-white/20 shadow-2xl flex flex-col overflow-hidden bg-white/40 dark:bg-slate-900/40 backdrop-blur-3xl">
+                <!-- Chat Header -->
+                <div
+                    class="px-10 py-6 border-b border-white/10 flex items-center justify-between bg-white/20 dark:bg-black/20">
+                    <div class="flex items-center gap-4">
+                        <div
+                            class="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-500">
+                            <i class="fas fa-shield-halved text-sm"></i>
+                        </div>
+                        <div>
+                            <span
+                                class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Secure
+                                Channel</span>
+                            <h2 class="font-display font-bold text-slate-800 dark:text-white">AI Concierge Terminal</h2>
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        <button
+                            class="w-10 h-10 rounded-xl flex items-center justify-center bg-white/10 border border-white/10 text-slate-500 dark:text-slate-400 hover:bg-primary-500 hover:text-white transition-all"><i
+                                class="fas fa-trash-can text-xs"></i></button>
+                        <button
+                            class="w-10 h-10 rounded-xl flex items-center justify-center bg-white/10 border border-white/10 text-slate-500 dark:text-slate-400 hover:bg-primary-500 hover:text-white transition-all"><i
+                                class="fas fa-download text-xs"></i></button>
+                    </div>
+                </div>
+
+                <!-- Messages Area -->
+                <div id="chat-messages" class="flex-1 overflow-y-auto p-10 space-y-8 scrollbar-hide bg-transparent">
+                    <!-- Bot Message -->
+                    <div class="flex gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <div
+                            class="w-12 h-12 rounded-2xl bg-primary-500/10 border border-primary-500/20 flex items-center justify-center text-primary-500 shrink-0 shadow-inner">
+                            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 3L14.4 9.6L21 12L14.4 14.4L12 21L9.6 14.4L3 12L9.6 9.6L12 3Z" />
+                            </svg>
+                        </div>
+                        <div class="space-y-2 max-w-2xl">
+                            <div
+                                class="bg-white/80 dark:bg-slate-800/80 p-6 rounded-3xl rounded-tl-none border border-white/20 shadow-xl text-slate-700 dark:text-slate-200 text-base leading-relaxed">
+                                <p>Greetings! I am the HotelPro Enterprise Intelligence engine. I have real-time access
+                                    to your <b>Property Management System</b>. How can I optimize your operations today?
+                                </p>
+                            </div>
+                            <span class="text-[10px] font-bold text-slate-400 uppercase ml-2">Just Now • AI
+                                Concierge</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Input Area -->
+                <div class="p-8 bg-white/20 dark:bg-black/20 border-t border-white/10">
+                    <form id="chat-form" class="relative group">
+                        <div
+                            class="absolute inset-x-0 bottom-full mb-4 px-2 translate-y-2 opacity-0 group-focus-within:translate-y-0 group-focus-within:opacity-100 transition-all pointer-events-none">
+                            <div class="flex gap-2">
+                                <span
+                                    class="px-2 py-1 rounded bg-primary-500/10 text-primary-500 text-[10px] font-bold border border-primary-500/20">CTRL
+                                    + Enter to send</span>
+                                <span
+                                    class="px-2 py-1 rounded bg-slate-500/10 text-slate-500 text-[10px] font-bold border border-slate-500/20">Markdown
+                                    supported</span>
+                            </div>
+                        </div>
+                        <div class="relative flex items-center">
+                            <div class="absolute left-6 text-slate-400 dark:text-slate-500">
+                                <i class="fas fa-terminal text-sm"></i>
+                            </div>
+                            <input type="text" id="user-input"
+                                class="w-full bg-white/50 dark:bg-slate-900/50 border-2 border-slate-200 dark:border-white/5 rounded-2xl pl-14 pr-32 py-5 text-base text-slate-800 dark:text-white focus:outline-none focus:border-primary-500/50 transition-all placeholder:text-slate-500 shadow-inner"
+                                placeholder="Message AI Concierge..." autocomplete="off">
+                            <div class="absolute right-4 flex items-center gap-2">
+                                <button type="button"
+                                    class="w-10 h-10 rounded-xl flex items-center justify-center bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-400 hover:text-primary-500 transition-colors"><i
+                                        class="fas fa-paperclip text-sm"></i></button>
+                                <button type="submit"
+                                    class="h-11 px-6 bg-primary-500 hover:bg-primary-600 text-white rounded-xl font-bold flex items-center gap-2 transition-all hover:shadow-lg hover:shadow-primary-500/30 active:scale-95">
+                                    Send <i class="fas fa-paper-plane text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const chatForm = document.getElementById('chat-form');
+    const userInput = document.getElementById('user-input');
+    const messagesContainer = document.getElementById('chat-messages');
+
+    function scrollToBottom() {
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    function addMessage(content, isUser = false) {
+        const wrapper = document.createElement('div');
+        wrapper.className = `flex ${isUser ? 'flex-row-reverse' : ''} gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500`;
+
+        const avatar = isUser ?
+            `<div class="w-12 h-12 rounded-2xl bg-slate-800 flex items-center justify-center text-white shrink-0 shadow-lg border border-white/10 font-bold text-xs">GM</div>` :
+            `<div class="w-12 h-12 rounded-2xl bg-primary-500/10 border border-primary-500/20 flex items-center justify-center text-primary-500 shrink-0 shadow-inner">
+                <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3L14.4 9.6L21 12L14.4 14.4L12 21L9.6 14.4L3 12L9.6 9.6L12 3Z"/></svg>
+             </div>`;
+
+        const bubbleWrapper = document.createElement('div');
+        bubbleWrapper.className = `space-y-2 max-w-2xl ${isUser ? 'text-right' : ''}`;
+
+        const bubble = document.createElement('div');
+        bubble.className = isUser ?
+            'bg-primary-500 text-white p-6 rounded-3xl rounded-tr-none shadow-xl text-base leading-relaxed' :
+            'bg-white/80 dark:bg-slate-800/80 p-6 rounded-3xl rounded-tl-none border border-white/20 shadow-xl text-slate-700 dark:text-slate-200 text-base leading-relaxed';
+
+        bubble.innerHTML = content;
+
+        const timestamp = document.createElement('span');
+        timestamp.className = 'text-[10px] font-bold text-slate-400 uppercase tracking-widest px-2';
+        timestamp.textContent = isUser ? 'Sent • General Manager' : 'Just Now • AI Concierge';
+
+        bubbleWrapper.appendChild(bubble);
+        bubbleWrapper.appendChild(timestamp);
+
+        wrapper.innerHTML = isUser ? avatar + bubbleWrapper.outerHTML : avatar + bubbleWrapper.outerHTML;
+        messagesContainer.appendChild(wrapper);
+        scrollToBottom();
+    }
+
+    function addLoading() {
+        const wrapper = document.createElement('div');
+        wrapper.id = 'loading-indicator';
+        wrapper.className = 'flex gap-6 animate-in fade-in duration-300';
+        wrapper.innerHTML = `
+            <div class="w-12 h-12 rounded-2xl bg-primary-500/10 border border-primary-500/20 flex items-center justify-center text-primary-500 shrink-0 shadow-inner">
+                 <svg class="w-6 h-6 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"/><path d="m16.2 7.8 2.9-2.9"/><path d="M18 12h4"/><path d="m16.2 16.2 2.9 2.9"/><path d="M12 18v4"/><path d="m4.9 19.1 2.9-2.9"/><path d="M2 12h4"/><path d="m4.9 4.9 2.9 2.9"/></svg>
+            </div>
+            <div class="bg-white/50 dark:bg-slate-800/50 p-6 rounded-3xl rounded-tl-none border border-white/10 flex space-x-2 items-center h-14">
+                <div class="w-2 h-2 bg-primary-500 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+                <div class="w-2 h-2 bg-primary-500 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+                <div class="w-2 h-2 bg-primary-500 rounded-full animate-bounce" style="animation-delay: 0.3s"></div>
+            </div>
+        `;
+        messagesContainer.appendChild(wrapper);
+        scrollToBottom();
+    }
+
+    function removeLoading() {
+        const loader = document.getElementById('loading-indicator');
+        if (loader) loader.remove();
+    }
+
+    if (chatForm) {
+        chatForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const message = userInput.value.trim();
+            if (!message) return;
+
+            addMessage(message, true);
+            userInput.value = '';
+            addLoading();
+
+            try {
+                const response = await fetch('{% url "ai_chat" %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({ message: message })
+                });
+
+                const data = await response.json();
+                removeLoading();
+
+                if (data.response) {
+                    addMessage(data.response);
+                } else if (data.error) {
+                    addMessage(`<span class="text-rose-500 font-bold">Error:</span> ${data.error}`);
+                } else {
+                    addMessage("I apologize, but I encountered an unknown protocol error.");
+                }
+            } catch (error) {
+                removeLoading();
+                addMessage("<span class='text-rose-500 font-bold'>Connection Interrupted:</span> I am having trouble reaching the neural processing server.");
+                console.error(error);
+            }
+        });
+    }
+
+    // Scroll to bottom after page load
+    document.addEventListener('DOMContentLoaded', () => {
+        setTimeout(scrollToBottom, 500);
+    });
+</script>
+{% endblock %}

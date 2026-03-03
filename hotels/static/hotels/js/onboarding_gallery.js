@@ -23,7 +23,6 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         uploadZone.classList.remove('drag-active');
         if (e.dataTransfer.files.length) {
-            input.files = e.dataTransfer.files;
             handleFiles(e.dataTransfer.files);
         }
     });
@@ -33,27 +32,45 @@ document.addEventListener('DOMContentLoaded', () => {
         handleFiles(input.files);
     });
 
+    // Internal state for property gallery
+    let galleryFiles = [];
+
+    const renderGallery = () => {
+        previewGrid.innerHTML = '';
+        galleryFiles.forEach((fileObj, idx) => {
+            const isHidden = idx > 2;
+            const isLastVisible = idx === 2;
+            const hasMore = galleryFiles.length > 3 && isLastVisible;
+            const moreCount = galleryFiles.length - 3;
+
+            const div = document.createElement('div');
+            div.className = `preview-item card-look ${hasMore ? 'has-more lightbox-trigger' : ''}`;
+            if (isHidden) div.style.display = 'none';
+            if (hasMore) div.setAttribute('data-more', `+${moreCount} More`);
+
+            div.innerHTML = `
+                <img src="${fileObj.url}" class="lightbox-trigger" alt="Preview">
+                <div class="preview-remove"><i class="fas fa-times"></i></div>
+            `;
+
+            div.querySelector('.preview-remove').onclick = (event) => {
+                event.stopPropagation();
+                galleryFiles.splice(idx, 1);
+                renderGallery();
+            };
+
+            previewGrid.appendChild(div);
+        });
+    };
+
     const handleFiles = (files) => {
         Array.from(files).forEach(file => {
             if (!file.type.startsWith('image/')) return;
-
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const div = document.createElement('div');
-                div.className = 'preview-item card-look';
-                div.innerHTML = `
-                    <img src="${e.target.result}" alt="Preview">
-                    <div class="preview-remove"><i class="fas fa-times"></i></div>
-                `;
-
-                div.querySelector('.preview-remove').onclick = (event) => {
-                    event.stopPropagation();
-                    div.remove();
-                };
-
-                previewGrid.appendChild(div);
-            };
-            reader.readAsDataURL(file);
+            galleryFiles.push({
+                file: file,
+                url: URL.createObjectURL(file)
+            });
         });
+        renderGallery();
     };
 });

@@ -40,7 +40,8 @@
                     {{ offer.get_applicability_display }}
                 </div>
                 <div style="font-size: 0.8rem; color: #64748b;">
-                    {% if offer.applicability == 'CATEGORY' %}{{ offer.room_categories|length }} categories selected{% else %}Site-wide property offer{% endif %}
+                    {% if offer.applicability == 'CATEGORY' %}{{ offer.room_categories|length }} categories selected
+                    {% else %}Site-wide property offer{% endif %}
                 </div>
             </div>
 
@@ -95,11 +96,5 @@
     </div>
 </div>
 
-<script>
-    function showRejection() {
-        document.getElementById('rejection-box').style.display = 'block';
-        document.getElementById('reject-trigger').style.display = 'none';
-        document.getElementById('reject-submit').style.display = 'block';
-    }
-</script>
+<script src="{% static 'hotels/js/admin_offer_review.js' %}"></script>
 {% endblock %}

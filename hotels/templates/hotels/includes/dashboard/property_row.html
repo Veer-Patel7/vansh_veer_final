@@ -1,31 +1,57 @@
-<tr>
-    <td>
-        <div class="hotel-name">
-            <div class="hotel-thumb"
-                style="background: var(--secondary); height: 40px; width: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--primary);">
-                <i class="fas fa-building"></i>
+<tr class="group hover:bg-slate-50/50 transition-all duration-300">
+    <td class="px-6 py-4">
+        <div class="flex items-center gap-4">
+            <div
+                class="w-10 h-10 rounded-xl bg-primary-900/5 border border-primary-900/10 flex items-center justify-center text-primary-900 group-hover:bg-primary-600 group-hover:text-white group-hover:border-primary-600 transition-all duration-300">
+                <i class="fas fa-building text-sm"></i>
             </div>
-            <a href="{% url 'hotels:hotel_dashboard' hotel.id %}" style="text-decoration: none; color: inherit;">
-                <span>{{ hotel.hotel_name }}</span>
+            <a href="{% url 'hotels:hotel_dashboard' hotel.id %}" class="flex flex-col">
+                <span class="text-sm font-bold text-slate-900 group-hover:text-primary-600 transition-colors">{{hotel.hotel_name }}</span>
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Premier
+                    Property</span>
             </a>
         </div>
     </td>
-    <td>{{ hotel.city }}</td>
-    <td>
+    <td class="px-6 py-4">
+        <div class="flex items-center gap-2 text-slate-600">
+            <i class="fas fa-location-dot text-[10px] text-slate-300"></i>
+            <span class="text-xs font-semibold">{{ hotel.city }}</span>
+        </div>
+    </td>
+    <td class="px-6 py-4">
         {% if hotel.is_live %}
-        <span style="color: #22c55e;">● Live</span>
+        <div
+            class="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100 text-[10px] font-bold uppercase tracking-widest">
+            <span class="w-1 h-1 rounded-full bg-emerald-600"></span> Live
+        </div>
         {% elif hotel.status == 'PENDING' %}
-        <span style="color: #facc15;">● In Review</span>
+        <div
+            class="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-amber-50 text-amber-600 border border-amber-100 text-[10px] font-bold uppercase tracking-widest">
+            <span class="w-1 h-1 rounded-full bg-amber-600"></span> In Review
+        </div>
         {% else %}
-        <span style="color: #64748b;">● Draft</span>
+        <div
+            class="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-slate-100 text-slate-500 border border-slate-200 text-[10px] font-bold uppercase tracking-widest">
+            <span class="w-1 h-1 rounded-full bg-slate-400"></span> Draft
+        </div>
         {% endif %}
     </td>
-    <td>₹{{ hotel.total_revenue|default:"0" }}</td>
-    <td>
-        <div style="display: flex; gap: 8px;">
-            <a href="{% url 'hotels:hotel_dashboard' hotel.id %}" class="btn-action" title="View Dashboard"><i
-                    class="fas fa-eye"></i></a>
-            <button class="btn-action" title="Edit Property"><i class="fas fa-edit"></i></button>
+    <td class="px-6 py-4">
+        <span class="text-sm font-bold text-slate-900 tracking-tight">₹{{ hotel.total_revenue|default:"0" }}</span>
+    </td>
+    <td class="px-6 py-4 text-right">
+        <div
+            class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0">
+            <a href="{% url 'hotels:hotel_dashboard' hotel.id %}"
+                class="w-9 h-9 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-primary-600 hover:border-primary-500 hover:shadow-lg hover:shadow-primary-600/5 transition-all duration-300"
+                title="View Dashboard">
+                <i class="fas fa-eye text-xs"></i>
+            </a>
+            <button
+                class="w-9 h-9 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-primary-600 hover:border-primary-500 hover:shadow-lg hover:shadow-primary-600/5 transition-all duration-300"
+                title="Edit Property">
+                <i class="fas fa-edit text-xs"></i>
+            </button>
         </div>
     </td>
 </tr>

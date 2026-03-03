@@ -1,12 +1,43 @@
 {% load static %}
 <!DOCTYPE html>
 <html>
+<style>
+    html {
+            scroll-behavior: smooth;
+        }
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: black;
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+        }
+        section {
+            height: 100vh;
+            padding-top: 120px;
+            text-align: center;
+        }
+
+</style>
 <head>
     <title>Search Hotels | HotelPro</title>
     <link rel="stylesheet" href="{% static 'customer/search.css' %}">
 </head>
 
 <body>
+
     
     <!-- HERO SECTION -->
     <div class="hero">
@@ -14,12 +45,21 @@
         <!-- NAVBAR -->
         <div class="navbar">
             <h2 class="logo">HotelPro</h2>
-
+            
+                <nav>
+                    <a href="#home">Home</a>
+                    <a href="#hotels">Hotels</a> 
+                    <a href="#contact">Contact Us</a>
+                    <a href="#about">About Us</a>
+                </nav>
             <div>
                 <a href="{% url 'accounts:auth' %}" class="signin-btn">Sign In</a>
             </div>
         </div>
 
+<section id="home">
+             
+</section>  
         <!-- HERO TEXT -->
         <div class="hero-content">
             <h1>WELCOME TO  HOTEL PRO</h1>
@@ -28,7 +68,7 @@
         </div>
 
         <!-- SEARCH FORM -->
-        <form method="POST" action="{% url 'customer:search_results' %}" class="search-form">
+        <form method="GET" action="{% url 'customer:search_results' %}" class="search-form">
             {% csrf_token %}
 
             <div class="search-group">
@@ -38,12 +78,12 @@
 
             <div class="search-group">
                 <label>Check-in</label>
-                <input type="date" name="checkin">
+                <input type="date" name="checkin" id="checkin">
             </div>
 
             <div class="search-group">
                 <label>Check-out</label>
-                <input type="date" name="checkout">
+                <input type="date" name="checkout" id="checkout">
             </div>
 
             <div class="search-group">
@@ -62,24 +102,72 @@
     </div>
 
     <!-- RESULTS SECTION -->
-    <section class="results-section">
-        <h2 class="section-title">Available Hotels</h2>
 
+     <!-- HOTELS -->
+    <section id="hotels">
+        <h1>Hotels</h1>
+        <p>Available hotel listings will appear here.</p>
+     <section class="results-section">
         <div class="hotel-container">
             {% if hotels %}
                 {% for hotel in hotels %}
                 <div class="hotel-card">
                     <h3>{{ hotel.hotel_name }}</h3>
-                    <p><strong>Location:</strong> {{ hotel.city }}</p>
-                    <p><strong>Price:</strong> ₹ {{ hotel.rooms.price_per_night }} / night</p>
-                    <a href="{% url 'customer:hotel_detail' hotel.id %}" class="btn-book">Book Now</a>
+                    <p><strong>Location:</strong> {{ hotel.address }}</p>
+                    <p><strong> ₹ {{ hotel.min_price }}</strong></p>
+                    <h5>₹ {{ hotel.max_price }} Totals</h5>
+                    <a href="{% url 'customer:hotel_detail' hotel.id %}" class="btn-book">View Details</a>
                 </div>
                 {% endfor %}
             {% else %}
                 <p>No hotels found.</p>
             {% endif %}
         </div>
+     </section>
     </section>
 
+        <!-- contact  -->
+<section id="contact">
+        <h1>Contact Us</h1>
+        <p>Get in touch with us for any queries or support.</p>
+</section>
+
+  <!-- about -->
+<section id="about">
+        <h1>About Us</h1>
+        <p>Learn more about HotelPro and our commitment to providing the best hotel experiences.</p>
+</section>
+
+   <!-- check in / out date  -->
+<script>
+const checkin = document.getElementById("checkin");
+const checkout = document.getElementById("checkout");
+
+// ---- Get India date ----
+const indiaDate = new Date().toLocaleDateString("en-CA", {
+    timeZone: "Asia/Kolkata"
+});
+
+checkin.min = indiaDate;
+
+// ---- Update checkout when checkin changes ----
+checkin.addEventListener("change", function () {
+    if (!this.value) return;
+
+    let checkinDate = new Date(this.value);
+    checkinDate.setDate(checkinDate.getDate() + 1);
+
+    let minCheckout = checkinDate.toLocaleDateString("en-CA", {
+        timeZone: "Asia/Kolkata"
+    });
+
+    checkout.min = minCheckout;
+
+    if (checkout.value && checkout.value <= this.value) {
+        checkout.value = "";
+    }
+});
+</script>
+
 </body>
-</html>
+</html> 

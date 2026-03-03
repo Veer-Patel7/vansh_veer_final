@@ -12,7 +12,7 @@ body{
 
 /* ================= NAVBAR ================= */
 .navbar{
-    position:absolute;
+    position:fixed;
     top:0;
     left:0;
     width:100%;
@@ -20,7 +20,7 @@ body{
     display:flex;
     justify-content:space-between;
     align-items:center;
-    background:#3b83f68e;
+    background:#054ab9;
     z-index:10;
 }
 
@@ -139,13 +139,13 @@ body{
 
 /* ================= RESULTS ================= */
 .results-section{
-    margin-top:120px;
-    padding:50px 8%;
+    padding:80px 8%;
 }
 
 .section-title{
     font-size:28px;
     margin-bottom:30px;
+    text-align:center;
 }
 
 .hotel-container{

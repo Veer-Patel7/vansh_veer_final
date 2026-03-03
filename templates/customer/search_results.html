@@ -18,9 +18,11 @@
                 {% for room in rooms %}
                 <div class="hotel-card">
                     <h3 class="hotel-name">{{ room.hotel.hotel_name }}</h3>
-                    <p><strong>Location:</strong> {{ room.hotel.city }}</p>
+                    <p><strong>Location:</strong> {{ room.hotel.address }}</p>
                     <p><strong>Price:</strong> ₹{{room.price_per_night}} / night</p>
-                    <a href="{% url 'auth' %}" class="btn-book">Book Now</a>
+                    <p><strong>Room Type:</strong> {{ room.get_room_type_display }}</p>
+                    <p><strong>Max Guests:</strong> {{ room.max_guest }}</p>
+                    <a href="{% url 'customer:hotel_detail' room.hotel.id  %}" class="btn-book">View Details</a>
                 </div>
                 {% endfor %}
             {% else %}

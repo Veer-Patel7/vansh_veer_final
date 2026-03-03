@@ -7,62 +7,112 @@
 {% block page_subtitle %}Track your guests and manage upcoming stays efficiently.{% endblock %}
 
 {% block dashboard_content %}
-<div class="glass-panel" style="margin-top: 30px;">
-    <div class="panel-header">
-        <h3>Recent Bookings</h3>
-        <div style="display: flex; gap: 10px;">
-            <input type="text" placeholder="Search Guest Name/ID..." class="btn-action"
-                style="background: rgba(255,255,255,0.05); width: 250px; text-align: left; padding-left: 15px;">
-            <button class="btn-action"><i class="fas fa-filter"></i> Filter</button>
-            <button class="btn-action"><i class="fas fa-download"></i> Export</button>
+<div
+    class="glass-panel rounded-[2.5rem] p-10 shadow-2xl shadow-slate-200/50 animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+        <div>
+            <h3 class="text-lg font-display font-bold text-slate-900 uppercase tracking-tight">Recent Reservations</h3>
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Live Guest Queue</span>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3">
+            <div class="relative group">
+                <i
+                    class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary-600 transition-colors"></i>
+                <input type="text" placeholder="Search Guest Name/ID..."
+                    class="pl-12 pr-6 py-3 bg-white border border-slate-200 rounded-2xl text-[11px] font-bold text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-500/5 transition-all w-full md:w-64">
+            </div>
+            <button
+                class="px-5 py-3 bg-white border border-slate-200 text-slate-500 text-[10px] font-bold uppercase tracking-widest rounded-2xl hover:border-primary-500 hover:text-primary-600 transition-all shadow-sm flex items-center gap-2">
+                <i class="fas fa-filter text-[10px]"></i> Filter
+            </button>
+            <button
+                class="px-5 py-3 bg-primary-950 text-white text-[10px] font-bold uppercase tracking-widest rounded-2xl hover:bg-primary-600 transition-all shadow-lg shadow-primary-950/10 flex items-center gap-2">
+                <i class="fas fa-download text-[10px]"></i> Export
+            </button>
         </div>
     </div>
 
-    <table class="hotel-table">
-        <thead>
-            <tr>
-                <th>Booking ID</th>
-                <th>Guest</th>
-                <th>Property</th>
-                <th>Room Type</th>
-                <th>Dates</th>
-                <th>Status</th>
-                <th>Amount</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td><span style="font-family: 'JetBrains Mono'; color: var(--accent);">#HP-9821</span></td>
-                <td><strong>Krish Kumar</strong></td>
-                <td>Breeze Bay Resort</td>
-                <td>Deluxe Suite</td>
-                <td>Feb 24 - Feb 26</td>
-                <td><span style="color: #22c55e;">● Confirmed</span></td>
-                <td>₹12,400</td>
-            </tr>
-            <tr>
-                <td><span style="font-family: 'JetBrains Mono'; color: var(--accent);">#HP-9819</span></td>
-                <td><strong>Aditya Singh</strong></td>
-                <td>Urban Elite Hotel</td>
-                <td>Standard King</td>
-                <td>Feb 23 - Feb 24</td>
-                <td><span style="color: #3b82f6;">● Checked In</span></td>
-                <td>₹5,200</td>
-            </tr>
-            <tr>
-                <td><span style="font-family: 'JetBrains Mono'; color: var(--accent);">#HP-9815</span></td>
-                <td><strong>Rohan Mehta</strong></td>
-                <td>The Grand Plaza</td>
-                <td>Executive Villa</td>
-                <td>Mar 02 - Mar 05</td>
-                <td><span style="color: #facc15;">● Pending</span></td>
-                <td>₹28,500</td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="overflow-x-auto">
+        <table class="w-full text-left border-separate border-spacing-y-3">
+            <thead>
+                <tr class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                    <th class="px-6 py-2">Booking ID</th>
+                    <th class="px-6 py-2">Guest Identity</th>
+                    <th class="px-6 py-2">Property</th>
+                    <th class="px-6 py-2">Room Details</th>
+                    <th class="px-6 py-2">Schedule</th>
+                    <th class="px-6 py-2">Status</th>
+                    <th class="px-6 py-2">Settlement</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for booking in bookings %}
+                <tr class="group hover:bg-slate-50/50 transition-all duration-300">
+                    <td class="px-6 py-4 bg-white/30 rounded-l-2xl border-y border-l border-white/40">
+                        <span
+                            class="text-[11px] font-bold text-primary-600 bg-primary-50 px-2 py-1 rounded-md tracking-tight">#HP-{{
+                            booking.id }}</span>
+                    </td>
+                    <td class="px-6 py-4 bg-white/30 border-y border-white/40">
+                        <div class="flex flex-col">
+                            <span class="text-sm font-bold text-slate-900">{{ booking.user.username }}</span>
+                            <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Registered
+                                Partner</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 bg-white/30 border-y border-white/40">
+                        <span class="text-xs font-semibold text-slate-600">{{ booking.hotel.hotel_name }}</span>
+                    </td>
+                    <td class="px-6 py-4 bg-white/30 border-y border-white/40">
+                        <div class="flex items-center gap-2">
+                            <div
+                                class="w-7 h-7 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400">
+                                <i class="fas fa-bed text-[10px]"></i>
+                            </div>
+                            <span class="text-xs font-semibold text-slate-600">{{ booking.room.room_type }}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 bg-white/30 border-y border-white/40">
+                        <div class="flex items-center gap-2 text-slate-500">
+                            <i class="far fa-calendar-alt text-[11px]"></i>
+                            <span class="text-xs font-bold">{{ booking.check_in|date:"M d" }} — {{
+                                booking.check_out|date:"M d" }}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 bg-white/30 border-y border-white/40">
+                        <div
+                            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100 text-[10px] font-bold uppercase tracking-widest">
+                            <span class="w-1 h-1 rounded-full bg-emerald-600 animate-pulse"></span> Confirmed
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 bg-white/30 rounded-r-2xl border-y border-r border-white/40">
+                        <span class="text-sm font-bold text-slate-900 tracking-tight">₹{{
+                            booking.total_price|floatformat:0 }}</span>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7"
+                        class="px-6 py-16 text-center text-slate-500 bg-white/30 rounded-2xl border border-white/60 shadow-inner">
+                        <div
+                            class="w-16 h-16 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-200 mx-auto mb-4">
+                            <i class="fas fa-calendar-times text-2xl"></i>
+                        </div>
+                        <p class="text-sm font-medium text-slate-400 uppercase tracking-widest">No reservations found in
+                            the queue.</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 
-    <div style="padding: 20px; text-align: center;">
-        <button class="btn-action">Load More Bookings</button>
+    <div class="mt-10 flex justify-center">
+        <button
+            class="px-8 py-4 bg-white border border-slate-200 text-slate-500 text-[10px] font-bold uppercase tracking-widest rounded-[2rem] hover:border-primary-500 hover:text-primary-600 hover:shadow-xl hover:scale-[1.02] shadow-sm transition-all flex items-center gap-3">
+            <i class="fas fa-chevron-down text-[9px]"></i> View Historical Records
+        </button>
     </div>
 </div>
 {% endblock %}

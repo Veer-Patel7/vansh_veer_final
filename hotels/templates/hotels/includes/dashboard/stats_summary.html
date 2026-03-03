@@ -1,4 +1,4 @@
-<div class="stats-grid">
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-10">
     {% with p='hotels/includes/dashboard/stat_card.html' %}
     {% include p with i='fa-hotel' l='Managed' v=total_hotels t='+1 mo' %}
     {% include p with i='fa-calendar-day' l='Bookings' v=bookings_today t='12%' th='success' %}

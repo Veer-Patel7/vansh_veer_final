@@ -3,7 +3,7 @@
 <html>
 <head>
     <title>Customer Auth</title>
-     <link rel="stylesheet" href="{% static 'customer/auth_slider.css' %}">
+    <link rel="stylesheet" href="{% static 'customer/auth_slider.css' %}">
 </head>
 <body>
 <div class="navbar">HotelPro</div>
@@ -14,7 +14,7 @@
         <div class="form-box">
             <h2>Login</h2>
 
-            <form method="POST" action="{% url 'accounts:auth' %}">
+            <form method="POST" action="{% url 'accounts:customer_login' %}">
                 {% csrf_token %}
                 <input type="email" name="email" placeholder="Email" required>
                 <input type="password" name="password" placeholder="Password" required>
@@ -30,7 +30,7 @@
         <div class="form-box">
             <h2>Signup</h2>
 
-            <form method="POST" action="{% url 'accounts:verify' %}">
+            <form method="POST"  action="{% url 'accounts:customer_signup' %}">
                 {% csrf_token %}
                 <input type="text" name="first_name" placeholder="First Name" required>
                 <input type="text" name="last_name" placeholder="Last Name" required>

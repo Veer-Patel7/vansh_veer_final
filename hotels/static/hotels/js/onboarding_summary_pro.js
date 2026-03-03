@@ -1,302 +1,400 @@
 /**
- * Onboarding Summary Logic (Pro Version)
- * Gathers data from Steps 1, 2, and 3 and populates Step 4.
+ * SummaryEngine - Professional Data Extraction & Modular Rendering
+ * Standardizes Step 4 Dossier Generation with high maintainability.
  */
+class SummaryEngine {
+    constructor() {
+        this.container = document.getElementById('summaryContainer');
+        this.setupEventListeners();
+    }
 
-window.populateSummary = function () {
-    const summaryContainer = document.getElementById('summaryContainer');
-    if (!summaryContainer) return;
+    /**
+     * Extracts values from input fields by name
+     */
+    getVal(name, multiple = false) {
+        if (multiple) {
+            const checked = document.querySelectorAll(`input[name="${name}"]:checked`);
+            return Array.from(checked).map(i => i.closest('label')?.textContent.trim() || i.value);
+        }
 
-    // Helper to get value or 'Not Provided'
-    const getVal = (name) => {
         const input = document.querySelector(`[name="${name}"]`);
         if (!input) return 'Not Provided';
-        // Handle radio buttons
+
         if (input.type === 'radio') {
             const checked = document.querySelector(`input[name="${name}"]:checked`);
-            return checked ? checked.value : 'Not Provided';
+            return checked ? checked.closest('label')?.querySelector('span')?.textContent.trim() || checked.value : 'Not Provided';
         }
-        // Handle select text
+
         if (input.tagName === 'SELECT') {
-            return input.options[input.selectedIndex]?.text || 'Not Selected';
+            return input.options[input.selectedIndex]?.text || '';
         }
-        return input.value || 'Not Provided';
-    };
 
-    // Helper to get checked labels (e.g. for services)
-    const getCheckedLabels = (name) => {
-        const checked = Array.from(document.querySelectorAll(`input[name="${name}"]:checked`));
-        return checked.map(el => {
-            const label = el.closest('label');
-            return label ? label.textContent.trim() : el.value;
-        }).join(', ') || 'None selected';
-    };
+        return input.value || '';
+    }
 
-    // 1. Hotel Identity Data
-    const hotelName = getVal('hotel_name');
-    const hotelType = getVal('hotel_type');
-    const address = getVal('address');
-
-    // 2. Compliance Data
-    const idTypeRaw = getVal('id_type');
-    let idType = idTypeRaw.charAt(0).toUpperCase() + idTypeRaw.slice(1).toLowerCase();
-    if (idTypeRaw.toUpperCase() === 'PAN') idType = 'PAN';
-    const idNumber = getVal('id_number');
-    const govtNumber = getVal('govt_reg_number');
-    const gstNumber = getVal('gst_number');
-
-    // Helper for ID Formatting: Groups of 4 with space
-    const formatID = (str) => {
+    /**
+     * Standardizes ID formatting
+     */
+    formatID(str) {
         if (!str || str === 'Not Provided') return str;
         return str.replace(/\s/g, '').match(/.{1,4}/g)?.join(' ') || str;
-    };
+    }
 
-    // 3. Media Logic
-    const getFilePreview = (inputSelector) => {
-        const input = document.querySelector(inputSelector);
-        if (input && input.files && input.files[0]) {
-            return URL.createObjectURL(input.files[0]);
-        }
-        return null;
-    };
-
-    const getAllFilePreviews = (inputSelector) => {
-        const input = document.querySelector(inputSelector);
-        if (input && input.files) {
-            return Array.from(input.files).map(file => URL.createObjectURL(file));
-        }
-        return [];
-    };
-
-    const propertyPhotos = getAllFilePreviews('#galleryInput');
-    const propertyPreview = propertyPhotos[0] || null;
-    const docMandatoryPreview = getFilePreview('[name="doc_mandatory"]');
-    const docCertificatePreview = getFilePreview('[name="doc_certificate"]');
-    const docGstPreview = getFilePreview('[name="doc_gst"]');
-
-    // 4. Inventory Module Logic
-    const roomRows = document.querySelectorAll('.room-row');
-    let roomsHtml = '';
-    roomRows.forEach((row, idx) => {
-        const rIdx = row.dataset.roomIndex;
-        const type = row.querySelector(`[name="room_name_${rIdx}"]`)?.value || 'Unnamed Category';
-        const rClass = row.querySelector(`[name="room_class_${rIdx}"]`)?.value || 'Standard';
-        const price = parseFloat(row.querySelector(`[name="room_price_${rIdx}"]`)?.value || '0').toLocaleString('en-IN');
-        const guests = row.querySelector(`[name="room_guests_${rIdx}"]`)?.value || '0';
-        const count = row.querySelector(`[name="room_count_${rIdx}"]`)?.value || '0';
-
-        const rInput = row.querySelector(`input[type="file"]`);
-        let rPreviewUrl = (rInput && rInput.files && rInput.files[0]) ? URL.createObjectURL(rInput.files[0]) : null;
-
-        const pillAmens = Array.from(row.querySelectorAll('.dynamic-pill-item span')).map(s => s.textContent);
-        const allAmens = pillAmens.join(', ') || 'Standard executive amenities';
-
-        roomsHtml += `
-            <div class="summary-room-item" style="padding: 24px; background: #f8fafc; border: 1px solid var(--border); border-radius: 20px; display: flex; gap: 20px; align-items: flex-start; transition: transform 0.3s ease;">
-                <div style="width: 80px; height: 80px; border-radius: 12px; overflow: hidden; flex-shrink: 0; background: #f1f5f9; border: 1px solid var(--border);">
-                    ${rPreviewUrl ? `<img src="${rPreviewUrl}" style="width: 100%; height: 100%; object-fit: cover;">` : '<div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #cbd5e1;"><i class="fas fa-image fa-2x"></i></div>'}
+    /**
+     * Renders a standardized summary section
+     */
+    renderSection(id, title, items) {
+        return `
+            <div class="summary-module">
+                <div class="module-header">
+                    <div class="module-number">${id}</div>
+                    <h4 style="font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">${title}</h4>
                 </div>
-                <div style="flex: 1; min-width: 0;">
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                <div class="dense-grid" style="gap: 30px;">
+                    ${items}
+                </div>
+            </div>
+        `;
+    }
+
+    /**
+     * Renders the final Executive Dossier
+     */
+    render() {
+        if (!this.container) return;
+
+        const data = {
+            hotelName: this.getVal('hotel_name'),
+            hotelType: this.getVal('hotel_type'),
+            address: this.getVal('address'),
+            city: this.getVal('city'),
+            pincode: this.getVal('pincode'),
+            idType: this.getVal('id_type'),
+            idNumber: this.getVal('id_number'),
+            gstNumber: this.getVal('gst_number'),
+            checkIn: this.getVal('check_in'),
+            checkOut: this.getVal('check_out'),
+            cancellation: this.getVal('cancellation_policy'),
+            services: this.getVal('services', true),
+            govtRegNumber: this.getVal('govt_reg_number')
+        };
+
+        const propertyPhotos = this.getAllFilePreviews('#galleryInput');
+        const idDocs = this.getAllFilePreviews('input[name="doc_mandatory"]');
+        const gstDocs = this.getAllFilePreviews('input[name="doc_gst"]');
+        const regDocs = this.getAllFilePreviews('input[name="doc_certificate"]');
+
+        this.container.innerHTML = `
+            <div class="summary-dossier">
+                <div class="summary-header">
+                    <div class="holographic-seal"></div>
+                    <div style="display: flex; justify-content: space-between; align-items: flex-end;">
                         <div>
-                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 2px;">
-                                <span style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; color: var(--secondary); font-weight: 700;">${rClass}</span>
-                                <span style="color: var(--text-muted); font-size: 0.65rem; font-weight: 600;">• Category ${idx + 1}</span>
+                            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                                <span class="compliance-badge" style="background:var(--primary); color:white; border:none;">Partner Enrollment</span>
+                                <span style="color:var(--text-muted); font-size: 0.7rem;">Ref: HP-${Math.floor(Math.random() * 900000 + 100000)}</span>
                             </div>
-                            <strong style="font-size: 1.1rem; color: var(--text-main); font-weight: 700;">${type}</strong>
+                            <h3 style="font-size: 2.8rem; font-weight: 800; color: var(--primary); line-height: 1;">${data.hotelName || 'Property Name'}</h3>
+                            <div style="margin-top: 20px; color: var(--text-muted); display:flex; gap:10px; align-items:center;">
+                                <i class="fas fa-location-dot" style="color:var(--secondary);"></i> 
+                                ${this.extractCleanCity(data.city, data.address)} ${data.pincode ? `(${data.pincode})` : ''}
+                            </div>
+                        </div>
+                        <div class="tier-badge" style="background: white; padding: 15px 25px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.05); border: 1px solid var(--border);">
+                            <span style="display:block; font-size:0.65rem; font-weight:800; color:var(--text-muted); text-transform:uppercase; margin-bottom: 2px;">Property Tier</span>
+                            <div style="font-size: 1.4rem; font-weight: 800; color: var(--primary); display: flex; align-items: center; gap: 10px;">
+                                <i class="fas fa-crown" style="color:var(--secondary);"></i> 
+                                ${data.hotelType}
+                            </div>
                         </div>
                     </div>
-                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px;">
-                        <div style="display: flex; align-items: baseline; gap: 4px;">
-                            <span style="font-size: 0.7rem; color: var(--text-muted);">₹</span>
-                            <span style="font-size: 1.1rem; font-weight: 700; color: var(--text-main);">${price}</span>
+                </div>
+
+                <div style="padding: 60px;">
+                    ${this.renderSection('01', 'Property Foundation', `
+                        <div class="col-12">
+                            <div class="summary-room-item" style="gap:40px; border-bottom: none; border-radius: 20px 20px 0 0;">
+                                <div style="flex: 1;">
+                                    <span style="font-size: 0.7rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;">Legal Designation & Location</span>
+                                    <h4 style="font-size: 1.8rem; font-weight: 800; color: var(--primary); margin-top: 8px;">${data.hotelName || 'Property Name'}</h4>
+                                    <p style="font-size: 1rem; margin-top: 12px; color: var(--text-muted);"><i class="fas fa-map-location-dot" style="color:var(--secondary);"></i> ${data.address}</p>
+                                </div>
+                                <div class="tier-badge" style="background: white; padding: 12px 20px; border-radius: 15px; border: 1px solid var(--border); box-shadow: 0 10px 25px rgba(0,0,0,0.03);">
+                                    <span style="display:block; font-size:0.6rem; font-weight:800; color:var(--text-muted); text-transform:uppercase;">Classification</span>
+                                    <div style="font-size: 1.1rem; font-weight: 800; color: var(--primary);"><i class="fas fa-crown" style="color:var(--secondary); font-size:0.8rem;"></i> ${data.hotelType}</div>
+                                </div>
+                            </div>
+                            
+                            <div class="summary-portfolio-showcase" style="background: rgba(15, 23, 42, 0.02); padding: 30px; border: 1px solid var(--border); border-top: none; border-radius: 0 0 20px 20px;">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 20px;">
+                                    <div>
+                                        <h5 style="font-size: 0.8rem; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 2px;">Property Portfolio Showcase</h5>
+                                        <p style="font-size: 0.7rem; color: var(--text-muted);">Displaying all ${propertyPhotos.length} verified physical assets</p>
+                                    </div>
+                                    <div style="font-size: 0.7rem; font-weight: 700; color: var(--secondary);"><i class="fas fa-expand-arrows-alt"></i> TAP TO INSPECT</div>
+                                </div>
+                                <div class="summary-media-grid" style="grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));">
+                                    ${propertyPhotos.map((fileObj, idx) => `
+                                        <div class="summary-media-item lightbox-trigger">
+                                            <img src="${fileObj.url}" class="lightbox-trigger">
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
                         </div>
-                        <div style="display: flex; gap: 8px;">
-                            <span style="font-size: 0.75rem; color: var(--text-muted); background: white; padding: 2px 8px; border-radius: 6px; border: 1px solid var(--border);"><i class="fas fa-users" style="font-size: 0.65rem;"></i> ${guests}</span>
-                            <span style="font-size: 0.75rem; color: var(--text-muted); background: white; padding: 2px 8px; border-radius: 6px; border: 1px solid var(--border);"><i class="fas fa-door-open" style="font-size: 0.65rem;"></i> ${count}</span>
+                    `)}
+
+                    ${this.renderSection('02', 'Operational Inventory', `
+                        <div class="col-12">
+                            <div id="summary-room-list" style="display: grid; gap: 15px;">
+                                ${this.renderRoomSummary()}
+                            </div>
+                        </div>
+                    `)}
+
+                    ${this.renderSection('03', 'Elite Service Registry', `
+                        <div class="col-12">
+                            <div class="elite-pills-container" style="margin-top: 0;">
+                                ${data.services.length > 0
+                ? data.services.map(s => `<div class="elite-pill-item"><i class="fas fa-check-double" style="color:var(--secondary); font-size:0.7rem;"></i> ${s}</div>`).join('')
+                : '<p style="color:var(--text-muted);">No additional services selected.</p>'}
+                            </div>
+                        </div>
+                    `)}
+
+                    ${this.renderSection('04', 'Operational Standards', `
+                        <div class="col-6">
+                            <div class="summary-room-item">
+                                <i class="fas fa-clock fa-2x" style="color:var(--secondary);"></i>
+                                <div>
+                                    <span style="font-size: 0.7rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">Standard Schedule</span>
+                                    <div style="font-size: 1.1rem; font-weight: 800;">IN: ${data.checkIn} | OUT: ${data.checkOut}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="summary-room-item">
+                                <i class="fas fa-shield-halved fa-2x" style="color:var(--secondary);"></i>
+                                <div style="flex:1;">
+                                    <span style="font-size: 0.7rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">Policy Protocol</span>
+                                    <div style="font-size: 0.85rem; font-weight: 600; line-height: 1.4;">${this.formatPolicy(data.cancellation)}</div>
+                                </div>
+                            </div>
+                        </div>
+                    `)}
+
+                    ${this.renderSection('05', 'Identity Verification', `
+                        <div class="col-12">
+                            <div class="summary-room-item" style="border-color: var(--secondary-hover); background: var(--accent-soft);">
+                                <div style="display:flex; gap:25px; width: 100%; align-items: center;">
+                                    <div class="summary-media-item lightbox-trigger" style="width: 120px; height: 80px; flex-shrink: 0; border-radius: 12px; display:flex; align-items:center; justify-content:center; background: white; border: 1.5px solid var(--border-gold);">
+                                        ${this.renderFilePreview(idDocs[0], 'fa-file-invoice')}
+                                    </div>
+                                    <div style="flex:1;">
+                                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                            <div>
+                                                <span style="font-size: 0.75rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;">Primary Identification</span>
+                                                <div style="font-size: 1.1rem; font-weight: 800; color: var(--secondary); margin: 4px 0;">${data.idType}</div>
+                                                <div style="font-size: 1.8rem; font-weight: 800; letter-spacing: 2px; color: var(--primary);">${this.formatID(data.idNumber)}</div>
+                                            </div>
+                                            <div style="text-align: right;">
+                                                <span class="compliance-badge" style="background: #22c55e; color: white; border: none; font-size: 0.6rem; padding: 4px 12px;">ACTIVE VALIDATION</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `)}
+
+                    ${this.renderSection('06', 'Business Authentication', `
+                        <div class="col-6">
+                            <div class="summary-room-item" style="height: 100%; align-items: flex-start;">
+                                <div style="display:flex; gap:15px; width: 100%;">
+                                    <div class="summary-media-item lightbox-trigger" style="width: 70px; height: 70px; flex-shrink: 0; border-radius: 10px; display:flex; align-items:center; justify-content:center; background: #f8fafc;">
+                                        ${this.renderFilePreview(gstDocs[0], 'fa-building-circle-check')}
+                                    </div>
+                                    <div style="flex:1;">
+                                        <span style="font-size: 0.7rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">Tax Authentication</span>
+                                        <div style="font-size: 0.85rem; font-weight: 800; color: var(--secondary); margin-bottom: 2px;">GST CERTIFICATE</div>
+                                        <div style="font-size: 1.1rem; font-weight: 800;">${data.gstNumber || 'Not Provided'}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="summary-room-item" style="height: 100%; align-items: flex-start;">
+                                <div style="display:flex; gap:15px; width: 100%;">
+                                    <div class="summary-media-item lightbox-trigger" style="width: 70px; height: 70px; flex-shrink: 0; border-radius: 10px; display:flex; align-items:center; justify-content:center; background: #f8fafc;">
+                                        ${this.renderFilePreview(regDocs[0], 'fa-gavel')}
+                                    </div>
+                                    <div style="flex:1;">
+                                        <span style="font-size: 0.7rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">Govt. Mandate</span>
+                                        <div style="font-size: 0.85rem; font-weight: 800; color: var(--secondary); margin-bottom: 2px;">REGISTRATION</div>
+                                        <div style="font-size: 1.1rem; font-weight: 800;">${data.govtRegNumber || 'Not Provided'}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `)}
+                </div>
+
+                <div class="summary-footer">
+                    <div class="summary-footer-brand">
+                        <i class="fas fa-shield-check fa-2x" style="color:var(--secondary);"></i>
+                        <div>
+                            <div style="font-size:0.7rem; opacity:0.6; text-transform:uppercase; font-weight:800;">Identity Authentication</div>
+                            <div style="font-weight:800; font-size:1.1rem;">Secured by HotelPro Elite</div>
                         </div>
                     </div>
-                    <div style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.4; display: flex; gap: 6px;">
-                        <i class="fas fa-check-circle" style="color: #22c55e; margin-top: 3px;"></i> 
-                        <span>${allAmens}</span>
+                    <div class="footer-timestamp">
+                        Report Generated<br><strong>${new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</strong>
                     </div>
                 </div>
             </div>
         `;
-    });
-
-    // 5. Build Final "Executive Dossier"
-    summaryContainer.innerHTML = `
-        <div class="summary-dossier" style="background: white; border-radius: 32px; overflow: hidden; box-shadow: var(--shadow-lg); border: 1px solid var(--border);">
-            
-            <!-- HEADER: Executive Summary -->
-            <div class="summary-header" style="background: #f8fafc; padding: 60px; border-bottom: 2px solid var(--secondary); position: relative;">
-                <div style="display: flex; justify-content: space-between; align-items: flex-end;">
-                    <div style="flex: 1;">
-                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
-                            <span style="background: var(--primary); color: white; padding: 4px 12px; border-radius: 100px; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Partner Enrollment</span>
-                            <span style="color: var(--text-muted); font-size: 0.7rem; font-family: monospace;">Ref: HP-${Math.floor(Math.random() * 900000 + 100000)}</span>
-                        </div>
-                        <h3 style="font-size: 3rem; margin: 0; font-weight: 800; color: var(--text-main); letter-spacing: -0.04em; line-height: 1;">${hotelName}</h3>
-                        <div style="margin-top: 20px; display: flex; align-items: center; gap: 8px;">
-                            <i class="fas fa-map-marker-alt" style="color: var(--secondary);"></i>
-                            <p style="margin: 0; color: var(--text-muted); font-size: 1.1rem; font-weight: 500;">${address}</p>
-                        </div>
-                    </div>
-                    <div style="text-align: right;">
-                        <div style="background: white; padding: 24px; border-radius: 20px; border: 1px solid var(--border); box-shadow: var(--shadow-sm);">
-                            <span style="display:block; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 8px; font-weight: 700;">Property Tier</span>
-                            <div style="font-size: 1.5rem; color: var(--text-main); font-weight: 800;">
-                                <i class="fas fa-crown" style="color: var(--secondary);"></i> ${hotelType}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="summary-content" style="padding: 60px; display: flex; flex-direction: column; gap: 50px;">
-                
-                <!-- PHASE 01: Property Foundation -->
-                <div class="summary-module">
-                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 30px; border-bottom: 1px solid #f1f5f9; padding-bottom: 20px;">
-                        <div style="width: 40px; height: 40px; background: var(--primary); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 800;">01</div>
-                        <h4 style="color: var(--text-main); font-size: 1.2rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 800; margin: 0;">Property Foundation</h4>
-                    </div>
-                    
-                    <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 40px;">
-                        <div style="background: #f8fafc; border-radius: 20px; padding: 30px; border: 1px solid var(--border);">
-                            <label style="display:block; font-size: 0.7rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 15px; font-weight: 700;">Identity Blueprint</label>
-                            <div style="display: flex; flex-direction: column; gap: 15px;">
-                                <div>
-                                    <span style="font-size: 0.65rem; color: var(--text-muted); display: block; text-transform: uppercase; font-weight: 700;">Designation</span>
-                                    <strong style="color: var(--text-main); font-size: 1.1rem; font-weight: 700;">${hotelName}</strong>
-                                </div>
-                                <div style="padding-top: 15px; border-top: 1px dashed var(--border);">
-                                    <span style="font-size: 0.65rem; color: var(--text-muted); display: block; text-transform: uppercase; font-weight: 700;">Location</span>
-                                    <span style="color: var(--text-main); font-size: 0.95rem; font-weight: 600;">${address}</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div>
-                            <label style="display:block; font-size: 0.7rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 15px; font-weight: 700;">Media Portfolio</label>
-                            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;">
-                                ${propertyPhotos.slice(0, 4).map((url) => `
-                                    <div style="aspect-ratio: 1; border-radius: 10px; overflow: hidden; border: 1px solid var(--border);">
-                                        <img src="${url}" style="width: 100%; height: 100%; object-fit: cover;">
-                                    </div>
-                                `).join('') || '<div style="grid-column: span 4; padding: 20px; text-align: center; color: var(--text-muted); border: 2px dashed var(--border); border-radius: 12px;">No images uploaded</div>'}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- PHASE 02: Inventory & Operations -->
-                <div class="summary-module">
-                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 30px; border-bottom: 1px solid #f1f5f9; padding-bottom: 20px;">
-                        <div style="width: 40px; height: 40px; background: var(--primary); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 800;">02</div>
-                        <h4 style="color: var(--text-main); font-size: 1.2rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 800; margin: 0;">Inventory & Operations</h4>
-                    </div>
-                    
-                    <div style="display: flex; flex-direction: column; gap: 40px;">
-                        <div>
-                            <label style="display:block; font-size: 0.7rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 20px; font-weight: 700;">Room Categories</label>
-                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
-                                ${roomsHtml}
-                            </div>
-                        </div>
-
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
-                            <div style="background: white; border-radius: 20px; padding: 30px; border: 1px solid var(--border);">
-                                <label style="display:block; font-size: 0.7rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 15px; font-weight: 700;">Services & Protocols</label>
-                                <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px;">
-                                    ${getCheckedLabels('services').split(', ').map(s => `
-                                        <span style="background: #f1f5f9; padding: 6px 14px; border-radius: 100px; font-size: 0.75rem; font-weight: 700; color: var(--text-main); border: 1px solid var(--border);">${s}</span>
-                                    `).join('')}
-                                </div>
-                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                                    <div style="background: #f8fafc; padding: 15px; border-radius: 12px; text-align: center; border: 1px solid var(--border);">
-                                        <span style="font-size: 0.6rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; display: block;">Check-In</span>
-                                        <strong style="font-size: 1.1rem; color: var(--text-main);">${getVal('check_in')}</strong>
-                                    </div>
-                                    <div style="background: #f8fafc; padding: 15px; border-radius: 12px; text-align: center; border: 1px solid var(--border);">
-                                        <span style="font-size: 0.6rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; display: block;">Check-Out</span>
-                                        <strong style="font-size: 1.1rem; color: var(--text-main);">${getVal('check_out')}</strong>
-                                    </div>
-                                </div>
-                            </div>
-                            <div style="background: var(--primary); border-radius: 20px; padding: 30px; color: white;">
-                                <label style="display:block; font-size: 0.7rem; text-transform: uppercase; color: rgba(255,255,255,0.6); margin-bottom: 15px; font-weight: 700;">Policies</label>
-                                <p style="font-size: 0.95rem; line-height: 1.6; color: white; margin: 0; font-style: italic;">"${getVal('cancellation_policy')}"</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- PHASE 03: Compliance -->
-                <div class="summary-module">
-                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 30px; border-bottom: 1px solid #f1f5f9; padding-bottom: 20px;">
-                        <div style="width: 40px; height: 40px; background: var(--primary); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 800;">03</div>
-                        <h4 style="color: var(--text-main); font-size: 1.2rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 800; margin: 0;">Identity & Compliance</h4>
-                    </div>
-                    
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                        <!-- Mandatory ID -->
-                        <div style="background: #f8fafc; border: 1px solid var(--border); padding: 25px; border-radius: 20px; display: flex; align-items: center; gap: 20px;">
-                            <div style="width: 50px; height: 50px; background: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border);">
-                                <i class="fas fa-id-card" style="color: var(--secondary); font-size: 1.5rem;"></i>
-                            </div>
-                            <div style="flex: 1;">
-                                <span style="font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 2px;">${idType} Number</span>
-                                <strong style="font-size: 1.1rem; color: var(--text-main); letter-spacing: 1px;">${formatID(idNumber)}</strong>
-                            </div>
-                            ${docMandatoryPreview ? `<a href="${docMandatoryPreview}" target="_blank" style="color: var(--primary); font-size: 1.2rem;"><i class="fas fa-external-link-alt"></i></a>` : ''}
-                        </div>
-
-                        <!-- Govt ID -->
-                        <div style="background: #f8fafc; border: 1px solid var(--border); padding: 25px; border-radius: 20px; display: flex; align-items: center; gap: 20px;">
-                            <div style="width: 50px; height: 50px; background: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border);">
-                                <i class="fas fa-landmark" style="color: var(--secondary); font-size: 1.5rem;"></i>
-                            </div>
-                            <div style="flex: 1;">
-                                <span style="font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 2px;">Govt Registry</span>
-                                <strong style="font-size: 1.1rem; color: var(--text-main); letter-spacing: 1px;">${formatID(govtNumber)}</strong>
-                            </div>
-                            ${docCertificatePreview ? `<a href="${docCertificatePreview}" target="_blank" style="color: var(--primary); font-size: 1.2rem;"><i class="fas fa-external-link-alt"></i></a>` : ''}
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-            
-            <!-- FOOTER -->
-            <div style="background: #0f172a; padding: 40px 60px; color: white; display: flex; justify-content: space-between; align-items: center;">
-                <div style="display: flex; gap: 30px; align-items: center;">
-                    <i class="fas fa-shield-check" style="font-size: 2rem; color: var(--secondary);"></i>
-                    <div>
-                        <div style="font-size: 0.7rem; opacity: 0.6; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">Data Authentication</div>
-                        <div style="font-weight: 700; font-size: 1.2rem;">Secured by HotelPro Global</div>
-                    </div>
-                </div>
-                <div style="text-align: right;">
-                    <div style="font-size: 0.7rem; opacity: 0.6; margin-bottom: 5px;">Report Generated</div>
-                    <div style="font-weight: 700;">${new Date().toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' })}</div>
-                </div>
-            </div>
-        </div>
-        <style>
-            .summary-room-item:hover {
-                transform: translateY(-5px);
-                border-color: var(--secondary);
-                background: white !important;
-                box-shadow: var(--shadow-md);
-            }
-        </style>
-    `;
-};
-
-// Auto-populate Step 4
-document.addEventListener('click', (e) => {
-    if (e.target.closest('.next-step') && e.target.closest('.next-step').dataset.target === '4') {
-        window.populateSummary();
     }
+
+    renderRoomSummary() {
+        const roomRows = document.querySelectorAll('.room-card-elite');
+        return Array.from(roomRows).map((row) => {
+            const index = row.dataset.roomIndex;
+            const name = row.querySelector(`[name="room_name_${index}"]`)?.value || 'Standard Category';
+            const price = row.querySelector(`[name="room_price_${index}"]`)?.value || '0';
+            const type = row.querySelector(`[name="room_class_${index}"]`)?.value || 'Room';
+            const amenitiesJson = row.querySelector(`[name="room_amenities_${index}"]`)?.value || '[]';
+            let amenities = [];
+            try { amenities = JSON.parse(amenitiesJson); } catch (e) { amenities = []; }
+
+            // Extract room-specific photos
+            const roomPreviewBox = row.querySelector('.room-preview-box');
+            const roomMediaUrls = Array.from(roomPreviewBox.querySelectorAll('img, video')).map(media => {
+                if (media.tagName === 'IMG') return media.src;
+                // For videos, we use a placeholder or thumbnail if possible, but for now, just the src
+                return media.src;
+            }).filter(src => src && !src.startsWith('blob:null'));
+
+            return `
+                <div class="summary-room-item" style="align-items: flex-start; gap: 25px;">
+                    <div class="summary-media-grid" style="width: 220px; grid-template-columns: repeat(2, 1fr); flex-shrink: 0;">
+                        ${roomMediaUrls.map((url, mIdx) => {
+                const isVid = url.includes('video') || url.startsWith('data:video');
+                return `
+                                <div class="summary-media-item lightbox-trigger" style="border-radius: 12px;">
+                                    ${isVid
+                        ? `<div class="video-overlay"><i class="fas fa-play" style="font-size: 0.6rem;"></i></div><video src="${url}" style="width:100\%; height:100\%; object-fit:cover;"></video>`
+                        : `<img src="${url}" class="lightbox-trigger">`
+                    }
+                                </div>
+                            `;
+            }).join('')}
+                        ${roomMediaUrls.length === 0 ? '<div class="summary-media-item" style="display:flex; align-items:center; justify-content:center; background:#f8fafc; border: 1px dashed var(--border);"><i class="fas fa-image" style="color:var(--text-muted); opacity:0.3;"></i></div>' : ''}
+                    </div>
+
+                    <div style="flex: 1;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                            <div>
+                                <span style="font-size: 0.65rem; font-weight: 800; color: var(--secondary); text-transform: uppercase;">${type}</span>
+                                <h5 style="font-size: 1.1rem; font-weight: 800; margin: 2px 0;">${name}</h5>
+                                <div style="font-size: 0.9rem; font-weight: 700; color: var(--primary);">₹${parseFloat(price).toLocaleString('en-IN')} / night</div>
+                            </div>
+                            <div style="font-size: 0.75rem; font-weight: 800; color: #22c55e; background: rgba(34, 197, 94, 0.1); padding: 5px 12px; border-radius: 8px;">
+                                <i class="fas fa-check-circle"></i> VERIFIED
+                            </div>
+                        </div>
+                        
+                        <div class="elite-pills-container" style="margin-top: 12px; gap: 6px;">
+                            ${amenities.map(a => `<span style="font-size: 0.65rem; background: rgba(15, 23, 42, 0.05); padding: 4px 10px; border-radius: 50px; font-weight: 700; color: var(--primary);"><i class="fas fa-check" style="color:var(--secondary); font-size: 0.6rem;"></i> ${a}</span>`).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    getAllFilePreviews(selector) {
+        const input = document.querySelector(selector);
+        if (!input?.files) return [];
+        return Array.from(input.files).map(f => ({
+            url: URL.createObjectURL(f),
+            type: f.type,
+            name: f.name
+        }));
+    }
+
+    /**
+     * Professional file preview renderer
+     */
+    renderFilePreview(fileObj, fallbackIcon) {
+        if (!fileObj) return `<i class="fas ${fallbackIcon}" style="opacity:0.2; font-size:1.8rem;"></i>`;
+
+        const viewerAttr = `data-document-url="${fileObj.url}" data-file-type="${fileObj.type}" title="Click to view full document"`;
+
+        if (fileObj.type.startsWith('image/')) {
+            return `<img src="${fileObj.url}" class="lightbox-trigger" ${viewerAttr} style="width:100\%; height:100\%; object-fit:cover;">`;
+        }
+
+        // Elite document icon for PDFs/other docs
+        const icon = fileObj.type === 'application/pdf' ? 'fa-file-pdf' : 'fa-file-lines';
+        const color = fileObj.type === 'application/pdf' ? '#ef4444' : 'var(--secondary)';
+
+        return `
+            <div class="document-view-trigger" ${viewerAttr} style="display:flex; flex-direction:column; align-items:center; gap:5px; cursor:pointer; width:100\%; height:100\%; justify-content:center;">
+                <i class="fas ${icon}" style="color:${color}; font-size:2rem;"></i>
+                <span style="font-size:0.5rem; font-weight:800; opacity:0.6; text-transform:uppercase;">DOCUMENT</span>
+            </div>
+        `;
+    }
+
+    /**
+     * Set up global event listeners for the summary
+     */
+    setupEventListeners() {
+        document.addEventListener('click', (e) => {
+            const trigger = e.target.closest('[data-document-url]');
+            if (!trigger) return;
+
+            const url = trigger.getAttribute('data-document-url');
+            const type = trigger.getAttribute('data-file-type');
+
+            // If it's a PDF, we always open in a new tab
+            if (type === 'application/pdf') {
+                e.preventDefault();
+                e.stopPropagation();
+                window.open(url, '_blank');
+            }
+            // Images are usually handled by the lightbox, 
+            // but we can add secondary handling here if needed.
+        }, true); // Use capture phase to intercept before other handlers if necessary
+    }
+
+    /**
+     * Professional policy text formatter
+     */
+    formatPolicy(text) {
+        if (!text || text.toLowerCase() === 'no' || text.length < 5) {
+            return '<span style="color:var(--text-muted); font-style:italic;">Standard Property Revocation & Refund Protocols Apply.</span>';
+        }
+        return text;
+    }
+
+    /**
+     * Refined city extraction for header
+     */
+    extractCleanCity(city, address) {
+        if (city && city !== 'Not Provided' && city.length > 2) return city;
+
+        // Extract from address components
+        const parts = address.split(',').map(p => p.trim());
+        if (parts.length > 2) {
+            // Usually the 2nd or 3rd part is most relevant for city/town
+            return parts[1] || parts[0];
+        }
+        return parts[0] || 'Property Location';
+    }
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', () => {
+    window.summaryEngine = new SummaryEngine();
 });

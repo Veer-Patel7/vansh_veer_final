@@ -7,13 +7,18 @@
 
         <div class="form-grid">
             <!-- Dynamic Rooms Section -->
-            <div class="input-group full-width" style="margin-bottom: 32px;">
+            <div class="input-group full-width" style="margin-bottom: 40px;">
                 <label class="section-subtitle"><i class="fas fa-layer-group"></i> 2A. Room Inventory</label>
-                <div id="roomList">
-                    <!-- Dynamic Room Items -->
+                <div id="roomList" class="room-grid">
+                    <!-- Dynamic Room Cards -->
                 </div>
-                <button type="button" id="addRoomBtn" class="btn btn-premium-outline full-width">
-                    <i class="fas fa-plus-circle"></i> Add Another Room Category
+
+                <button type="button" id="addRoomBtn" class="add-room-trigger-elite">
+                    <i class="fas fa-circle-plus"></i>
+                    <div class="trigger-text-elite">
+                        <span class="trigger-main">Initialize New Room Category</span>
+                        <span class="trigger-sub">Define another premium room type for your global inventory</span>
+                    </div>
                 </button>
             </div>
 
@@ -21,57 +26,61 @@
             {% include 'hotels/includes/service_selection.html' %}
 
             <!-- Operational Information -->
-            <div class="input-group full-width" style="margin-top: 40px; margin-bottom: 20px;">
-                <label class="section-subtitle"><i class="fas fa-clock"></i> 2C. Operational Information</label>
+            <div class="input-group full-width" style="margin-top: 56px; margin-bottom: 0;">
+                <label class="section-subtitle"><i class="fas fa-clock"></i> 2B. Operational Standards</label>
             </div>
 
-            <div class="dense-grid">
-                <div class="col-6">
-                    <div class="input-group">
-                        <label>Standard Check-in</label>
-                        <div class="input-with-icon">
-                            <input type="time" name="check_in" value="14:00" required>
-                            <i class="fas fa-door-open"></i>
+            <div class="operational-grid">
+                <div class="dense-grid">
+                    <div class="col-6">
+                        <div class="input-group">
+                            <label>Standard Check-in</label>
+                            <div class="input-with-icon">
+                                <input type="time" name="check_in" value="14:00" required>
+                                <i class="fas fa-door-open"></i>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="col-6">
-                    <div class="input-group">
-                        <label>Standard Check-out</label>
-                        <div class="input-with-icon">
-                            <input type="time" name="check_out" value="11:00" required>
-                            <i class="fas fa-door-closed"></i>
+                    <div class="col-6">
+                        <div class="input-group">
+                            <label>Standard Check-out</label>
+                            <div class="input-with-icon">
+                                <input type="time" name="check_out" value="11:00" required>
+                                <i class="fas fa-door-closed"></i>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="col-12">
-                    <div class="input-group">
-                        <label>Cancellation Policy</label>
-                        <div class="input-with-icon">
-                            <textarea name="cancellation_policy" rows="2"
-                                placeholder="Describe your cancellation policy clearly..." required
-                                style="resize: none;"></textarea>
-                            <i class="fas fa-info-circle" style="top: 20px; transform: none;"></i>
+                    <div class="col-12">
+                        <div class="input-group" style="margin-top: 10px;">
+                            <label>Global Cancellation Policy</label>
+                            <div class="input-with-icon">
+                                <textarea name="cancellation_policy" rows="3"
+                                    placeholder="Describe your property's cancellation terms for administrative transparency..."
+                                    required style="resize: none;"></textarea>
+                                <i class="fas fa-shield-halved" style="top: 25px; transform: none;"></i>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Property Gallery Section -->
-            <div class="input-group full-width" style="margin-top: 40px;">
-                <label class="section-subtitle"><i class="fas fa-images"></i> 2D. Property Gallery</label>
-                <p class="input-hint" style="margin-bottom: 15px;">Upload at least 5 photos showing the exterior, lobby,
-                    and common areas.</p>
+            <div class="input-group full-width" style="margin-top: 56px;">
+                <label class="section-subtitle"><i class="fas fa-images"></i> 2C. Property Gallery Portfolio</label>
+                <p class="input-hint" style="margin-bottom: 20px;">Curate a minimum of 5 high-resolution photos
+                    showcasing the exterior, lobby, and exclusive common areas.</p>
 
-                <div class="upload-zone" id="galleryUploadZone">
+                <div class="upload-zone-elite" id="galleryUploadZone">
                     <input type="file" name="property_images" id="galleryInput" multiple accept="image/*"
                         style="display: none;">
-                    <i class="fas fa-cloud-upload-alt upload-zone-icon"></i>
-                    <p class="upload-zone-text">Click to select or drag and drop photos</p>
-                    <p class="upload-zone-subtext">Supports JPG, PNG, WEBP (Max 5MB per file)</p>
+                    <i class="fas fa-cloud-arrow-up upload-zone-icon"
+                        style="font-size: 3rem; color: var(--secondary); margin-bottom: 16px;"></i>
+                    <p class="upload-zone-text" style="font-weight: 800; font-size: 1.1rem; color: var(--primary);">
+                        Securely Select or Deposit Portfolio Photos</p>
+                    <p class="upload-zone-subtext">Optimized for JPG, PNG, WEBP (Maximum 5MB per professional asset)</p>
                 </div>
 
-                <div id="galleryPreviewContainer" class="gallery-preview-grid">
+                <div id="galleryPreviewContainer" class="gallery-preview-grid" style="margin-top: 24px;">
                     <!-- Gallery previews will be injected here -->
                 </div>
             </div>
@@ -90,107 +99,247 @@
 
 <!-- Hidden Template for Dynamic Room Row -->
 <template id="room-row-template">
-    <div class="room-row" data-room-index="__prefix__">
-        <div class="room-header-premium">
-            <div class="room-title">
-                <i class="fas fa-bed"></i>
-                <h4>Room Category #<span class="room-num-display">__prefix__</span></h4>
+    <div class="room-card-elite" data-room-index="__prefix__">
+        <div class="room-card-header-elite">
+            <div class="room-card-title-elite">
+                <div class="room-elite-badge"><span class="room-num-display">__prefix__</span></div>
+                <h4>Administrative Room Configuration</h4>
             </div>
-            <div class="remove-room" title="Remove Category"><i class="fas fa-trash-alt"></i></div>
+            <button type="button" class="remove-room-elite remove-room" title="Permanently remove category">
+                <i class="fas fa-trash-can"></i>
+            </button>
         </div>
 
-        <div class="room-body">
+        <div class="room-card-body-elite">
             <div class="dense-grid">
-                <!-- Basic Info -->
-                <div class="col-6">
+                <!-- Category Name & Class -->
+                <div class="col-8">
                     <div class="input-group">
-                        <label>Room Category Name</label>
-                        <div class="input-with-icon">
-                            <input type="text" name="room_name___prefix__" placeholder="e.g. Deluxe Garden View"
-                                required>
-                            <i class="fas fa-tag"></i>
+                        <label>Professional Room Category</label>
+                        <input type="hidden" name="room_name___prefix__" id="room_name_hidden___prefix__" required>
+                        <div class="custom-select-container category-name-select-container"
+                            data-target="room_name_hidden___prefix__">
+                            <div class="select-selected">
+                                <span class="selected-text">
+                                    <div class="item-icon-box">
+                                        <i class="fas fa-layer-group"></i>
+                                    </div>
+                                    <span class="item-text">Select Specific Category</span>
+                                </span>
+                                <i class="fas fa-chevron-down arrow-icon"></i>
+                            </div>
+                            <div class="select-items">
+                                <div class="select-item" data-value="Standard Room">
+                                    <div class="item-icon-box"><i class="fas fa-bed"></i></div>
+                                    <span class="item-text">Standard Room</span>
+                                </div>
+                                <div class="select-item" data-value="Standard City View">
+                                    <div class="item-icon-box"><i class="fas fa-city"></i></div>
+                                    <span class="item-text">Standard City View</span>
+                                </div>
+                                <div class="select-item" data-value="Standard Garden View">
+                                    <div class="item-icon-box"><i class="fas fa-leaf"></i></div>
+                                    <span class="item-text">Standard Garden View</span>
+                                </div>
+                                <div class="select-item" data-value="Standard Pool View">
+                                    <div class="item-icon-box"><i class="fas fa-water"></i></div>
+                                    <span class="item-text">Standard Pool View</span>
+                                </div>
+                                <div class="select-item" data-value="Standard Twin Room">
+                                    <div class="item-icon-box"><i class="fas fa-bed"></i></div>
+                                    <span class="item-text">Standard Twin Room</span>
+                                </div>
+                                <div class="select-item" data-value="Standard Double Room">
+                                    <div class="item-icon-box"><i class="fas fa-bed"></i></div>
+                                    <span class="item-text">Standard Double Room</span>
+                                </div>
+                                <div class="select-item custom-cat-trigger" data-value="OTHER">
+                                    <i class="fas fa-ellipsis" style="color:var(--text-muted);"></i> + Other Category...
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-6">
+
+                <div class="col-4">
                     <div class="input-group">
-                        <label>Room Class</label>
+                        <label>Inventory Tier / Class</label>
                         <select name="room_class___prefix__" id="room_class_hidden___prefix__" required
                             style="display: none !important;">
                             <option value="STANDARD">Standard</option>
                             <option value="DELUXE">Deluxe</option>
                             <option value="SUITE">Suite</option>
-                            <option value="LUXURY">Luxury / Presidential</option>
+                            <option value="LUXURY">Luxury</option>
+                            <option value="ECONOMY">Economy</option>
+                            <option value="PREMIUM">Premium</option>
+                            <option value="EXECUTIVE">Executive</option>
+                            <option value="CLUB">Club</option>
+                            <option value="PRESIDENTIAL">Presidential</option>
+                            <option value="ROYAL">Royal</option>
+                            <option value="FAMILY">Family</option>
+                            <option value="SPECIALTY">Specialty</option>
+                            <option value="OTHER">Other</option>
+
                         </select>
-                        <div class="custom-select-container" data-target="room_class_hidden___prefix__">
+                        <div class="custom-select-container room-class-select-container"
+                            data-target="room_class_hidden___prefix__">
                             <div class="select-selected">
-                                <span class="selected-text"><i class="fas fa-layer-group"
-                                        style="color:var(--secondary);"></i> Select Class</span>
+                                <span class="selected-text">
+                                    <div class="item-icon-box">
+                                        <i class="fas fa-layer-group"></i>
+                                    </div>
+                                    <span class="item-text">Selection Tier</span>
+                                </span>
                                 <i class="fas fa-chevron-down arrow-icon"></i>
                             </div>
                             <div class="select-items">
-                                <div class="select-item" data-value="STANDARD">Standard</div>
-                                <div class="select-item" data-value="DELUXE">Deluxe</div>
-                                <div class="select-item" data-value="SUITE">Suite</div>
-                                <div class="select-item" data-value="LUXURY">Luxury</div>
+                                <div class="select-item" data-value="STANDARD">
+                                    <div class="item-icon-box"><i class="fas fa-bed" style="color:#fbbf24;"></i></div>
+                                    <span class="item-text">Standard</span>
+                                </div>
+                                <div class="select-item" data-value="DELUXE">
+                                    <div class="item-icon-box"><i class="fas fa-crown" style="color:#fbbf24;"></i></div>
+                                    <span class="item-text">Deluxe</span>
+                                </div>
+                                <div class="select-item" data-value="SUITE">
+                                    <div class="item-icon-box"><i class="fas fa-couch" style="color:#fbbf24;"></i></div>
+                                    <span class="item-text">Suite</span>
+                                </div>
+                                <div class="select-item" data-value="LUXURY">
+                                    <div class="item-icon-box"><i class="fas fa-gem" style="color:#fbbf24;"></i></div>
+                                    <span class="item-text">Luxury</span>
+                                </div>
+                                <div class="select-item" data-value="ECONOMY">
+                                    <div class="item-icon-box"><i class="fas fa-wallet"
+                                            style="color:var(--text-muted);"></i></div>
+                                    <span class="item-text">Economy</span>
+                                </div>
+                                <div class="select-item" data-value="PREMIUM">
+                                    <div class="item-icon-box"><i class="fas fa-star" style="color:#fbbf24;"></i></div>
+                                    <span class="item-text">Premium</span>
+                                </div>
+                                <div class="select-item" data-value="EXECUTIVE">
+                                    <div class="item-icon-box"><i class="fas fa-briefcase" style="color:#fbbf24;"></i>
+                                    </div>
+                                    <span class="item-text">Executive</span>
+                                </div>
+                                <div class="select-item" data-value="CLUB">
+                                    <div class="item-icon-box"><i class="fas fa-key" style="color:#fbbf24;"></i></div>
+                                    <span class="item-text">Club</span>
+                                </div>
+                                <div class="select-item" data-value="PRESIDENTIAL">
+                                    <div class="item-icon-box"><i class="fas fa-medal" style="color:#fbbf24;"></i></div>
+                                    <span class="item-text">Presidential</span>
+                                </div>
+                                <div class="select-item" data-value="ROYAL">
+                                    <div class="item-icon-box"><i class="fas fa-landmark" style="color:#fbbf24;"></i>
+                                    </div>
+                                    <span class="item-text">Royal</span>
+                                </div>
+                                <div class="select-item" data-value="FAMILY">
+                                    <div class="item-icon-box"><i class="fas fa-people-roof" style="color:#fbbf24;"></i>
+                                    </div>
+                                    <span class="item-text">Family</span>
+                                </div>
+                                <div class="select-item" data-value="SPECIALTY">
+                                    <div class="item-icon-box"><i class="fas fa-shapes" style="color:#fbbf24;"></i>
+                                    </div>
+                                    <span class="item-text">Specialty</span>
+                                </div>
+                                <div class="select-item custom-class-trigger" data-value="OTHER">
+                                    <i class="fas fa-ellipsis" style="color:var(--text-muted);"></i>
+                                    + Add Custom Class...
+                                </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Guests, Price & Units -->
+                <div class="col-4">
+                    <div class="input-group">
+                        <label>Maximum Guest Capacity</label>
+                        <div class="input-with-icon">
+                            <input type="number" name="room_guests___prefix__" placeholder="2" min="1" required>
+                            <i class="fas fa-users-viewfinder"></i>
                         </div>
                     </div>
                 </div>
 
                 <div class="col-4">
                     <div class="input-group">
-                        <label>Max Guests</label>
+                        <label>Base Rate / Business Night</label>
                         <div class="input-with-icon">
-                            <input type="number" name="room_guests___prefix__" value="2" min="1" required>
-                            <i class="fas fa-users"></i>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-4">
-                    <div class="input-group">
-                        <label>Price / Night (₹)</label>
-                        <div class="input-with-icon">
-                            <input type="number" name="room_price___prefix__" placeholder="0.00" required>
+                            <input type="number" name="room_price___prefix__" placeholder="0.00" min="0" required>
                             <i class="fas fa-indian-rupee-sign"></i>
                         </div>
                     </div>
                 </div>
+
                 <div class="col-4">
                     <div class="input-group">
-                        <label>Available Units</label>
+                        <label>Current Physical Inventory</label>
                         <div class="input-with-icon">
                             <input type="number" name="room_count___prefix__" value="1" min="1" required>
-                            <i class="fas fa-door-open"></i>
+                            <i class="fas fa-door-closed"></i>
                         </div>
                     </div>
                 </div>
 
-                <!-- Amenities Pill Input -->
-                <div class="col-12" style="margin-top: 10px;">
-                    <label class="section-subtitle" style="font-size: 0.7rem;"><i class="fas fa-concierge-bell"></i>
-                        Special Amenities for this Category</label>
-                    <div class="dynamic-pills-container" style="margin-bottom: 10px;">
-                        <!-- Custom pills go here -->
+                <!-- Amenities Pill Entry -->
+                <div class="col-12">
+                    <div class="input-group" style="margin-top: 10px;">
+                        <label>Exclusive Room Amenities Registry</label>
+                        <div class="pill-input-wrapper">
+                            <input type="text" class="new-amenity-text"
+                                placeholder="e.g. In-Room Safe, Smart Concierge...">
+                            <button type="button" class="pill-add-btn"><i class="fas fa-plus"></i></button>
+                        </div>
+                        <div class="elite-pills-container dynamic-pills-container"
+                            style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px;">
+                            <!-- Standard Elite Amenity Toggles -->
+                            <label class="pill-label">
+                                <input type="checkbox" value="Air Conditioning" checked style="display: none;">
+                                <i class="fas fa-snowflake" style="color: var(--secondary);"></i> Air Conditioning
+                            </label>
+                            <label class="pill-label">
+                                <input type="checkbox" value="Smart TV" checked style="display: none;">
+                                <i class="fas fa-tv" style="color: var(--secondary);"></i> Smart TV
+                            </label>
+                            <label class="pill-label">
+                                <input type="checkbox" value="High-speed WiFi" checked style="display: none;">
+                                <i class="fas fa-wifi" style="color: var(--secondary);"></i> High-speed WiFi
+                            </label>
+                            <label class="pill-label">
+                                <input type="checkbox" value="Mini Bar" style="display: none;">
+                                <i class="fas fa-glass-martini-alt"></i> Mini Bar
+                            </label>
+                            <label class="pill-label">
+                                <input type="checkbox" value="Private Balcony" style="display: none;">
+                                <i class="fas fa-mountain-sun"></i> Private Balcony
+                            </label>
+                            <label class="pill-label">
+                                <input type="checkbox" value="Electronic Safe" style="display: none;">
+                                <i class="fas fa-vault"></i> Electronic Safe
+                            </label>
+                        </div>
+                        <input type="hidden" name="room_amenities___prefix__" value="[]">
                     </div>
-                    <div class="pill-input-wrapper">
-                        <input type="text" class="new-amenity-text" placeholder="Add amenity (e.g. Bathtub, Minibar)">
-                        <button type="button" class="pill-add-btn"><i class="fas fa-plus"></i></button>
-                    </div>
-                    <input type="hidden" name="room_amenities___prefix__">
                 </div>
 
-                <!-- Room Gallery -->
-                <div class="col-12" style="margin-top: 10px;">
-                    <div class="room-image-group">
-                        <div class="room-upload-btn">
-                            <i class="fas fa-images"></i>
-                            <span>Add Room Photos</span>
-                            <input type="file" name="room_image___prefix__" multiple accept="image/*"
-                                style="display:none;">
-                        </div>
-                        <div class="room-preview-box">
-                            <!-- Previews injected here -->
+                <!-- Elite Photo & Video Upload -->
+                <div class="col-12">
+                    <div class="input-group" style="margin-top: 10px;">
+                        <label>Category Portfolio Showcase</label>
+                        <p class="input-hint" style="margin-bottom: 8px;">Upload exactly <strong>3 Photos</strong> and
+                            <strong>1 Video</strong> for an elite professional presentation.
+                        </p>
+                        <div class="room-upload-zone room-gallery-elite room-upload-btn">
+                            <i class="fas fa-clapperboard"></i>
+                            <span>Selection of Professional Category Media</span>
+                            <input type="file" name="room_photos___prefix__" multiple style="display:none;"
+                                accept="image/*,video/*">
+                            <div class="room-preview-box gallery-preview-grid" style="margin-top: 16px;"></div>
                         </div>
                     </div>
                 </div>
@@ -198,13 +347,54 @@
         </div>
     </div>
 </template>
-<!-- Lightbox Modal -->
-<div id="lightboxModal" style="display: none;">
-    <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
-    <div class="lightbox-nav lightbox-prev" onclick="changeSlide(-1)">&#10094;</div>
-    <div class="lightbox-content-wrapper">
-        <img id="lightboxImage" class="lightbox-content" src="" style="display:none;">
-        <video id="lightboxVideo" class="lightbox-content" controls style="display:none;"></video>
+<!-- Room Classification Manager Modal -->
+<div id="roomManagerPopup" class="location-popup manager-popup">
+    <div class="popup-box" style="max-width: 650px;">
+        <div class="popup-header">
+            <div class="header-info">
+                <h3 id="roomManagerTitle"><i class="fas fa-layer-group"></i> Room Classification Registry</h3>
+            </div>
+            <button type="button" id="close-room-manager-btn" class="close-btn">&times;</button>
+        </div>
+
+        <div class="popup-body">
+            <!-- Active Room Types Area -->
+            <div class="active-classifications-area" style="max-height: 300px;">
+                <span class="section-subtitle" id="roomManagerListTitle"><i class="fas fa-list-check"></i> Current
+                    Tiers</span>
+                <div id="room-manager-list" class="dense-grid"
+                    style="grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 16px; padding: 10px;">
+                    <!-- Dynamically populated room types -->
+                </div>
+            </div>
+
+            <!-- Professional Registry Section -->
+            <div class="registry-section">
+                <div class="registry-card">
+                    <div class="registry-header">
+                        <h4 id="roomFormTitle">Add New Room Tier</h4>
+                        <p class="input-hint">Specify a label for your custom room classification.</p>
+                    </div>
+
+                    <div class="dossier-form-grid" style="grid-template-columns: 1fr;">
+                        <div class="input-group">
+                            <label>Classification Label</label>
+                            <div class="input-with-icon">
+                                <input type="text" id="room-type-label" placeholder="e.g. Ultra Deluxe / Penthouse">
+                                <i class="fas fa-tag"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="registry-actions" style="margin-top: 20px;">
+                        <button type="button" id="save-room-type-btn" class="btn btn-primary save-classification-btn"
+                            style="width: 100%;">
+                            Save Room Classification
+                            <i class="fas fa-check-circle"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="lightbox-nav lightbox-next" onclick="changeSlide(1)">&#10095;</div>
 </div>

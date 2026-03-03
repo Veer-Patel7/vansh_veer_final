@@ -3,6 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.core.mail import send_mail
 from django.conf import settings
+from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from .forms import SuperAdminLoginForm, UserLoginForm, UserRegistrationForm, ForgotPasswordForm, OTPVerificationForm, SetNewPasswordForm
@@ -25,7 +26,7 @@ def dashboard_redirect(request):
         return redirect("hotels:hotelregister")
 
     elif request.user.role == "customer":
-        return redirect("customer:customer_dashboard")
+        return redirect("customer:booking_success")
 
     return redirect("/")
 
@@ -156,7 +157,7 @@ def customer_signup(request):
                     [email],
                 )
 
-                return redirect(f"/accounts/verify/?email={email}")
+                return redirect(f"{reverse('accounts:verify')}?email={email}")
     else:
         form = UserRegistrationForm()
 
@@ -203,7 +204,7 @@ def hotel_signup(request):
                     [email],
                 )
 
-                return redirect(f"/accounts/verify/?email={email}")
+                return redirect(f"{reverse('accounts:verify')}?email={email}")
     else:
         form = UserRegistrationForm()
 
@@ -227,6 +228,9 @@ def verify(request):
             user.is_active = True
             user.otp = ""
             user.save()
+            
+            login(request, user)
+            
             return redirect("accounts:dashboard_redirect")
 
         messages.error(request, "Invalid OTP")

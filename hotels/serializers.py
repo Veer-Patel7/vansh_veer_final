@@ -14,7 +14,7 @@ class RoomTypeSerializer(serializers.ModelSerializer):
         model = RoomType
         fields = [
             'id', 'room_type', 'room_type_display', 'price_per_night', 
-            'max_guests', 'total_rooms'
+            'max_guest', 'total_rooms'
         ]
 
 # HotelPolicySerializer removed as fields are merged into Hotel

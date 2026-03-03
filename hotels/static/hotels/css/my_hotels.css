@@ -1,0 +1,36 @@
+.empty-state {
+    text-align: center;
+    padding: 80px 40px;
+    background: var(--card-bg);
+    border: 2px dashed var(--border);
+    border-radius: 30px;
+    margin-top: 30px;
+    backdrop-filter: var(--glass-blur);
+}
+
+.empty-state i {
+    font-size: 4rem;
+    color: var(--text-dim);
+    margin-bottom: 20px;
+    opacity: 0.5;
+}
+
+.btn-primary-add {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 24px;
+    background: var(--secondary);
+    color: var(--primary);
+    border-radius: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
+}
+
+.btn-primary-add:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(212, 175, 55, 0.3);
+    filter: brightness(1.1);
+}

@@ -1,17 +1,26 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse, HttpResponseForbidden, JsonResponse
+from django.http import HttpResponseForbidden, JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-
-from bookings.models import Booking
-from .models import Hotel, RoomType, HotelImage, Offer, ChangeRequest
+from accounts.decorators import hotel_admin_required, super_admin_required
+from .models import Hotel, RoomType, HotelImage, Offer, ChangeRequest, LocationHistory
+import json
+from django.utils import timezone
+from datetime import timedelta
 from .forms import HotelDeploymentForm, RoomTypeForm, HotelPolicyForm, HotelImageForm, OfferForm
-from reviews.models import Review
+from core.models import Review, Booking
+from rest_framework import viewsets, permissions, status, parsers
+from rest_framework.response import Response
+from rest_framework.decorators import action
+from .serializers import (
+    HotelSerializer, RoomTypeSerializer, 
+    HotelImageSerializer
+) 
 
 from django.db import transaction
 
 # --- 1. Property Identity (Unified Onboarding) ---
-@login_required
+@hotel_admin_required
 def add_hotel(request):
     """Professional Multi-step Hotel Onboarding View"""
     if request.method == 'POST':
@@ -55,7 +64,7 @@ def add_hotel(request):
                             room_category_name=room_name,
                             room_type=room_class.upper(),
                             price_per_night=price,
-                            max_guests=guests,
+                            max_guest=guests,
                             total_rooms=inventory,
                             amenities=amenities
                         )
@@ -72,7 +81,7 @@ def add_hotel(request):
     return render(request, 'hotels/add_hotel.html', {'form': form})
 
 # --- 2. Room Inventory (Module 2) ---
-@login_required
+@hotel_admin_required
 def create_room_type(request, hotel_id):
     """Hotel mein room categories (Standard/Deluxe) add karne ke liye"""
     hotel = get_object_or_404(Hotel, id=hotel_id, owner=request.user)
@@ -89,7 +98,7 @@ def create_room_type(request, hotel_id):
     return render(request, 'hotels/room_form.html', {'form': form, 'hotel': hotel})
 
 # --- 3. Operational Policies (Module 3) ---
-@login_required
+@hotel_admin_required
 def setup_policy(request, hotel_id):
     """Check-in/Check-out aur rules set karne ke liye"""
     hotel = get_object_or_404(Hotel, id=hotel_id, owner=request.user)
@@ -106,7 +115,7 @@ def setup_policy(request, hotel_id):
     return render(request, 'hotels/policy_form.html', {'form': form, 'hotel': hotel})
 
 # --- 4. Visual Assets / Gallery (Module 4) ---
-@login_required
+@hotel_admin_required
 def upload_images(request, hotel_id):
     """Hotel ki photos gallery mein upload karne ke liye"""
     hotel = get_object_or_404(Hotel, id=hotel_id, owner=request.user)
@@ -119,7 +128,7 @@ def upload_images(request, hotel_id):
     return render(request, 'hotels/upload_gallery.html', {'hotel': hotel})
 
 # --- 5. Main Dashboard (The Controller) ---
-@login_required
+@hotel_admin_required
 def hotel_dashboard(request, hotel_id):
     """Sare models ka data yahan calculate hota hai progress ke liye"""
     hotel = get_object_or_404(Hotel, id=hotel_id, owner=request.user)
@@ -130,20 +139,12 @@ def hotel_dashboard(request, hotel_id):
     # Check if policy fields are filled (not default or empty)
     has_policy = bool(hotel.check_in and hotel.check_out and hotel.cancellation_policy)
     
-    pending_requests = ChangeRequest.objects.filter(
-        hotel=hotel,
-        status='PENDING'
-    ).values_list('category', flat=True)
-
-    pending_categories = list(pending_requests)
-
     context = {
         'hotel': hotel,
         'rooms': rooms,
         'image_count': image_count,
         'has_rooms': rooms.exists(),
         'has_policy': has_policy,
-        'pending_categories': pending_categories or [],
         # Progress Calculation
         'progress': (40 if rooms.exists() else 0) + (40 if image_count >= 5 else 0) + (20 if has_policy else 0)
     }
@@ -152,7 +153,7 @@ def hotel_dashboard(request, hotel_id):
 
 
 
-@login_required
+@hotel_admin_required
 def admin_dashboard_pro(request):
     """Executive Dashboard for Hotel Owners"""
     owned_hotels = Hotel.objects.filter(owner=request.user)
@@ -168,14 +169,14 @@ def admin_dashboard_pro(request):
     
     total_hotels = owned_hotels.count()
     bookings_today = Booking.objects.filter(hotel__in=owned_hotels, created_at__date=today).count()
-    revenue_today = Booking.objects.filter(hotel__in=owned_hotels, created_at__date=today).aggregate(total=Sum('room__price_per_night'))['total'] or 0
+    revenue_today = Booking.objects.filter(hotel__in=owned_hotels, created_at__date=today).aggregate(total=Sum('total_price'))['total'] or 0
     avg_rating = Review.objects.filter(hotel__in=owned_hotels).aggregate(avg=Avg('rating'))['avg'] or 5.0
     
     context = {
         'owned_hotels': owned_hotels,
         'primary_hotel_status': primary_hotel.status if primary_hotel else 'DRAFT',
         'primary_hotel_remarks': primary_hotel.verification_remarks if primary_hotel else '',
-        'is_admin': request.user.role == 'ADMIN',
+        'is_admin': request.user.is_super_admin,
         'recent_reviews': recent_reviews,
         'total_hotels': total_hotels,
         'bookings_today': bookings_today,
@@ -184,7 +185,7 @@ def admin_dashboard_pro(request):
     }
     return render(request, 'hotels/admin_dashboard_pro.html', context)
 
-@login_required
+@hotel_admin_required
 def my_hotels(request):
     """List of all hotels owned by the current user"""
     owned_hotels = Hotel.objects.filter(owner=request.user)
@@ -192,7 +193,7 @@ def my_hotels(request):
 
 # --- Offers Management ---
 
-@login_required
+@hotel_admin_required
 def offers_view(request):
     owned_hotels = Hotel.objects.filter(owner=request.user)
     offers = Offer.objects.filter(hotel__in=owned_hotels)
@@ -217,7 +218,7 @@ def offers_view(request):
 
     return render(request, 'hotels/offers.html', {'offers': offers, 'stats': stats})
 
-@login_required
+@hotel_admin_required
 def create_offer(request):
     owned_hotels = Hotel.objects.filter(owner=request.user)
     room_types = RoomType.objects.filter(hotel__in=owned_hotels)
@@ -239,7 +240,7 @@ def create_offer(request):
     }
     return render(request, 'hotels/add_offer.html', context)
 
-@login_required
+@hotel_admin_required
 def edit_offer(request, offer_id):
     owned_hotels = Hotel.objects.filter(owner=request.user)
     room_types = RoomType.objects.filter(hotel__in=owned_hotels)
@@ -263,14 +264,14 @@ def edit_offer(request, offer_id):
     }
     return render(request, 'hotels/add_offer.html', context)
 
-@login_required
+@hotel_admin_required
 def delete_offer(request, offer_id):
     offer = get_object_or_404(Offer, id=offer_id, hotel__owner=request.user)
     offer.delete()
     messages.success(request, "Offer terminated.")
     return redirect('hotels:offers')
 
-@login_required
+@hotel_admin_required
 def submit_offer(request, offer_id):
     offer = get_object_or_404(Offer, id=offer_id, hotel__owner=request.user)
     offer.status = 'PENDING'
@@ -280,17 +281,13 @@ def submit_offer(request, offer_id):
 
 # --- Admin Verifications ---
 
-@login_required
+@super_admin_required
 def admin_verify_list(request):
-    if request.user.role != 'ADMIN':
-        return HttpResponseForbidden()
     pending_hotels = Hotel.objects.filter(status='PENDING')
     return render(request, 'hotels/admin/verify_list.html', {'pending_hotels': pending_hotels})
 
-@login_required
+@super_admin_required
 def admin_approve_hotel(request, hotel_id):
-    if request.user.role != 'ADMIN':
-        return HttpResponseForbidden()
     hotel = get_object_or_404(Hotel, id=hotel_id)
     hotel.status = 'LIVE'
     hotel.is_live = True
@@ -298,17 +295,13 @@ def admin_approve_hotel(request, hotel_id):
     messages.success(request, f"{hotel.hotel_name} is now LIVE!")
     return redirect('hotels:admin_verify_list')
 
-@login_required
+@super_admin_required
 def admin_offer_list(request):
-    if request.user.role != 'ADMIN':
-        return HttpResponseForbidden()
     pending_offers = Offer.objects.filter(status='PENDING')
     return render(request, 'hotels/admin/offer_review_list.html', {'pending_offers': pending_offers})
 
-@login_required
+@super_admin_required
 def admin_review_offer(request, offer_id):
-    if request.user.role != 'ADMIN':
-        return HttpResponseForbidden()
     offer = get_object_or_404(Offer, id=offer_id)
     if request.method == 'POST':
         action = request.POST.get('action')
@@ -325,44 +318,39 @@ def admin_review_offer(request, offer_id):
 
 # --- Bookings, Insights, etc. ---
 
-@login_required
+@hotel_admin_required
 def bookings_view(request):
     owned_hotels = Hotel.objects.filter(owner=request.user)
-    bookings = bookings.objects.filter(hotel__in=owned_hotels).order_by('-created_at')
+    bookings = Booking.objects.filter(hotel__in=owned_hotels).order_by('-created_at')
     return render(request, 'hotels/bookings.html', {'bookings': bookings})
 
-@login_required
+@hotel_admin_required
 def insights_view(request):
     return render(request, 'hotels/insights.html')
 
-@login_required(login_url="/hotel/login/")
-def hotel_reviews(request):
+@hotel_admin_required
+def reviews_view(request):
+    owned_hotels = Hotel.objects.filter(owner=request.user)
+    reviews = Review.objects.filter(hotel__in=owned_hotels).order_by('-created_at')
+    
+    from django.db.models import Avg
+    avg_rating = reviews.aggregate(avg=Avg('rating'))['avg'] or 5.0
+    total_reviews = reviews.count()
+    
+    context = {
+        'reviews': reviews,
+        'avg_rating': f"{avg_rating:.1f}",
+        'total_reviews': total_reviews,
+    }
+    return render(request, 'hotels/reviews.html', context)
 
-    reviews = Review.objects.filter(hotel__owner=request.user)
-
-    return render(request, "hotels/reviews.html", {"reviews": reviews})
-
-
-@login_required(login_url="/hotel/login/")
-def request_delete_review(request, id):
-
-    r = Review.objects.get(id=id)
-
-    if r.hotel.owner != request.user:
-        return HttpResponse("Unauthorized")
-
-    r.status = "delete_request"
-    r.save()
-
-    return redirect("/hotel/reviews/")
-
-@login_required
+@hotel_admin_required
 def settings_view(request):
     return render(request, 'hotels/settings.html')
 
 # --- Property Edit Workflow ---
 
-@login_required
+@hotel_admin_required
 def property_edit_detail(request, hotel_id, category):
     hotel = get_object_or_404(Hotel, id=hotel_id, owner=request.user)
     # Simple JSON data response for the modal
@@ -375,7 +363,7 @@ def property_edit_detail(request, hotel_id, category):
     }
     return JsonResponse(data)
 
-@login_required
+@hotel_admin_required
 def submit_edit_request(request, hotel_id, category):
     hotel = get_object_or_404(Hotel, id=hotel_id, owner=request.user)
     if request.method == 'POST':
@@ -390,3 +378,149 @@ def submit_edit_request(request, hotel_id, category):
         return JsonResponse({'status': 'success', 'message': 'Request submitted!'})
     return JsonResponse({'status': 'error'}, status=400)
 
+
+class HotelViewSet(viewsets.ModelViewSet):
+    """
+    The main API for Property Management.
+    """
+    serializer_class = HotelSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    # MultiPartParser handles file/image uploads via API
+    parser_classes = (parsers.MultiPartParser, parsers.FormParser)
+
+    def get_queryset(self):
+        """Owners only see their properties with optimized queries."""
+        return Hotel.objects.filter(owner=self.request.user).prefetch_related(
+            'rooms', 'images'
+        )
+
+    def perform_create(self, serializer):
+        """Attach the logged-in user as the owner."""
+        serializer.save(owner=self.request.user)
+
+    @action(detail=True, methods=['post'], url_path='request-approval')
+    def request_approval(self, request, pk=None):
+        """Business Logic: Request Go-Live status."""
+        hotel = self.get_object()
+        # Verify 100% completion before allowing approval request
+        if hotel.rooms.count() == 0 or hotel.images.count() < 5:
+            return Response(
+                {"error": "Profile incomplete (Needs rooms and 5+ photos)."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        hotel.status = 'PENDING'
+        hotel.save()
+        return Response({'message': 'Approval request sent to admin.'})
+
+class RoomTypeViewSet(viewsets.ModelViewSet):
+    serializer_class = RoomTypeSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return RoomType.objects.filter(hotel__owner=self.request.user)
+
+class GalleryViewSet(viewsets.ModelViewSet):
+    """Handles Image Uploads & Deletions."""
+    serializer_class = HotelImageSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    parser_classes = (parsers.MultiPartParser, parsers.FormParser)
+
+    def get_queryset(self):
+        return HotelImage.objects.filter(hotel__owner=self.request.user)
+
+# --- Phase 2: Location History API ---
+
+@login_required
+def get_location_history(request):
+    """Fetch user's location history grouped by date (Recent vs Older)."""
+    history_items = LocationHistory.objects.filter(user=request.user)
+    
+    # Optional filtering
+    city_filter = request.GET.get('city')
+    if city_filter and city_filter != 'All':
+        history_items = history_items.filter(city__iexact=city_filter)
+
+    now = timezone.now()
+    three_days_ago = now - timedelta(days=3)
+
+    recent = []
+    older = []
+    cities = set()
+
+    for item in history_items:
+        if item.city:
+            cities.add(item.city)
+            
+        data = {
+            'id': item.id,
+            'lat': str(item.lat),
+            'lng': str(item.lng),
+            'formatted_address': item.formatted_address,
+            'city': item.city,
+            'location_name': item.location_name,
+            'category': item.category,
+            'rating': str(item.rating) if item.rating else None,
+            'review_count': item.review_count,
+            'image_reference': item.image_reference,
+            'timestamp': item.timestamp.isoformat()
+        }
+        
+        if item.timestamp >= three_days_ago:
+            recent.append(data)
+        else:
+            older.append(data)
+
+    return JsonResponse({
+        'status': 'success',
+        'cities': sorted(list(cities)),
+        'recent': recent,
+        'older': older
+    })
+
+@login_required
+def add_location_history(request):
+    """Add a newly verified location to the history."""
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            # Prevent duplicate inserts based on core coords
+            existing = LocationHistory.objects.filter(
+                user=request.user, 
+                lat=data.get('lat'), 
+                lng=data.get('lng')
+            ).first()
+            
+            if not existing:
+                LocationHistory.objects.create(
+                    user=request.user,
+                    lat=data.get('lat'),
+                    lng=data.get('lng'),
+                    formatted_address=data.get('address'),
+                    city=data.get('city', ''),
+                    location_name=data.get('locationName'),
+                    category=data.get('category'),
+                    rating=data.get('rating'),
+                    review_count=data.get('reviewCount', 0),
+                    image_reference=data.get('imageReference')
+                )
+            return JsonResponse({'status': 'success'})
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+    return JsonResponse({'status': 'error'}, status=405)
+
+@login_required
+def bulk_action_location_history(request):
+    """Handle bulk actions like delete on multiple history items."""
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            action = data.get('action')
+            item_ids = data.get('ids', [])
+            
+            if action == 'delete' and item_ids:
+                LocationHistory.objects.filter(user=request.user, id__in=item_ids).delete()
+                
+            return JsonResponse({'status': 'success'})
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+    return JsonResponse({'status': 'error'}, status=405)

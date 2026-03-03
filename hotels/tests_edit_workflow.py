@@ -1,6 +1,6 @@
 from django.test import TestCase, Client
 from django.urls import reverse
-from user_access.models import User
+from account.models import User
 from .models import Hotel, ChangeRequest, RoomType
 import json
 
@@ -29,7 +29,7 @@ class PropertyEditWorkflowTest(TestCase):
             hotel=self.hotel,
             room_type="STANDARD",
             price_per_night=1000,
-            max_guests=2,
+            max_guest=2,
             total_rooms=5
         )
 
@@ -60,3 +60,4 @@ class PropertyEditWorkflowTest(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue(ChangeRequest.objects.filter(hotel=self.hotel, category='IDENTITY', status='PENDING').exists())
+

@@ -39,7 +39,7 @@ class RoomTypeForm(forms.ModelForm):
     """
     class Meta:
         model = RoomType
-        fields = ['room_type', 'price_per_night', 'max_guests', 'total_rooms']
+        fields = ['room_type', 'room_category_name', 'price_per_night', 'max_guest', 'room_size', 'total_rooms']
         widgets = {
             'room_type': forms.Select(attrs={'class': 'console-input'}),
         }

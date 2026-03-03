@@ -7,48 +7,111 @@
 {% block page_subtitle %}Data-driven insights to optimize your property performance.{% endblock %}
 
 {% block extra_head %}
+<!-- Chart.js loaded via CDN if not in base, but assuming it's needed for this page -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 {% endblock %}
 
 {% block dashboard_content %}
-<div class="stats-grid" style="margin-top: 30px;">
-    <div class="stat-card">
-        <div class="stat-info">
-            <div class="label">Overall Occupancy</div>
-            <div class="value">78.5%</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <!-- Occupancy Card -->
+    <div class="glass-panel hover-lift p-8 rounded-panel-lg flex flex-col gap-6 group">
+        <div class="flex items-center justify-between">
+            <div
+                class="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary-500/10 to-primary-500/5 text-primary-600 flex items-center justify-center group-hover:bg-primary-600 group-hover:text-white transition-all duration-500 shadow-inner">
+                <i class="fas fa-bed text-xl"></i>
+            </div>
+            <div
+                class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100 text-[9px] font-bold uppercase tracking-widest">
+                <i class="fas fa-arrow-up"></i> +4.2% YoY
+            </div>
         </div>
-        <div class="trend up"><i class="fas fa-arrow-up"></i> +4.2% YoY</div>
+        <div class="flex flex-col">
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Overall Occupancy</span>
+            <div class="flex items-baseline gap-2">
+                <span class="text-3xl font-display font-bold text-slate-900 tracking-tight">78.5%</span>
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Target 85%</span>
+            </div>
+        </div>
     </div>
-    <div class="stat-card">
-        <div class="stat-info">
-            <div class="label">Avg Daily Rate (ADR)</div>
-            <div class="value">₹4,850</div>
+
+    <!-- ADR Card -->
+    <div class="glass-panel hover-lift p-8 rounded-panel-lg flex flex-col gap-6 group">
+        <div class="flex items-center justify-between">
+            <div
+                class="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary-500/10 to-primary-500/5 text-primary-600 flex items-center justify-center group-hover:bg-primary-600 group-hover:text-white transition-all duration-500 shadow-inner">
+                <i class="fas fa-hand-holding-dollar text-xl"></i>
+            </div>
+            <div
+                class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100 text-[9px] font-bold uppercase tracking-widest">
+                <i class="fas fa-arrow-up"></i> +12% YoY
+            </div>
         </div>
-        <div class="trend up"><i class="fas fa-arrow-up"></i> +12% YoY</div>
+        <div class="flex flex-col">
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Avg Daily Rate
+                (ADR)</span>
+            <div class="flex items-baseline gap-2">
+                <span class="text-3xl font-display font-bold text-slate-900 tracking-tight">₹4,850</span>
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Premium Level</span>
+            </div>
+        </div>
     </div>
-    <div class="stat-card">
-        <div class="stat-info">
-            <div class="label">RevPAR</div>
-            <div class="value">₹3,807</div>
+
+    <!-- RevPAR Card -->
+    <div class="glass-panel hover-lift p-8 rounded-panel-lg flex flex-col gap-6 group">
+        <div class="flex items-center justify-between">
+            <div
+                class="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary-500/10 to-primary-500/5 text-primary-600 flex items-center justify-center group-hover:bg-primary-600 group-hover:text-white transition-all duration-500 shadow-inner">
+                <i class="fas fa-chart-pie text-xl"></i>
+            </div>
+            <div
+                class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100 text-[9px] font-bold uppercase tracking-widest">
+                <i class="fas fa-arrow-up"></i> +8.5% YoY
+            </div>
         </div>
-        <div class="trend up"><i class="fas fa-arrow-up"></i> +8.5% YoY</div>
+        <div class="flex flex-col">
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">RevPAR</span>
+            <div class="flex items-baseline gap-2">
+                <span class="text-3xl font-display font-bold text-slate-900 tracking-tight">₹3,807</span>
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Market Lead</span>
+            </div>
+        </div>
     </div>
 </div>
 
-<div class="dashboard-row" style="margin-top: 30px;">
-    <div class="glass-panel">
-        <div class="panel-header">
-            <h3>Revenue Segmentation</h3>
+<div class="grid grid-cols-1 xl:grid-cols-2 gap-8 mb-12">
+    <!-- Chart Panel 1 -->
+    <div class="glass-panel rounded-panel-lg p-10 shadow-2xl shadow-slate-200/50">
+        <div class="flex items-center justify-between mb-10">
+            <div>
+                <h3 class="text-lg font-display font-bold text-slate-900 uppercase tracking-tight text-[15px]">Revenue
+                    Segmentation</h3>
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">By Property Category</span>
+            </div>
+            <button
+                class="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 hover:text-primary-600 transition-all">
+                <i class="fas fa-ellipsis-v"></i>
+            </button>
         </div>
-        <div style="height: 300px; display: flex; align-items: center; justify-content: center;">
+        <div class="h-[350px] w-full relative flex items-center justify-center">
             <canvas id="propChart"></canvas>
         </div>
     </div>
-    <div class="glass-panel">
-        <div class="panel-header">
-            <h3>Guest Demographics</h3>
+
+    <!-- Chart Panel 2 -->
+    <div class="glass-panel rounded-panel-lg p-10 shadow-2xl shadow-slate-200/50">
+        <div class="flex items-center justify-between mb-10">
+            <div>
+                <h3 class="text-lg font-display font-bold text-slate-900 uppercase tracking-tight text-[15px]">Guest
+                    Demographics</h3>
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Market Reach
+                    Analysis</span>
+            </div>
+            <button
+                class="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 hover:text-primary-600 transition-all">
+                <i class="fas fa-ellipsis-v"></i>
+            </button>
         </div>
-        <div style="height: 300px; display: flex; align-items: center; justify-content: center;">
+        <div class="h-[350px] w-full relative flex items-center justify-center">
             <canvas id="demoChart"></canvas>
         </div>
     </div>
@@ -56,46 +119,5 @@
 {% endblock %}
 
 {% block extra_scripts %}
-<script>
-    // Revenue Chart
-    const ctx1 = document.getElementById('propChart').getContext('2d');
-    new Chart(ctx1, {
-        type: 'doughnut',
-        data: {
-            labels: ['Room Revenue', 'F&B', 'Services', 'Events'],
-            datasets: [{
-                data: [65, 20, 10, 5],
-                backgroundColor: ['#d4af37', '#06b6d4', '#22c55e', '#ef4444'],
-                borderWidth: 0
-            }]
-        },
-        options: {
-            plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8' } } },
-            maintainAspectRatio: false
-        }
-    });
-
-    // Demographics Chart
-    const ctx2 = document.getElementById('demoChart').getContext('2d');
-    new Chart(ctx2, {
-        type: 'bar',
-        data: {
-            labels: ['Business', 'Leisure', 'Families', 'Solo'],
-            datasets: [{
-                label: '% of Guests',
-                data: [40, 35, 15, 10],
-                backgroundColor: '#06b6d4',
-                borderRadius: 8
-            }]
-        },
-        options: {
-            scales: {
-                y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8' } },
-                x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
-            },
-            plugins: { legend: { display: false } },
-            maintainAspectRatio: false
-        }
-    });
-</script>
+<script src="{% static 'hotels/js/insights.js' %}"></script>
 {% endblock %}

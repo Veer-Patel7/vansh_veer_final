@@ -1,0 +1,74 @@
+/* RESET */
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins', sans-serif;
+}
+
+/* BODY */
+body{
+    min-height:100vh;
+    background:url("../image/Hotel.jpg") center/cover no-repeat;
+    display:flex;
+    flex-direction:column;
+}
+
+/* NAVBAR */
+.navbar{
+    background:linear-gradient(to right,#4e73df,#3a5ccc);
+    color:white;
+    padding:18px 40px;
+    font-size:22px;
+    font-weight:600;
+}
+
+/* WRAPPER */
+.confirm-wrapper{
+    flex:1;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+/* CARD */
+.confirm-card{
+    background:#ffffffee;
+    width:420px;
+    padding:40px 35px;
+    border-radius:18px;
+    box-shadow:0 15px 40px rgba(0,0,0,0.15);
+    text-align:center;
+}
+
+/* TITLE */
+.confirm-card h2{
+    margin-bottom:25px;
+    font-size:26px;
+}
+
+
+/* BUTTON */
+.confirm-btn{
+    width:100%;
+    padding:12px;
+    border:none;
+    border-radius:8px;
+    background:linear-gradient(to right,#5a4bff,#6a5cff);
+    color:white;
+    font-size:16px;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.confirm-btn:hover{
+    opacity:0.9;
+    transform:scale(1.02);
+}
+
+/* RESPONSIVE */
+@media(max-width:480px){
+    .confirm-card{
+        width:90%;
+    }
+}
