@@ -1,0 +1,618 @@
+{% extends 'hotels/dashboard_base.html' %}
+{% load static %}
+
+{% block title %}Property Onboarding | HotelPro{% endblock %}
+
+{% block page_title %}Property Status: {{ hotel.hotel_name }}{% endblock %}
+{% block page_subtitle %}Complete your onboarding to go live on the platform.{% endblock %}
+
+{% block dashboard_content %}
+<style>
+    .status-card {
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        padding: 30px;
+        margin-bottom: 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .progress-bar-container {
+        width: 100%;
+        height: 12px;
+        background: #f1f5f9;
+        border-radius: 6px;
+        overflow: hidden;
+        margin: 20px 0;
+    }
+
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--accent), var(--secondary));
+        transition: width 0.8s ease-out;
+    }
+
+    .task-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+        margin-top: 30px;
+    }
+
+    .task-item {
+        background: #f8fafc;
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 24px;
+        transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        cursor: pointer;
+    }
+
+    .task-item:hover {
+        background: white;
+        border-color: var(--secondary);
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .task-status {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        padding: 4px 10px;
+        border-radius: 6px;
+        width: fit-content;
+    }
+
+    .status-done {
+        background: rgba(34, 197, 94, 0.1);
+        color: #22c55e;
+    }
+
+    .status-todo {
+        background: #f1f5f9;
+        color: var(--text-dim);
+    }
+
+    .status-pending {
+        background: rgba(250, 204, 21, 0.1);
+        color: #ca8a04;
+    }
+
+    .review-banner {
+        border-left: 4px solid #ca8a04;
+        background: rgba(250, 204, 21, 0.05);
+    }
+
+    /* Edit Modal Styles */
+    #editModalOverlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.7);
+        backdrop-filter: blur(8px);
+        z-index: 2000;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+
+    #editModalOverlay.active {
+        display: flex;
+    }
+
+    #editModalBox {
+        background: white;
+        border-radius: 24px;
+        max-width: 620px;
+        width: 100%;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: 0 40px 80px rgba(0, 0, 0, 0.3);
+        position: relative;
+        animation: slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes slideUp {
+        from {
+            transform: translateY(20px);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    .modal-header {
+        padding: 30px 35px 20px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .modal-body {
+        padding: 30px 35px;
+    }
+
+    .modal-footer {
+        padding: 20px 35px 30px;
+        border-top: 1px solid var(--border);
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+    }
+
+    .edit-field {
+        margin-bottom: 20px;
+    }
+
+    .edit-field label {
+        display: block;
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-dim);
+        margin-bottom: 6px;
+    }
+
+    .edit-field input,
+    .edit-field textarea,
+    .edit-field select {
+        width: 100%;
+        padding: 12px 16px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        font-size: 0.95rem;
+        font-family: inherit;
+        color: var(--text-main);
+        background: #f8fafc;
+        box-sizing: border-box;
+        transition: 0.2s;
+    }
+
+    .edit-field input:focus,
+    .edit-field textarea:focus,
+    .edit-field select:focus {
+        outline: none;
+        border-color: var(--secondary);
+        background: white;
+        box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+    }
+
+    .room-edit-card {
+        background: #f8fafc;
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 18px;
+        margin-bottom: 15px;
+    }
+
+    .gallery-preview-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .gallery-preview-grid img {
+        width: 100%;
+        height: 90px;
+        object-fit: cover;
+        border-radius: 8px;
+        border: 2px solid transparent;
+        transition: 0.2s;
+    }
+
+    .gallery-preview-grid img.primary-img {
+        border-color: var(--secondary);
+    }
+
+    .pending-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(250, 204, 21, 0.1);
+        color: #ca8a04;
+        border: 1px solid rgba(250, 204, 21, 0.3);
+        border-radius: 20px;
+        padding: 4px 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+</style>
+
+{% if hotel.status == 'PENDING' %}
+<div class="status-card review-banner">
+    <div style="display: flex; align-items: center; gap: 20px;">
+        <div
+            style="width: 50px; height: 50px; border-radius: 50%; background: rgba(250, 204, 21, 0.1); display: flex; align-items: center; justify-content: center; color: #ca8a04; font-size: 1.5rem;">
+            <i class="fas fa-hourglass-half"></i>
+        </div>
+        <div>
+            <h3 style="margin: 0; color: #ca8a04;">Verification in Progress</h3>
+            <p style="margin: 5px 0 0 0; color: var(--text-dim); font-size: 14px;">Your property is being audited by our
+                Super Admin team.</p>
+        </div>
+    </div>
+</div>
+{% elif hotel.status == 'REJECTED' %}
+<div class="status-card" style="border-left: 4px solid #ef4444; background: rgba(239, 68, 68, 0.05);">
+    <div style="display: flex; align-items: center; gap: 20px;">
+        <div
+            style="width: 50px; height: 50px; border-radius: 50%; background: rgba(239, 68, 68, 0.1); display: flex; align-items: center; justify-content: center; color: #ef4444; font-size: 1.5rem;">
+            <i class="fas fa-exclamation-circle"></i>
+        </div>
+        <div>
+            <h3 style="margin: 0; color: #ef4444;">Submission Rejected</h3>
+            <p style="margin: 5px 0 0 0; color: var(--text-dim); font-size: 14px;"><strong>Reason:</strong> {{
+                hotel.verification_remarks|default:"Please review your data and resubmit." }}</p>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="glass-panel">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h2 style="margin: 0;">Onboarding Progress</h2>
+            <p style="margin: 5px 0 0 0; color: var(--text-dim); font-size: 14px;">Click any section below to view
+                details or request an update.</p>
+        </div>
+        <div style="text-align: right;">
+            <div style="font-size: 28px; font-weight: 700; color: var(--accent);">{{ progress }}%</div>
+            <div style="font-size: 12px; color: var(--text-dim);">Profile Completion</div>
+        </div>
+    </div>
+
+    <div class="progress-bar-container">
+        <div class="progress-fill" id="progressFill" data-progress="{{ progress|default:0 }}"></div>
+    </div>
+    <script>document.getElementById('progressFill').style.width = document.getElementById('progressFill').dataset.progress + '%';</script>
+
+    <div class="task-list">
+        <!-- Task 1: Identity -->
+        <div class="task-item" onclick="openEditInterface('{{ hotel.id }}', 'IDENTITY')">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <i class="fas fa-id-card" style="color: var(--accent); font-size: 1.2rem;"></i>
+                {% if pending_categories and 'IDENTITY' in pending_categories %}
+                <span class="pending-badge"><i class="fas fa-clock"></i> Pending Review</span>
+                {% else %}
+                <span class="task-status status-done">Completed</span>
+                {% endif %}
+            </div>
+            <div>
+                <h4 style="margin: 0 0 5px 0;">Property Identity</h4>
+                <p style="margin: 0; color: var(--text-dim); font-size: 13px;">Basic details, license numbers, and
+                    address location.</p>
+            </div>
+            <div
+                style="display: flex; align-items: center; gap: 6px; color: var(--secondary); font-size: 0.8rem; font-weight: 600;">
+                <i class="fas fa-pen-to-square"></i> {% if 'IDENTITY' in pending_categories %}Request Pending{% else %}Click to View & Edit{% endif %}
+            </div>
+        </div>
+
+        <!-- Task 2: Inventory -->
+        <div class="task-item" onclick="openEditInterface('{{ hotel.id }}', 'INVENTORY')">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <i class="fas fa-bed" style="color: var(--secondary); font-size: 1.2rem;"></i>
+                {% if 'INVENTORY' in pending_categories %}
+                <span class="pending-badge"><i class="fas fa-clock"></i> Pending Review</span>
+                {% else %}
+                <span class="task-status {% if has_rooms %}status-done{% else %}status-todo{% endif %}">
+                    {% if has_rooms %}Completed{% else %}To-Do{% endif %}
+                </span>
+                {% endif %}
+            </div>
+            <div>
+                <h4 style="margin: 0 0 5px 0;">Room Inventory</h4>
+                <p style="margin: 0; color: var(--text-dim); font-size: 13px;">Define your room categories, pricing,
+                    and
+                    amenities.</p>
+            </div>
+            <div
+                style="display: flex; align-items: center; gap: 6px; color: var(--secondary); font-size: 0.8rem; font-weight: 600;">
+                <i class="fas fa-pen-to-square"></i> {% if 'INVENTORY' in pending_categories %}Request Pending{% else %}Click to View & Edit{% endif %}
+            </div>
+        </div>
+
+        <!-- Task 3: Gallery -->
+        <div class="task-item" onclick="openEditInterface('{{ hotel.id }}', 'GALLERY')">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <i class="fas fa-images" style="color: #a855f7; font-size: 1.2rem;"></i>
+                {% if 'GALLERY' in pending_categories %}
+                <span class="pending-badge"><i class="fas fa-clock"></i> Pending Review</span>
+                {% else %}
+                <span class="task-status {% if image_count >= 5 %}status-done{% else %}status-todo{% endif %}">
+                    {% if image_count >= 5 %}Completed{% else %}{{ image_count }}/5 Images{% endif %}
+                </span>
+                {% endif %}
+            </div>
+            <div>
+                <h4 style="margin: 0 0 5px 0;">Photo Gallery</h4>
+                <p style="margin: 0; color: var(--text-dim); font-size: 13px;">Upload at least 5 high-quality
+                    property
+                    photos.</p>
+            </div>
+            <div
+                style="display: flex; align-items: center; gap: 6px; color: var(--secondary); font-size: 0.8rem; font-weight: 600;">
+                <i class="fas fa-pen-to-square"></i> {% if 'GALLERY' in pending_categories %}Request Pending{% else %}Click to View & Edit{% endif %}
+            </div>
+        </div>
+
+        <!-- Task 4: Policies -->
+        <div class="task-item" onclick="openEditInterface('{{ hotel.id }}', 'OPS')">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <i class="fas fa-clock" style="color: #f59e0b; font-size: 1.2rem;"></i>
+                {% if 'OPS' in pending_categories %}
+                <span class="pending-badge"><i class="fas fa-clock"></i> Pending Review</span>
+                {% else %}
+                <span class="task-status {% if has_policy %}status-done{% else %}status-todo{% endif %}">
+                    {% if has_policy %}Completed{% else %}To-Do{% endif %}
+                </span>
+                {% endif %}
+            </div>
+            <div>
+                <h4 style="margin: 0 0 5px 0;">Policies & Ops</h4>
+                <p style="margin: 0; color: var(--text-dim); font-size: 13px;">Set check-in/out times and
+                    cancellation
+                    rules.</p>
+            </div>
+            <div
+                style="display: flex; align-items: center; gap: 6px; color: var(--secondary); font-size: 0.8rem; font-weight: 600;">
+                <i class="fas fa-pen-to-square"></i> {% if 'OPS' in pending_categories %}Request Pending{% else %}Click
+                to View & Edit{% endif %}
+            </div>
+        </div>
+    </div>
+
+    {% if progress == 100 and hotel.status == 'PENDING' %}
+    <div
+        style="margin-top: 40px; padding: 25px; background: rgba(6, 182, 212, 0.05); border: 1px dashed var(--accent); border-radius: 16px; text-align: center;">
+        <i class="fas fa-check-double" style="color: var(--accent); font-size: 2rem; margin-bottom: 15px;"></i>
+        <h3 style="margin: 0;">All Set!</h3>
+        <p style="margin: 10px 0 0 0; color: var(--text-dim);">Your data is complete and under verification. No
+            further
+            action needed.</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- ─── Edit Interface Modal ─── -->
+<div id="editModalOverlay" onclick="handleOverlayClick(event)">
+    <div id="editModalBox">
+        <div class="modal-header">
+            <div>
+                <div
+                    style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dim); margin-bottom: 4px;">
+                    Property Edit</div>
+                <h3 id="modalTitle" style="margin: 0; font-size: 1.3rem;">Edit Section</h3>
+            </div>
+            <button onclick="closeModal()"
+                style="width:36px; height:36px; border-radius:50%; border: 1px solid var(--border); background: #f8fafc; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-dim);">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body" id="modalBody">
+            <div style="text-align: center; padding: 40px; color: var(--text-dim);">
+                <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 15px;"></i>
+                <p>Loading details...</p>
+            </div>
+        </div>
+        <div class="modal-footer" id="modalFooter">
+            <button onclick="closeModal()" class="btn btn-outline"
+                style="padding: 10px 24px; border-radius: 8px; border: 1px solid var(--border); background: white; cursor: pointer; font-weight: 600; font-family: inherit;">Cancel</button>
+            <button onclick="submitEditRequest()" id="submitBtn" class="btn btn-primary"
+                style="padding: 10px 24px; border-radius: 8px; background: var(--secondary); border: none; color: var(--primary); cursor: pointer; font-weight: 700; font-family: inherit;">
+                <i class="fas fa-paper-plane"></i> Request Update
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentHotelId = null;
+    let currentCategory = null;
+    let currentData = null;
+
+    function getCsrfToken() {
+        const cookie = document.cookie.split(';').find(c => c.trim().startsWith('csrftoken='));
+        return cookie ? cookie.trim().split('=')[1] : '';
+    }
+
+    function handleOverlayClick(e) {
+        if (e.target === document.getElementById('editModalOverlay')) closeModal();
+    }
+
+    function openEditInterface(hotelId, category) {
+        currentHotelId = hotelId;
+        currentCategory = category;
+        document.getElementById('editModalOverlay').classList.add('active');
+
+        const titles = { IDENTITY: 'Property Identity', INVENTORY: 'Room Inventory', GALLERY: 'Photo Gallery', OPS: 'Policies & Ops' };
+        document.getElementById('modalTitle').textContent = titles[category] || category;
+
+        document.getElementById('modalBody').innerHTML = `
+        <div style="text-align: center; padding: 40px; color: var(--text-dim);">
+            <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 15px;"></i>
+            <p>Loading details...</p>
+        </div>`;
+
+        fetch(`/hotel/edit-detail/${hotelId}/${category}/`)
+            .then(r => r.json())
+            .then(res => {
+                currentData = res.data;
+                renderEditForm(category, res.data);
+            })
+            .catch(() => {
+                document.getElementById('modalBody').innerHTML = `<p style="color:#ef4444; text-align:center;">Failed to load. Please try again.</p>`;
+            });
+    }
+
+    function renderEditForm(category, data) {
+        let html = '';
+
+        if (category === 'IDENTITY') {
+            html = `
+        <div class="edit-field"><label>Hotel Name</label><input type="text" id="f_hotel_name" value="${data.hotel_name || ''}"></div>
+        <div class="edit-field">
+            <label>Property Type</label>
+            <select id="f_hotel_type">
+                <option value="HOTEL" ${data.hotel_type === 'HOTEL' ? 'selected' : ''}>Hotel</option>
+                <option value="5_STAR" ${data.hotel_type === '5_STAR' ? 'selected' : ''}>5 Star Premium</option>
+                <option value="4_STAR" ${data.hotel_type === '4_STAR' ? 'selected' : ''}>4 Star Luxury</option>
+                <option value="3_STAR" ${data.hotel_type === '3_STAR' ? 'selected' : ''}>3 Star Business</option>
+                <option value="RESORT" ${data.hotel_type === 'RESORT' ? 'selected' : ''}>Resort / Villa</option>
+                <option value="VILLA" ${data.hotel_type === 'VILLA' ? 'selected' : ''}>Villa</option>
+                <option value="GUESTHOUSE" ${data.hotel_type === 'GUESTHOUSE' ? 'selected' : ''}>Guest House</option>
+                <option value="HOSTEL" ${data.hotel_type === 'HOSTEL' ? 'selected' : ''}>Hostel</option>
+                <option value="OTHER" ${data.hotel_type === 'OTHER' ? 'selected' : ''}>Other</option>
+            </select>
+        </div>
+        <div class="edit-field"><label>Description</label><textarea id="f_description" rows="3">${data.description || ''}</textarea></div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
+            <div class="edit-field"><label>City</label><input type="text" id="f_city" value="${data.city || ''}"></div>
+            <div class="edit-field"><label>State</label><input type="text" id="f_state" value="${data.state || ''}"></div>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
+            <div class="edit-field"><label>Pincode</label><input type="text" id="f_pincode" value="${data.pincode || ''}"></div>
+        </div>
+        <div class="edit-field"><label>Address</label><textarea id="f_address" rows="2">${data.address || ''}</textarea></div>
+        <div style="background:#fefce8; border:1px solid #fde68a; border-radius:10px; padding:12px 16px; font-size:0.85rem; color:#92400e;">
+            <i class="fas fa-info-circle"></i> Changes require Super Admin approval before going live.
+        </div>`;
+        } else if (category === 'INVENTORY') {
+            if (!data.rooms || data.rooms.length === 0) {
+                html = `<p style="text-align:center; color:var(--text-dim); padding:20px;">No rooms added yet.</p>`;
+            } else {
+                html = data.rooms.map((r, i) => `
+                <div class="room-edit-card">
+                    <div style="font-weight:700; margin-bottom:12px; color:var(--primary);">
+                        <i class="fas fa-bed" style="color:var(--secondary);"></i> ${r.name || r.type}
+                    </div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                        <div class="edit-field"><label>Price / Night (₹)</label><input type="number" id="f_room_price_${i}" value="${r.price}" data-room-id="${r.id}"></div>
+                        <div class="edit-field"><label>Max Guests</label><input type="number" id="f_room_guests_${i}" value="${r.guests}"></div>
+                        <div class="edit-field"><label>Total Rooms</label><input type="number" id="f_room_count_${i}" value="${r.inventory}"></div>
+                    </div>
+                </div>`).join('');
+                html += `<div style="background:#fefce8; border:1px solid #fde68a; border-radius:10px; padding:12px 16px; font-size:0.85rem; color:#92400e;">
+                <i class="fas fa-info-circle"></i> Changes require Super Admin approval before going live.
+            </div>`;
+            }
+            document.getElementById('submitBtn').style.display = (!data.rooms || data.rooms.length === 0) ? 'none' : 'flex';
+        } else if (category === 'GALLERY') {
+            if (!data.images || data.images.length === 0) {
+                html = `<p style="text-align:center; color:var(--text-dim); padding:20px;">No images uploaded yet.</p>`;
+                document.getElementById('submitBtn').style.display = 'none';
+            } else {
+                html = `<p style="color:var(--text-dim); font-size:0.9rem; margin:0 0 15px;">Current gallery images (${data.images.length} total):</p>
+            <div class="gallery-preview-grid">
+                ${data.images.map(img => `<img src="${img.url}" class="${img.is_primary ? 'primary-img' : ''}" title="${img.is_primary ? 'Primary Image' : ''}">`).join('')}
+            </div>
+            <p style="margin-top:20px; color:var(--text-dim); font-size:0.85rem;"><i class="fas fa-info-circle"></i> To add/remove photos, submit a gallery change request via the form below.</p>
+            <div class="edit-field" style="margin-top:10px;"><label>Change Request Description</label><textarea id="f_gallery_note" rows="3" placeholder="Describe what changes you'd like to make to the gallery..."></textarea></div>`;
+            }
+        } else if (category === 'OPS') {
+            html = `
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
+            <div class="edit-field"><label>Check-In Time</label><input type="time" id="f_check_in" value="${data.check_in || '14:00'}"></div>
+            <div class="edit-field"><label>Check-Out Time</label><input type="time" id="f_check_out" value="${data.check_out || '11:00'}"></div>
+        </div>
+        <div class="edit-field"><label>Cancellation Policy</label><textarea id="f_cancellation_policy" rows="4">${data.cancellation_policy || ''}</textarea></div>
+        <div style="background:#fefce8; border:1px solid #fde68a; border-radius:10px; padding:12px 16px; font-size:0.85rem; color:#92400e;">
+            <i class="fas fa-info-circle"></i> Changes require Super Admin approval before going live.
+        </div>`;
+        }
+
+        document.getElementById('modalBody').innerHTML = html;
+    }
+
+    function collectFormData() {
+        const d = {};
+        if (currentCategory === 'IDENTITY') {
+            d.hotel_name = document.getElementById('f_hotel_name').value;
+            d.hotel_type = document.getElementById('f_hotel_type').value;
+            d.description = document.getElementById('f_description').value;
+            d.city = document.getElementById('f_city').value;
+            d.state = document.getElementById('f_state').value;
+            d.pincode = document.getElementById('f_pincode').value;
+            d.address = document.getElementById('f_address').value;
+        } else if (currentCategory === 'INVENTORY') {
+            d.rooms = currentData.rooms.map((r, i) => ({
+                id: r.id,
+                price: document.getElementById(`f_room_price_${i}`)?.value,
+                guests: document.getElementById(`f_room_guests_${i}`)?.value,
+                inventory: document.getElementById(`f_room_count_${i}`)?.value,
+            }));
+        } else if (currentCategory === 'GALLERY') {
+            d.note = document.getElementById('f_gallery_note')?.value;
+        } else if (currentCategory === 'OPS') {
+            d.check_in = document.getElementById('f_check_in').value;
+            d.check_out = document.getElementById('f_check_out').value;
+            d.cancellation_policy = document.getElementById('f_cancellation_policy').value;
+        }
+        return d;
+    }
+
+    function submitEditRequest() {
+        const btn = document.getElementById('submitBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+
+        const payload = collectFormData();
+
+        fetch(`/hotel/edit-submit/${currentHotelId}/${currentCategory}/`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCsrfToken() },
+            body: JSON.stringify(payload)
+        })
+            .then(r => r.json())
+            .then(res => {
+                if (res.status === 'success') {
+                    document.getElementById('modalBody').innerHTML = `
+                <div style="text-align:center; padding: 40px;">
+                    <div style="width:70px; height:70px; background:rgba(34,197,94,0.1); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 20px; font-size:2rem; color:#22c55e;">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <h3 style="margin:0 0 10px;">Request Submitted!</h3>
+                    <p style="color:var(--text-dim);">Your change request has been sent to the Super Admin for review. You'll be notified once it's approved.</p>
+                </div>`;
+                    document.getElementById('modalFooter').innerHTML = `
+                <button onclick="closeModal()" class="btn btn-primary" style="padding: 12px 32px; border-radius: 8px; background: var(--secondary); border: none; color: var(--primary); cursor: pointer; font-weight: 700; font-family: inherit; width: 100%;">
+                    Done
+                </button>`;
+                } else {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-paper-plane"></i> Request Update';
+                    alert('Submission failed. Please try again.');
+                }
+            })
+            .catch(() => {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-paper-plane"></i> Request Update';
+                alert('Network error. Please try again.');
+            });
+    }
+
+    function closeModal() {
+        document.getElementById('editModalOverlay').classList.remove('active');
+        currentHotelId = null;
+        currentCategory = null;
+        currentData = null;
+        document.getElementById('submitBtn').style.display = 'flex';
+        document.getElementById('submitBtn').disabled = false;
+        document.getElementById('submitBtn').innerHTML = '<i class="fas fa-paper-plane"></i> Request Update';
+    }
+</script>
+{% endblock %}

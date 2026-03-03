@@ -1,0 +1,8 @@
+<div class="stats-grid">
+    {% with p='hotels/includes/dashboard/stat_card.html' %}
+    {% include p with i='fa-hotel' l='Managed' v=total_hotels t='+1 mo' %}
+    {% include p with i='fa-calendar-day' l='Bookings' v=bookings_today t='12%' th='success' %}
+    {% include p with i='fa-wallet' l='Revenue' v=revenue_today t='2%' tc='down' th='info' %}
+    {% include p with i='fa-star' l='Rating' v=avg_rating t='Top 5%' th='warning' %}
+    {% endwith %}
+</div>

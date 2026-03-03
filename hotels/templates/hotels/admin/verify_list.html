@@ -1,0 +1,51 @@
+{% extends 'hotels/dashboard_base.html' %}
+{% load static %}
+
+{% block title %}Super Admin | Verification Queue{% endblock %}
+
+{% block page_title %}Verification Queue{% endblock %}
+{% block page_subtitle %}Review and activate pending hotel submissions.{% endblock %}
+
+{% block dashboard_content %}
+<div class="glass-panel">
+    <div class="panel-header">
+        <h3>Pending Properties</h3>
+    </div>
+    <table class="hotel-table">
+        <thead>
+            <tr>
+                <th>Hotel Name</th>
+                <th>Owner</th>
+                <th>Submitted</th>
+                <th>Location</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for hotel in pending_hotels %}
+            <tr>
+                <td>
+                    <div style="font-weight: 600; color: white;">{{ hotel.hotel_name }}</div>
+                    <div style="font-size: 11px; color: var(--text-dim);">{{ hotel.get_hotel_type_display }}</div>
+                </td>
+                <td>{{ hotel.owner.username }}</td>
+                <td style="color: var(--text-dim);">{{ hotel.submitted_at|date:"D, d M Y" }}</td>
+                <td>{{ hotel.city }}, {{ hotel.state }}</td>
+                <td>
+                    <a href="{% url 'hotels:admin_dashboard_pro' %}" class="btn-action"
+                        style="background: rgba(255,255,255,0.05); color: white; text-decoration: none;">
+                        Use Super Admin Site
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" style="text-align: center; color: var(--text-dim); padding: 40px;">No pending
+                    verifications at the moment.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

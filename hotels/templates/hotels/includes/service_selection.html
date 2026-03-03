@@ -1,0 +1,35 @@
+﻿<div class="input-group full-width">
+    <label class="section-subtitle"><i class="fas fa-concierge-bell"></i> 2B. Premium Hotel Services</label>
+
+    <div class="selection-pill-group" id="servicesGrid">
+        {% for value, label in form.fields.room_services.choices %}
+        <label class="pill-label">
+            {% if value in form.services.value %}
+                <input type="checkbox" name="services" value="{{ value }}" checked>
+            {% else %}
+                <input type="checkbox" name="services" value="{{ value }}">
+            {% endif %}
+            
+            {% if 'Wifi' in label %}
+                <i class="fas fa-wifi"></i>
+            {% elif 'Parking' in label %}
+                <i class="fas fa-car"></i>
+            {% elif 'Pool' in label %}
+                <i class="fas fa-swimming-pool"></i>
+            {% else %}
+                <i class="fas fa-check"></i>
+            {% endif %}
+            
+            {{ label }}
+        </label>
+        {% endfor %}
+    </div>
+
+    <!-- Custom Service Input Refined -->
+    <div class="pill-input-wrapper" style="margin-top: 15px;">
+        <input type="text" id="customServiceInput" placeholder="Add custom service (e.g. Yoga, Valet)">
+        <button type="button" id="addServiceBtn" class="pill-add-btn">
+            <i class="fas fa-plus"></i>
+        </button>
+    </div>
+</div>

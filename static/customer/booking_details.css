@@ -1,0 +1,96 @@
+/* ========== RESET ========== */
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins', sans-serif;
+}
+
+/* ========== BODY ========== */
+body{
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:url("../image/Hotel.jpg") center/cover no-repeat;
+    position:relative;
+    padding-top:70px;
+}
+
+/* ========== NAVBAR ========== */
+.navbar{
+    position:absolute;
+    top:0;
+    width:100%;
+    background:rgba(59,131,246,0.75);
+    backdrop-filter:blur(6px);
+    color:white;
+    padding:15px 40px;
+    font-size:20px;
+    font-weight:600;
+}
+
+/* ========== CARD ========== */
+.card-form{
+    background:white;
+    width:90%;
+    max-width:350px;
+    padding:35px;
+    border-radius:18px;
+    box-shadow:0 20px 40px rgba(0,0,0,0.2);
+    text-align:center;
+}
+
+/* ========== INPUTS ========== */
+.input-group{
+    margin-bottom:18px;
+    text-align:left;
+}
+
+.input-group label{
+    display:block;
+    margin-bottom:6px;
+    font-size:14px;
+    font-weight:500;
+}
+
+.input-group input{
+    width:100%;
+    padding:12px;
+    border:1px solid #ddd;
+    border-radius:10px;
+    outline:none;
+    transition:0.3s;
+}
+
+.input-group input:focus{
+    border-color:#4f46e5;
+    box-shadow:0 0 8px rgba(79,70,229,0.3);
+}
+
+/* ========== BUTTON ========== */
+.btn-main{
+    width:100%;
+    padding:12px;
+    background:#4f46e5;
+    color:white;
+    border:none;
+    border-radius:10px;
+    font-weight:600;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.btn-main:hover{
+    background:#4338ca;
+}
+
+/* ========== MESSAGE ========== */
+.success-msg{
+    background:#e6fffa;
+    color:#047857;
+    padding:8px;
+    border-radius:8px;
+    margin-bottom:15px;
+    font-size:14px;
+}

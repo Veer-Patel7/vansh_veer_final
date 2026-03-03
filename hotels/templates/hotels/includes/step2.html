@@ -1,0 +1,210 @@
+{% load static %}
+<!-- STEP 2: Rooms, Services & Hotel Information -->
+<div class="onboarding-step" id="step-2">
+    <div class="premium-card">
+        <h2 class="step-title"><i class="fas fa-bed"></i> Inventory, Services & Policies</h2>
+        <p class="step-description">Define your property's offerings and operational standards.</p>
+
+        <div class="form-grid">
+            <!-- Dynamic Rooms Section -->
+            <div class="input-group full-width" style="margin-bottom: 32px;">
+                <label class="section-subtitle"><i class="fas fa-layer-group"></i> 2A. Room Inventory</label>
+                <div id="roomList">
+                    <!-- Dynamic Room Items -->
+                </div>
+                <button type="button" id="addRoomBtn" class="btn btn-premium-outline full-width">
+                    <i class="fas fa-plus-circle"></i> Add Another Room Category
+                </button>
+            </div>
+
+            <!-- Services Section -->
+            {% include 'hotels/includes/service_selection.html' %}
+
+            <!-- Operational Information -->
+            <div class="input-group full-width" style="margin-top: 40px; margin-bottom: 20px;">
+                <label class="section-subtitle"><i class="fas fa-clock"></i> 2C. Operational Information</label>
+            </div>
+
+            <div class="dense-grid">
+                <div class="col-6">
+                    <div class="input-group">
+                        <label>Standard Check-in</label>
+                        <div class="input-with-icon">
+                            <input type="time" name="check_in" value="14:00" required>
+                            <i class="fas fa-door-open"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="input-group">
+                        <label>Standard Check-out</label>
+                        <div class="input-with-icon">
+                            <input type="time" name="check_out" value="11:00" required>
+                            <i class="fas fa-door-closed"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="input-group">
+                        <label>Cancellation Policy</label>
+                        <div class="input-with-icon">
+                            <textarea name="cancellation_policy" rows="2"
+                                placeholder="Describe your cancellation policy clearly..." required
+                                style="resize: none;"></textarea>
+                            <i class="fas fa-info-circle" style="top: 20px; transform: none;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Property Gallery Section -->
+            <div class="input-group full-width" style="margin-top: 40px;">
+                <label class="section-subtitle"><i class="fas fa-images"></i> 2D. Property Gallery</label>
+                <p class="input-hint" style="margin-bottom: 15px;">Upload at least 5 photos showing the exterior, lobby,
+                    and common areas.</p>
+
+                <div class="upload-zone" id="galleryUploadZone">
+                    <input type="file" name="property_images" id="galleryInput" multiple accept="image/*"
+                        style="display: none;">
+                    <i class="fas fa-cloud-upload-alt upload-zone-icon"></i>
+                    <p class="upload-zone-text">Click to select or drag and drop photos</p>
+                    <p class="upload-zone-subtext">Supports JPG, PNG, WEBP (Max 5MB per file)</p>
+                </div>
+
+                <div id="galleryPreviewContainer" class="gallery-preview-grid">
+                    <!-- Gallery previews will be injected here -->
+                </div>
+            </div>
+        </div>
+
+        <div class="button-group" style="margin-top: 40px;">
+            <button type="button" class="btn btn-outline prev-step" data-target="1">
+                <i class="fas fa-arrow-left"></i> Back
+            </button>
+            <button type="button" class="btn btn-primary next-step" data-target="3">
+                Next: 03. Compliance <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden Template for Dynamic Room Row -->
+<template id="room-row-template">
+    <div class="room-row" data-room-index="__prefix__">
+        <div class="room-header-premium">
+            <div class="room-title">
+                <i class="fas fa-bed"></i>
+                <h4>Room Category #<span class="room-num-display">__prefix__</span></h4>
+            </div>
+            <div class="remove-room" title="Remove Category"><i class="fas fa-trash-alt"></i></div>
+        </div>
+
+        <div class="room-body">
+            <div class="dense-grid">
+                <!-- Basic Info -->
+                <div class="col-6">
+                    <div class="input-group">
+                        <label>Room Category Name</label>
+                        <div class="input-with-icon">
+                            <input type="text" name="room_name___prefix__" placeholder="e.g. Deluxe Garden View"
+                                required>
+                            <i class="fas fa-tag"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="input-group">
+                        <label>Room Class</label>
+                        <select name="room_class___prefix__" id="room_class_hidden___prefix__" required
+                            style="display: none !important;">
+                            <option value="STANDARD">Standard</option>
+                            <option value="DELUXE">Deluxe</option>
+                            <option value="SUITE">Suite</option>
+                            <option value="LUXURY">Luxury / Presidential</option>
+                        </select>
+                        <div class="custom-select-container" data-target="room_class_hidden___prefix__">
+                            <div class="select-selected">
+                                <span class="selected-text"><i class="fas fa-layer-group"
+                                        style="color:var(--secondary);"></i> Select Class</span>
+                                <i class="fas fa-chevron-down arrow-icon"></i>
+                            </div>
+                            <div class="select-items">
+                                <div class="select-item" data-value="STANDARD">Standard</div>
+                                <div class="select-item" data-value="DELUXE">Deluxe</div>
+                                <div class="select-item" data-value="SUITE">Suite</div>
+                                <div class="select-item" data-value="LUXURY">Luxury</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-4">
+                    <div class="input-group">
+                        <label>Max Guests</label>
+                        <div class="input-with-icon">
+                            <input type="number" name="room_guests___prefix__" value="2" min="1" required>
+                            <i class="fas fa-users"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="input-group">
+                        <label>Price / Night (₹)</label>
+                        <div class="input-with-icon">
+                            <input type="number" name="room_price___prefix__" placeholder="0.00" required>
+                            <i class="fas fa-indian-rupee-sign"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="input-group">
+                        <label>Available Units</label>
+                        <div class="input-with-icon">
+                            <input type="number" name="room_count___prefix__" value="1" min="1" required>
+                            <i class="fas fa-door-open"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Amenities Pill Input -->
+                <div class="col-12" style="margin-top: 10px;">
+                    <label class="section-subtitle" style="font-size: 0.7rem;"><i class="fas fa-concierge-bell"></i>
+                        Special Amenities for this Category</label>
+                    <div class="dynamic-pills-container" style="margin-bottom: 10px;">
+                        <!-- Custom pills go here -->
+                    </div>
+                    <div class="pill-input-wrapper">
+                        <input type="text" class="new-amenity-text" placeholder="Add amenity (e.g. Bathtub, Minibar)">
+                        <button type="button" class="pill-add-btn"><i class="fas fa-plus"></i></button>
+                    </div>
+                    <input type="hidden" name="room_amenities___prefix__">
+                </div>
+
+                <!-- Room Gallery -->
+                <div class="col-12" style="margin-top: 10px;">
+                    <div class="room-image-group">
+                        <div class="room-upload-btn">
+                            <i class="fas fa-images"></i>
+                            <span>Add Room Photos</span>
+                            <input type="file" name="room_image___prefix__" multiple accept="image/*"
+                                style="display:none;">
+                        </div>
+                        <div class="room-preview-box">
+                            <!-- Previews injected here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+<!-- Lightbox Modal -->
+<div id="lightboxModal" style="display: none;">
+    <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
+    <div class="lightbox-nav lightbox-prev" onclick="changeSlide(-1)">&#10094;</div>
+    <div class="lightbox-content-wrapper">
+        <img id="lightboxImage" class="lightbox-content" src="" style="display:none;">
+        <video id="lightboxVideo" class="lightbox-content" controls style="display:none;"></video>
+    </div>
+    <div class="lightbox-nav lightbox-next" onclick="changeSlide(1)">&#10095;</div>
+</div>

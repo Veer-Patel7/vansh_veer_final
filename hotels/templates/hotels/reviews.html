@@ -1,0 +1,109 @@
+{% extends 'hotels/dashboard_base.html' %}
+{% load static %}
+
+{% block title %}Reviews | HotelPro Admin{% endblock %}
+
+{% block page_title %}Guest Feedback{% endblock %}
+{% block page_subtitle %}Monitor and respond to guest reviews to maintain your premium reputation.{% endblock %}
+
+{% block dashboard_content %}
+<div class="stats-grid" style="margin-top: 30px;">
+    <div class="stat-card">
+        <div class="stat-info">
+            <div class="label">Average Rating</div>
+            <div class="value">4.8 <span style="font-size: 1rem; color: #facc15;"><i class="fas fa-star"></i></span>
+            </div>
+        </div>
+        <div class="trend up"><i class="fas fa-arrow-up"></i> +0.2 this quarter</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-info">
+            <div class="label">Total Reviews</div>
+            <div class="value">1,204</div>
+        </div>
+        <div class="trend up"><i class="fas fa-arrow-up"></i> +45 new this week</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-info">
+            <div class="label">Response Rate</div>
+            <div class="value">94%</div>
+        </div>
+        <div class="trend up"><i class="fas fa-check"></i> High performance</div>
+    </div>
+</div>
+
+<div class="glass-panel" style="margin-top: 30px;">
+    <div class="panel-header">
+        <h3>Recent Guest Reviews</h3>
+        <div style="display: flex; gap: 10px;">
+            <button class="btn-action">All Ratings</button>
+            <button class="btn-action">Pending Response</button>
+            <button class="btn-action">Critical</button>
+        </div>
+    </div>
+
+    <div class="review-list">
+        <div class="review-item" style="padding: 25px; border-bottom: 1px solid var(--border);">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
+                <div style="display: flex; gap: 15px; align-items: center;">
+                    <div
+                        style="width: 40px; height: 40px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; color: white;">
+                        AS</div>
+                    <div>
+                        <div style="font-weight: 600;">Amit Sharma</div>
+                        <div style="font-size: 0.75rem; color: var(--text-dim);">Stayed at Breeze Bay Resort • 2 days
+                            ago</div>
+                    </div>
+                </div>
+                <div style="color: #facc15;">
+                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                        class="fas fa-star"></i><i class="fas fa-star"></i>
+                </div>
+            </div>
+            <p style="font-style: italic; color: var(--text-main); margin-bottom: 15px;">"Exceptional service and
+                stunning views. The staff went above and beyond to make our stay comfortable. Highly recommended for
+                families."</p>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn-action" style="font-size: 0.75rem; padding: 6px 12px;"><i class="fas fa-reply"></i>
+                    Reply</button>
+                <button class="btn-action" style="font-size: 0.75rem; padding: 6px 12px;"><i class="fas fa-share"></i>
+                    Feature</button>
+            </div>
+        </div>
+
+        <div class="review-item" style="padding: 25px; border-bottom: 1px solid var(--border);">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
+                <div style="display: flex; gap: 15px; align-items: center;">
+                    <div
+                        style="width: 40px; height: 40px; border-radius: 50%; background: #ef4444; display: flex; align-items: center; justify-content: center; color: white;">
+                        RK</div>
+                    <div>
+                        <div style="font-weight: 600;">Riya Kapoor</div>
+                        <div style="font-size: 0.75rem; color: var(--text-dim);">Stayed at Urban Elite Hotel • 1 week
+                            ago</div>
+                    </div>
+                </div>
+                <div style="color: #facc15;">
+                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                        class="fas fa-star"></i><i class="far fa-star"></i>
+                </div>
+            </div>
+            <p style="font-style: italic; color: var(--text-main); margin-bottom: 15px;">"The room was pristine but the
+                check-in process was a bit slow. Overall a good experience but room for improvement in operations."</p>
+            <div
+                style="background: rgba(255,255,255,0.03); border-radius: 12px; padding: 15px; margin-bottom: 15px; border-left: 3px solid var(--secondary);">
+                <div style="font-weight: 600; font-size: 0.8rem; margin-bottom: 5px;">Manager Response:</div>
+                <p style="font-size: 0.8rem; color: var(--text-dim);">"Dear Riya, thank you for your feedback. We
+                    apologize for the delay during check-in and are already working on streamlining the process. We hope
+                    to welcome you back soon!"</p>
+            </div>
+            <button class="btn-action" style="font-size: 0.75rem; padding: 6px 12px;"><i class="fas fa-edit"></i> Edit
+                Reply</button>
+        </div>
+    </div>
+
+    <div style="padding: 20px; text-align: center;">
+        <button class="btn-action">View All Reviews</button>
+    </div>
+</div>
+{% endblock %}

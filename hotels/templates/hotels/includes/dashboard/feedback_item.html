@@ -1,0 +1,16 @@
+<div class="review-item">
+    <div class="review-meta">
+        <span class="reviewer">{{ review.name }}</span>
+        <div class="stars">
+            {% for i in "12345"|make_list %}
+            <i class="fas fa-star{% if forloop.counter > review.rating %}-o{% endif %}"></i>
+            {% endfor %}
+        </div>
+    </div>
+    <p class="review-text">"{{ review.comment|truncatechars:80 }}"</p>
+    <div class="review-footer">
+        <span style="font-size: 0.7rem; color: #64748b;">Applied to {{ review.hotel.hotel_name|default:"General"
+            }}</span>
+        <span style="font-size: 0.7rem; color: #64748b;">{{ review.created_at|date:"M d, Y" }}</span>
+    </div>
+</div>

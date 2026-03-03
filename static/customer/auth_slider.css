@@ -1,0 +1,99 @@
+
+/* ===== RESET ===== */
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins', sans-serif;
+}
+
+/* ===== BODY ===== */
+body{
+    height:100vh;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    background:url("../image/Hotel.jpg") center/cover no-repeat;
+    position:relative;
+}
+
+/* ===== NAVBAR ===== */
+.navbar{
+    position:absolute;
+    top:0;
+    width:100%;
+    background:rgba(59,131,246,0.75);
+    backdrop-filter:blur(6px);
+    color:white;
+    padding:15px 40px;
+    font-size:20px;
+    font-weight:600;
+}
+
+/* ===== CONTAINER ===== */
+.container{
+    width:400px;
+    overflow:hidden;
+}
+
+/* ===== SLIDER ===== */
+.slider{
+    display:flex;
+    width:200%;
+    transition:0.6s ease-in-out;
+}
+
+/* ===== FORM BOX ===== */
+.form-box{
+    width:50%;
+    background:white;
+    padding:40px;
+    border-radius:20px;
+    text-align:center;
+    box-shadow:0 15px 35px rgba(0,0,0,0.2);
+}
+
+/* ===== INPUT ===== */
+.form-box input{
+    width:100%;
+    padding:12px;
+    margin:10px 0;
+    border:1px solid #ddd;
+    border-radius:10px;
+    outline:none;
+    transition:0.3s;
+}
+
+.form-box input:focus{
+    border:1px solid #4f46e5;
+}
+
+/* ===== BUTTON ===== */
+.form-box button{
+    width:100%;
+    padding:12px;
+    background:#4f46e5;
+    color:white;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight:500;
+    transition:0.3s;
+}
+
+.form-box button:hover{
+    background:#4338ca;
+}
+
+/* ===== SWITCH TEXT ===== */
+.switch{
+    margin-top:15px;
+    color:#4f46e5;
+    cursor:pointer;
+    font-size:14px;
+}
+
+.switch:hover{
+    text-decoration:underline;
+}

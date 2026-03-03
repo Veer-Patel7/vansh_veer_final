@@ -1,0 +1,127 @@
+{% extends "superadmin/base.html" %}
+{% block content %}
+
+<style>
+.card-box{
+    padding:20px;
+    border-radius:10px;
+    color:white;
+}
+.bg1{background:#3498db;}
+.bg2{background:#27ae60;}
+.bg3{background:#e74c3c;}
+
+.table-box{
+    background:white;
+    padding:20px;
+    border-radius:10px;
+    margin-top:25px;
+}
+</style>
+
+<div class="container-fluid">
+
+<h2 class="mb-4">HOTEL APPROVAL PAGE</h2>
+
+<!-- STATS CARDS -->
+<div class="row">
+    <div class="col-md-4">
+        <div class="card-box bg1">
+            <h4>Pending Hotels</h4>
+            <h2>{{ pending_count }}</h2>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card-box bg2">
+            <h4>Live Hotels</h4>
+            <h2>{{ live_count }}</h2>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card-box bg3">
+            <h4>Rejected</h4>
+            <h2>{{ rejected_count }}</h2>
+        </div>
+    </div>
+</div>
+
+
+<!-- PENDING TABLE -->
+<div class="table-box">
+<h4>Pending Hotel Approvals</h4>
+
+<table class="table table-bordered">
+<tr>
+<th>Hotel</th>
+<th>City</th>
+<th>Action</th>
+</tr>
+
+{% for h in hotels %}
+{% if h.status == "PENDING" %}
+<tr>
+<td>{{ h.hotel_name }}</td>
+<td>{{ h.city }}</td>
+<td>
+<a href="/super/approve-hotel/{{h.id}}/" class="btn btn-success btn-sm">Approve</a>
+<a href="/super/reject-hotel/{{h.id}}/" class="btn btn-danger btn-sm">Reject</a>
+</td>
+</tr>
+{% endif %}
+{% endfor %}
+</table>
+</div>
+
+
+<!-- LIVE TABLE -->
+<div class="table-box">
+<h4>Live Hotels</h4>
+
+<table class="table table-bordered">
+<tr>
+<th>Hotel</th>
+<th>City</th>
+<th>Status</th>
+</tr>
+
+{% for h in hotels %}
+{% if h.status == "LIVE" %}
+<tr>
+<td>{{ h.hotel_name }}</td>
+<td>{{ h.city }}</td>
+<td><span class="badge bg-success">LIVE</span></td>
+</tr>
+{% endif %}
+{% endfor %}
+</table>
+</div>
+
+
+<!-- REJECTED TABLE -->
+<div class="table-box">
+<h4>Rejected Hotels</h4>
+
+<table class="table table-bordered">
+<tr>
+<th>Hotel</th>
+<th>City</th>
+<th>Reason</th>
+</tr>
+
+{% for h in hotels %}
+{% if h.status == "REJECTED" %}
+<tr>
+<td>{{ h.hotel_name }}</td>
+<td>{{ h.city }}</td>
+<td>{{ h.verification_remarks }}</td>
+</tr>
+{% endif %}
+{% endfor %}
+</table>
+</div>
+
+</div>
+
+{% endblock %}

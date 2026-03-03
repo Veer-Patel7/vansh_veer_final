@@ -1,0 +1,71 @@
+{% extends "superadmin/base.html" %}
+
+{% block content %}
+
+<h2>Review Delete Requests</h2>
+<hr>
+
+<div class="card">
+  <div class="card-body">
+
+    <table class="table table-bordered table-striped">
+      <tr>
+        <th>Hotel</th>
+        <th>Customer</th>
+        <th>Rating</th>
+        <th>Comment</th>
+        <th>Recommend</th>
+        <th>Action</th>
+      </tr>
+
+      {% for r in reviews %}
+      <tr>
+        <td>{{ r.hotel.hotel_name }}</td>
+        <td>{{ r.user.email }}</td>
+
+        <td>
+          <span class="badge bg-info">{{ r.rating }}</span>
+        </td>
+
+        <td>{{ r.comment }}</td>
+
+        <td>
+          {% if r.recommend %}
+            <span class="badge bg-success">Yes</span>
+          {% else %}
+            <span class="badge bg-secondary">No</span>
+          {% endif %}
+        </td>
+
+        <td>
+          <a href="/super/approve-review/{{ r.id }}/"
+             class="btn btn-success btn-sm">
+             Approve Delete
+          </a>
+
+          <a href="/super/reject-review/{{ r.id }}/"
+             class="btn btn-warning btn-sm">
+             Reject
+          </a>
+
+          <a href="/super/fake-review/{{ r.id }}/"
+             class="btn btn-danger btn-sm">
+             Mark Fake
+          </a>
+        </td>
+      </tr>
+
+      {% empty %}
+      <tr>
+        <td colspan="6" class="text-center">
+          No delete requests
+        </td>
+      </tr>
+      {% endfor %}
+
+    </table>
+
+  </div>
+</div>
+
+{% endblock %}

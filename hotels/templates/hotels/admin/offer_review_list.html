@@ -1,0 +1,64 @@
+{% extends 'hotels/dashboard_base.html' %}
+{% load static %}
+
+{% block title %}Pending Offer Reviews | Admin{% endblock %}
+
+{% block dashboard_content %}
+<div class="glass-panel" style="margin-top: 20px;">
+    <div class="panel-header">
+        <h3 style="font-weight: 800; font-size: 1.5rem; letter-spacing: -0.5px;">Pending Offer Approval Queue</h3>
+        <p style="color: #737373; font-size: 0.9rem;">Review and verify promotional strategies before they go live.</p>
+    </div>
+
+    <table class="hotel-table">
+        <thead>
+            <tr>
+                <th>Strategic Property</th>
+                <th>Offer Name</th>
+                <th>Benefit</th>
+                <th>Submitted By</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for offer in pending_offers %}
+            <tr>
+                <td>
+                    <div style="font-weight: 700;">{{ offer.hotel.hotel_name }}</div>
+                    <div style="font-size: 0.75rem; color: #64748b;">{{ offer.hotel.city }}, {{ offer.hotel.state }}
+                    </div>
+                </td>
+                <td>
+                    <div style="font-weight: 600;">{{ offer.name }}</div>
+                    <div style="font-size: 0.7rem; color: #525252;">{{ offer.get_offer_type_display }}</div>
+                </td>
+                <td>
+                    <div style="font-weight: 800; color: #22c55e;">
+                        {% if offer.discount_type == 'PERCENT' %}{{ offer.discount_value|floatformat:0 }}% OFF{% else %}₹{{ offer.discount_value|floatformat:0 }} FLAT{% endif %}
+                    </div>
+                </td>
+                <td>
+                    <div style="font-size: 0.85rem;">{{ offer.hotel.owner.full_name }}</div>
+                    <div style="font-size: 0.7rem; color: #737373;">{{ offer.created_at|date:"d M Y" }}</div>
+                </td>
+                <td>
+                    <a href="{% url 'hotels:admin_review_offer' offer.id %}" class="btn-action"
+                        style="background: var(--accent-red); color: white; padding: 10px 20px; border-radius: 10px; font-weight: 700; text-decoration: none;">
+                        REVIEW
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" style="text-align: center; padding: 80px; color: #64748b;">
+                    <div style="font-size: 3rem; margin-bottom: 20px; opacity: 0.2;"><i class="fas fa-check-circle"></i>
+                    </div>
+                    <h3>Queue is Clear</h3>
+                    <p>No offers are currently pending approval.</p>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

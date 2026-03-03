@@ -1,0 +1,148 @@
+{% extends 'hotels/dashboard_base.html' %}
+{% load static %}
+
+{% block title %}Executive Dashboard | HotelPro Admin{% endblock %}
+
+{% block page_title %}Welcome Back, {{ user.username }}{% endblock %}
+
+{% block page_subtitle %}Hotel Performance Overview{% endblock %}
+
+{% block dashboard_content %}
+{% if primary_hotel_status == 'PENDING' %}
+<div class="glass-panel"
+    style="margin-bottom: 24px; border-left: 4px solid #facc15; background: rgba(250, 204, 21, 0.05); padding: 20px;">
+    <div style="display: flex; align-items: center; gap: 15px;">
+        <div
+            style="width: 40px; height: 40px; border-radius: 50%; background: rgba(250, 204, 21, 0.1); display: flex; align-items: center; justify-content: center; color: #facc15;">
+            <i class="fas fa-clock"></i>
+        </div>
+        <div>
+            <h4 style="margin: 0; color: #facc15;">Verification in Progress</h4>
+            <p style="margin: 0; font-size: 13px; color: var(--text-dim);">Your property is currently being reviewed by
+                our team.</p>
+        </div>
+    </div>
+</div>
+{% elif primary_hotel_status == 'REJECTED' %}
+<div class="glass-panel"
+    style="margin-bottom: 24px; border-left: 4px solid #ef4444; background: rgba(239, 68, 68, 0.05); padding: 20px;">
+    <div style="display: flex; align-items: center; gap: 15px;">
+        <div
+            style="width: 40px; height: 40px; border-radius: 50%; background: rgba(239, 68, 68, 0.1); display: flex; align-items: center; justify-content: center; color: #ef4444;">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <div>
+            <h4 style="margin: 0; color: #ef4444;">Action Required: Submission Rejected</h4>
+            <p style="margin: 0; font-size: 13px; color: var(--text-dim);"><strong>Feedback:</strong> {{
+                primary_hotel_remarks|default:"Please resubmit." }}</p>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% if is_admin %}
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+    <div class="glass-panel"
+        style="border-left: 4px solid var(--accent); background: rgba(6, 182, 212, 0.1); padding: 20px;">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div
+                    style="width: 40px; height: 40px; border-radius: 50%; background: rgba(6, 182, 212, 0.2); display: flex; align-items: center; justify-content: center; color: var(--accent);">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+                <div>
+                    <h4 style="margin: 0; color: var(--accent);">Hotel Verifications</h4>
+                    <p style="margin: 0; font-size: 13px; color: var(--text-dim);">Validate new properties.</p>
+                </div>
+            </div>
+            <a href="{% url 'hotels:admin_verify_list' %}" class="btn-action"
+                style="background: var(--accent); color: var(--primary); border: none; text-decoration: none;">Verify
+                Queue</a>
+        </div>
+    </div>
+
+    <div class="glass-panel"
+        style="border-left: 4px solid #f59e0b; background: rgba(245, 158, 11, 0.1); padding: 20px;">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div
+                    style="width: 40px; height: 40px; border-radius: 50%; background: rgba(245, 158, 11, 0.2); display: flex; align-items: center; justify-content: center; color: #f59e0b;">
+                    <i class="fas fa-tags"></i>
+                </div>
+                <div>
+                    <h4 style="margin: 0; color: #f59e0b;">Offer Reviews</h4>
+                    <p style="margin: 0; font-size: 13px; color: var(--text-dim);">Approve promotions.</p>
+                </div>
+            </div>
+            <a href="{% url 'hotels:admin_offer_list' %}" class="btn-action"
+                style="background: #f59e0b; color: var(--primary); border: none; text-decoration: none;">Review
+                Queue</a>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="{% if primary_hotel_status != 'LIVE' and not is_admin %}locked-state{% endif %}">
+    {% include 'hotels/includes/dashboard/stats_summary.html' %}
+
+    <div class="dashboard-row">
+        <div class="glass-panel">
+            <div class="panel-header">
+                <h3>Live Properties</h3>
+                <div style="display: flex; gap: 12px;">
+                    <a href="{% url 'hotels:hotelregister' %}" class="btn-action"
+                        style="background: var(--accent); border-color: var(--accent); text-decoration: none; color: var(--primary);"><i
+                            class="fas fa-plus-circle"></i> Register</a>
+                    <button class="btn-action">View All</button>
+                </div>
+            </div>
+            <table class="hotel-table">
+                <thead>
+                    <tr>
+                        <th>Identity</th>
+                        <th>Location</th>
+                        <th>Status</th>
+                        <th>Revenue</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for hotel in owned_hotels %}
+                    {% include 'hotels/includes/dashboard/property_row.html' with hotel=hotel %}
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" style="text-align: center; color: var(--text-dim); padding: 40px;">No
+                            properties.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="glass-panel">
+            <div class="panel-header">
+                <h3>Recent Feedback</h3>
+            </div>
+            <div class="review-list">
+                {% for review in recent_reviews %}
+                {% include 'hotels/includes/dashboard/feedback_item.html' with review=review %}
+                {% empty %}
+                <p style="color: var(--text-dim); text-align: center; padding: 20px;">No reviews.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="glass-panel" style="margin-top: 30px;">
+        <div class="panel-header">
+            <h3>Insights</h3>
+        </div>
+        <canvas id="revenueChart" style="max-height: 400px;"></canvas>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{% static 'hotels/js/dashboard.js' %}"></script>
+{% endblock %}

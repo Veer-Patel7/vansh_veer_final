@@ -1,0 +1,65 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ hotel.hotel_name }} | HotelPro</title>
+    <link rel="stylesheet" href="{% static 'css/hotel_detail.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<div class="container">
+
+    <!-- HOTEL HEADER -->
+    <div class="hotel-header">
+        <h1>{{ hotel.hotel_name }}</h1>
+        <p><i class="fa-solid fa-location-dot"></i> {{ hotel.city }}</p>
+    </div>
+
+    <!-- HOTEL IMAGE -->
+    <div class="hotel-image">
+        {% if hotel.image %}
+            <img src="{{ hotel.image.url }}">
+        {% else %}
+            <img src="{% static 'images/default-hotel.jpg' %}">
+        {% endif %}
+    </div>
+
+    <!-- HOTEL DESCRIPTION -->
+    <div class="hotel-description">
+        <h3>About this hotel</h3>
+        <p>{{ hotel.description }}</p>
+    </div>
+
+    <!-- ROOM LIST -->
+    <div class="room-section">
+        <h2>Available Rooms</h2>
+
+        {% if rooms %}
+            {% for room in rooms %}
+            <div class="room-card">
+
+                <div class="room-info">
+                    <h4>{{ room.category.get_room_type_display }}</h4>
+                    <p>Room Size: {{ room.category.room_size }} sqft</p>
+                    <p>Max Guests: {{ room.category.max_guest }}</p>
+                    <p class="price">
+                        ₹ {{ room.category.price_per_night }} / night
+                    </p>
+                </div>
+
+                <div class="room-action">
+                    <a href="{% url 'accounts:auth' %}" class="book-btn">Book Now</a>
+                </div>
+
+            </div>
+            {% endfor %}
+        {% else %}
+            <p>No available rooms right now.</p>
+        {% endif %}
+    </div>
+
+</div>
+
+</body>
+</html>

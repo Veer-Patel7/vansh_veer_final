@@ -1,0 +1,91 @@
+/* ========== RESET ========== */
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins', sans-serif;
+}
+
+/* ========== BODY ========== */
+body{
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:linear-gradient(135deg,#4f46e5,#3b82f6);
+}
+
+/* ========== CARD ========== */
+.card-form{
+    background:white;
+    width:350px;
+    padding:35px;
+    border-radius:18px;
+    box-shadow:0 20px 40px rgba(0, 0, 0, 0.708);
+    text-align:center;
+}
+
+.card-form h2{
+    margin-bottom:25px;
+    font-weight:600;
+}
+
+/* ========== INPUTS ========== */
+.input-group{
+    margin-bottom:18px;
+}
+
+.input-group input{
+    width:100%;
+    padding:12px;
+    border:1px solid #ddd;
+    border-radius:10px;
+    outline:none;
+    transition:0.3s;
+}
+
+.input-group input:focus{
+    border-color:#4f46e5;
+    box-shadow:0 0 8px rgba(79,70,229,0.3);
+}
+
+/* ========== BUTTON ========== */
+.btn-main{
+    width:100%;
+    padding:12px;
+    background:#4f46e5;
+    color:white;
+    border:none;
+    border-radius:10px;
+    font-weight:600;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.btn-main:hover{
+    background:#4338ca;
+}
+
+/* ========== LINK BUTTON ========== */
+.link-btn{
+    display:block;
+    margin-top:15px;
+    color:#4f46e5;
+    text-decoration:none;
+    font-size:14px;
+}
+
+.link-btn:hover{
+    text-decoration:underline;
+}
+
+/* ========== MESSAGE ========== */
+.success-msg{
+    background:#e6fffa;
+    color:#047857;
+    padding:8px;
+    border-radius:8px;
+    margin-bottom:15px;
+    font-size:14px;
+}
+

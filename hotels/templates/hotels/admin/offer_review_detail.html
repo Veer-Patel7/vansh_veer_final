@@ -1,0 +1,105 @@
+{% extends 'hotels/dashboard_base.html' %}
+{% load static %}
+
+{% block title %}Review Offer: {{ offer.name }} | Admin{% endblock %}
+
+{% block dashboard_content %}
+<div class="strategy-container" style="max-width: 900px; margin: 0 auto;">
+    <a href="{% url 'hotels:admin_offer_list' %}" class="back-nav">
+        <i class="fas fa-arrow-left"></i> RETURN TO QUEUE
+    </a>
+
+    <div class="strategy-card" style="padding: 40px; border-radius: 32px;">
+        <div class="strategy-header" style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+                <span class="section-label" style="color: #f59e0b;">Pending Verification</span>
+                <h1 class="strategy-title" style="font-size: 2rem;">{{ offer.name }}</h1>
+            </div>
+            <div style="text-align: right;">
+                <div style="font-size: 0.8rem; color: #737373;">Property</div>
+                <div style="font-weight: 700; color: white;">{{ offer.hotel.hotel_name }}</div>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 30px;">
+            <div class="review-item">
+                <div style="font-size: 0.75rem; color: #737373; text-transform: uppercase; letter-spacing: 1px;">Benefit
+                    Configuration</div>
+                <div style="font-size: 1.5rem; font-weight: 800; color: #22c55e; margin-top: 8px;">
+                    {% if offer.discount_type == 'PERCENT' %}{{ offer.discount_value|floatformat:0 }}% OFF{% else %}₹{{
+                    offer.discount_value|floatformat:0 }} FLAT{% endif %}
+                </div>
+                {% if offer.max_discount_limit %}<div style="font-size: 0.8rem; color: #64748b;">Capped at ₹{{
+                    offer.max_discount_limit }}</div>{% endif %}
+            </div>
+
+            <div class="review-item">
+                <div style="font-size: 0.75rem; color: #737373; text-transform: uppercase; letter-spacing: 1px;">
+                    Targeting Rule</div>
+                <div style="font-size: 1.1rem; font-weight: 700; color: white; margin-top: 8px;">
+                    {{ offer.get_applicability_display }}
+                </div>
+                <div style="font-size: 0.8rem; color: #64748b;">
+                    {% if offer.applicability == 'CATEGORY' %}{{ offer.room_categories|length }} categories selected{% else %}Site-wide property offer{% endif %}
+                </div>
+            </div>
+
+            <div class="review-item">
+                <div style="font-size: 0.75rem; color: #737373; text-transform: uppercase; letter-spacing: 1px;">
+                    Validity Window</div>
+                <div style="font-size: 1rem; font-weight: 700; color: white; margin-top: 8px;">
+                    {{ offer.valid_from|date:"d M, Y" }} — {{ offer.valid_to|date:"d M, Y" }}
+                </div>
+                <div style="font-size: 0.8rem; color: #64748b;">{{ offer.applicable_days|length }} active days per week
+                </div>
+            </div>
+
+            <div class="review-item">
+                <div style="font-size: 0.75rem; color: #737373; text-transform: uppercase; letter-spacing: 1px;">Booking
+                    Thresholds</div>
+                <div style="font-size: 1rem; font-weight: 700; color: white; margin-top: 8px;">
+                    Min Spend: ₹{{ offer.min_amount }} | Min Stay: {{ offer.min_nights }} nights
+                </div>
+                <div style="font-size: 0.8rem; color: #64748b;">Coupon: {{ offer.coupon_code|default:"Automatic Apply"
+                    }}</div>
+            </div>
+        </div>
+
+        <div style="margin-top: 50px; padding-top: 30px; border-top: 1px solid var(--glass-border);">
+            <form method="POST">
+                {% csrf_token %}
+                <div id="rejection-box" style="display: none; margin-bottom: 25px;">
+                    <label
+                        style="display: block; font-size: 0.8rem; font-weight: 700; color: #ef4444; margin-bottom: 10px;">PROVISION
+                        REJECTION REASON</label>
+                    <textarea name="rejection_reason" class="premium-input" style="height: 100px; resize: none;"
+                        placeholder="Provide detailed feedback to the property owner..."></textarea>
+                </div>
+
+                <div style="display: flex; gap: 20px;">
+                    <button type="submit" name="action" value="approve" class="btn-save"
+                        style="flex: 2; background: linear-gradient(135deg, #22c55e, #16a34a); box-shadow: 0 10px 20px rgba(34, 197, 94, 0.2);">
+                        APPROVE & GO LIVE
+                    </button>
+                    <button type="button" onclick="showRejection()" id="reject-trigger" class="btn-discard"
+                        style="flex: 1; border: 1px solid #ef4444; color: #ef4444; padding: 15px; border-radius: 18px; font-weight: 800; text-align: center; cursor: pointer;">
+                        REJECT STRATEGY
+                    </button>
+                    <button type="submit" name="action" value="reject" id="reject-submit"
+                        style="display: none; flex: 1; background: #ef4444; color: white; border: none; padding: 15px; border-radius: 18px; font-weight: 800; cursor: pointer;">
+                        CONFIRM REJECTION
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function showRejection() {
+        document.getElementById('rejection-box').style.display = 'block';
+        document.getElementById('reject-trigger').style.display = 'none';
+        document.getElementById('reject-submit').style.display = 'block';
+    }
+</script>
+{% endblock %}

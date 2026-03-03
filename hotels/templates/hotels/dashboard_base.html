@@ -1,0 +1,96 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Dashboard | HotelPro Admin{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'hotels/css/dashboard_style.css' %}">
+    {% block extra_head %}{% endblock %}
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+    <!-- Decorative Background Elements moved to CSS or removed for pure light theme -->
+
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <div class="logo">
+            <i class="fas fa-hotel"></i>
+            <span>HotelPro</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="{% url 'hotels:admin_dashboard_pro' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'admin_dashboard_pro' %}active{% endif %}">
+                    <i class="fas fa-th-large"></i> <span>Dashboard</span></a></li>
+            <li><a href="{% url 'hotels:my_hotels' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'my_hotels' %}active{% endif %}">
+                    <i class="fas fa-building"></i> <span>My Hotels</span></a></li>
+            <li><a href="{% url 'hotels:offers' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'offers' %}active{% endif %}">
+                    <i class="fas fa-tags"></i> <span>Offers & Deals</span></a></li>
+            <li><a href="{% url 'hotels:bookings' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'bookings' %}active{% endif %}">
+                    <i class="fas fa-calendar-check"></i> <span>Bookings</span></a></li>
+            <li><a href="{% url 'hotels:insights' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'insights' %}active{% endif %}">
+                    <i class="fas fa-chart-line"></i> <span>Insights</span></a></li>
+            <li><a href="{% url 'hotels:hotel_reviews' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'hotel_reviews' %}active{% endif %}">
+                    <i class="fas fa-star"></i> <span>Reviews</span></a></li>
+            <li><a href="{% url 'hotels:settings' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'settings' %}active{% endif %}">
+                    <i class="fas fa-cog"></i> <span>Settings</span></a></li>
+
+            <li style="margin-top: auto;"><a href="{% url 'accounts:logout' %}" class="nav-item"><i
+                        class="fas fa-sign-out-alt"></i> <span>Logout</span></a></li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <header>
+            <div class="welcome-text">
+                <h1>{% block page_title %}Welcome Back, {{ user.first_name|default:user.username }}{% endblock %}</h1>
+                <p>{% block page_subtitle %}Monitor your performance across {{ total_hotels|default:owned_hotels.count
+                    }} properties.{% endblock %}</p>
+            </div>
+            <div class="header-actions">
+                {% block header_actions %}
+                <div class="status-badge">
+                    <i class="fas fa-circle" style="font-size: 8px;"></i>
+                    SYSTEM LIVE
+                </div>
+                <div class="stat-icon"
+                    style="background: #f1f5f9; color: var(--primary); border: 1px solid var(--border);">
+                    <i class="fas fa-bell"></i>
+                </div>
+                {% endblock %}
+                <div
+                    style="width: 45px; height: 45px; border-radius: 50%; background: var(--secondary); display: flex; align-items: center; justify-content: center; color: var(--primary); font-weight: 700;">    
+
+                    {% if user.first_name %}
+                        {{ user.first_name|first|upper }}
+                    {% elif user.username %}
+                        {{ user.username|first|upper }}
+                    {% elif user.email %}
+                        {{ user.email|first|upper }}
+                    {% else %}
+                        U
+                    {% endif %}
+                </div>
+            </div>
+        </header>
+
+        {% block dashboard_content %}{% endblock %}
+    </div>
+
+    {% block extra_scripts %}{% endblock %}
+</body>
+
+</html>

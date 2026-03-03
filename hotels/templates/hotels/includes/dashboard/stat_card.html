@@ -1,0 +1,14 @@
+{% comment %}
+Shortened tags for formatter stability: i=icon, l=label, v=value, t=trend, tc=trend_class, th=theme
+{% endcomment %}
+<div class="stat-card {{ th }}">
+    <div class="stat-icon"><i class="fas {{ i }}"></i></div>
+    <div class="stat-info">
+        <div class="label">{{ l }}</div>
+        <div class="value">{{ v }}</div>
+    </div>
+    {% if t %}
+    <div class="trend {{ tc|default:'up' }}"><i
+            class="fas fa-arrow-{% if tc == 'down' %}down{% else %}up{% endif %}"></i> {{ t }}</div>
+    {% endif %}
+</div>

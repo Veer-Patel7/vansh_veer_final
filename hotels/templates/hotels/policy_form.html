@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotel Requirement</title>
+</head>
+<body>
+    <div class="requirement-container">
+        <h1>Hotel Requirements</h1>
+        <p class="subtitle">Please provide the necessary details for hotel requirements</p> 
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+
+            <button type="submit" class="btn">Submit Requirements</button>
+        </form>
+    </div>
+</body>
+</html>

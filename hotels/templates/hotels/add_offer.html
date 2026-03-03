@@ -1,0 +1,644 @@
+﻿{% extends 'hotels/dashboard_base.html' %}
+{% load static %}
+
+{% block title %}
+{% if mode == 'edit' %}Refine Strategy{% else %}New Growth Strategy{% endif %} | HotelPro Enterprise
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --glass-bg: rgba(255, 255, 255, 0.02);
+        --glass-border: rgba(255, 255, 255, 0.08);
+        --accent-ruby: #dc2626;
+        --accent-ruby-glow: rgba(220, 38, 38, 0.3);
+        --success-emerald: #10b981;
+        --success-glow: rgba(16, 185, 129, 0.2);
+        --bg-deep: #0a0a0c;
+        --card-surface: radial-gradient(circle at 20% 0%, #1c1c21 0%, #0d0d0f 100%);
+        --text-muted: #64748b;
+        --text-secondary: #94a3b8;
+    }
+
+    body {
+        background-color: var(--bg-deep) !important;
+        color: white !important;
+    }
+
+    .strategy-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding-bottom: 120px;
+        animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(40px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .back-nav {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        color: var(--text-muted);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.85rem;
+        margin-bottom: 40px;
+        letter-spacing: 1px;
+        transition: all 0.3s ease;
+    }
+
+    .back-nav:hover {
+        color: white;
+        transform: translateX(-5px);
+    }
+
+    .form-layout {
+        display: grid;
+        grid-template-columns: 1fr 380px;
+        gap: 48px;
+        align-items: start;
+    }
+
+    .strategy-card {
+        background: var(--card-surface);
+        border: 1px solid var(--glass-border);
+        border-radius: 40px;
+        padding: 56px;
+        box-shadow: 0 50px 100px -20px rgba(0, 0, 0, 0.6);
+    }
+
+    .strategy-header {
+        margin-bottom: 56px;
+        border-bottom: 1px solid var(--glass-border);
+        padding-bottom: 40px;
+    }
+
+    .strategy-title {
+        font-size: 3rem;
+        font-weight: 800;
+        letter-spacing: -2px;
+        background: linear-gradient(135deg, #ffffff 0%, #94a3b8 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin: 12px 0 0;
+    }
+
+    .section-label {
+        font-size: 0.75rem;
+        font-weight: 800;
+        color: var(--accent-ruby);
+        text-transform: uppercase;
+        letter-spacing: 3px;
+    }
+
+    .form-section {
+        margin-bottom: 64px;
+        display: grid;
+        grid-template-columns: 240px 1fr;
+        gap: 64px;
+    }
+
+    .section-info h3 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-bottom: 12px;
+        color: white;
+    }
+
+    .section-info p {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        line-height: 1.6;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+    }
+
+    .full-width {
+        grid-column: span 2;
+    }
+
+    .premium-label {
+        display: block;
+        font-size: 0.7rem;
+        font-weight: 700;
+        color: var(--text-muted);
+        margin-bottom: 10px;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+    }
+
+    .premium-input {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.02) !important;
+        border: 1px solid var(--glass-border) !important;
+        border-radius: 18px !important;
+        padding: 18px 24px !important;
+        color: white !important;
+        font-size: 1rem !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        box-sizing: border-box;
+    }
+
+    .premium-input:focus {
+        background: rgba(255, 255, 255, 0.04) !important;
+        border-color: var(--accent-ruby) !important;
+        box-shadow: 0 0 0 4px var(--accent-ruby-glow) !important;
+        outline: none !important;
+    }
+
+    ::placeholder {
+        color: #404040;
+    }
+
+    .pill-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .premium-pill {
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border);
+        padding: 14px 24px;
+        border-radius: 16px;
+        color: var(--text-secondary);
+        font-size: 0.85rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .premium-pill:hover {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .premium-pill.active {
+        background: var(--accent-ruby-glow);
+        border-color: var(--accent-ruby);
+        color: white;
+        box-shadow: 0 8px 16px rgba(220, 38, 38, 0.2);
+    }
+
+    .selection-row {
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border);
+        border-radius: 18px;
+        padding: 16px 24px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-bottom: 8px;
+    }
+
+    .selection-row:hover {
+        background: rgba(255, 255, 255, 0.04);
+    }
+
+    .selection-row input[type="checkbox"] {
+        width: 22px;
+        height: 22px;
+        accent-color: var(--accent-ruby);
+        cursor: pointer;
+    }
+
+    .selection-row span {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--text-secondary);
+    }
+
+    .selection-row input:checked+span {
+        color: white;
+    }
+
+    .preview-sticky {
+        position: sticky;
+        top: 40px;
+        background: var(--card-surface);
+        border: 1px solid var(--glass-border);
+        border-radius: 32px;
+        padding: 40px;
+        box-shadow: 0 40px 80px rgba(0, 0, 0, 0.4);
+    }
+
+    .preview-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 0.8rem;
+        font-weight: 800;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 32px;
+    }
+
+    .preview-price {
+        margin-bottom: 40px;
+    }
+
+    .price-label {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        margin-bottom: 8px;
+    }
+
+    .current-strike {
+        font-size: 1.5rem;
+        color: var(--text-muted);
+        text-decoration: line-through;
+        margin-bottom: 4px;
+        font-weight: 500;
+    }
+
+    .growth-price {
+        font-size: 4rem;
+        font-weight: 900;
+        color: var(--success-emerald);
+        letter-spacing: -2px;
+        line-height: 1;
+    }
+
+    .impact-badge {
+        display: inline-flex;
+        align-items: center;
+        background: var(--success-glow);
+        color: var(--success-emerald);
+        padding: 8px 16px;
+        border-radius: 10px;
+        font-size: 0.85rem;
+        font-weight: 800;
+        margin-top: 16px;
+        border: 1px solid rgba(16, 185, 129, 0.1);
+    }
+
+    .analysis-card {
+        background: rgba(16, 185, 129, 0.03);
+        border: 1px solid rgba(16, 185, 129, 0.08);
+        border-radius: 20px;
+        padding: 24px;
+        margin-top: 40px;
+    }
+
+    .analysis-card h4 {
+        font-size: 0.75rem;
+        font-weight: 800;
+        color: var(--success-emerald);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .deploy-bar {
+        position: fixed;
+        bottom: 40px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100%;
+        max-width: 1000px;
+        background: rgba(13, 13, 15, 0.8);
+        backdrop-filter: blur(32px);
+        border: 1px solid var(--glass-border);
+        border-radius: 30px;
+        padding: 24px 48px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        z-index: 100;
+        box-shadow: 0 40px 80px rgba(0, 0, 0, 0.8);
+    }
+
+    .btn-deploy {
+        background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+        color: white;
+        padding: 20px 56px;
+        border-radius: 20px;
+        font-weight: 800;
+        font-size: 1.1rem;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        box-shadow: 0 12px 24px rgba(220, 38, 38, 0.3);
+    }
+
+    .btn-deploy:hover {
+        transform: translateY(-4px) scale(1.02);
+        box-shadow: 0 20px 40px rgba(220, 38, 38, 0.5);
+    }
+
+    .btn-abort {
+        color: var(--text-muted);
+        font-weight: 700;
+        text-decoration: none;
+        font-size: 0.9rem;
+        transition: color 0.3s;
+    }
+
+    .btn-abort:hover {
+        color: white;
+    }
+
+    @media (max-width: 1024px) {
+        .form-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .form-section {
+            grid-template-columns: 1fr;
+            gap: 32px;
+        }
+
+        .strategy-card {
+            padding: 32px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="strategy-container">
+    <a href="{% url 'hotels:offers' %}" class="back-nav">
+        <i class="fas fa-arrow-left"></i> RETURN TO STRATEGY CENTER
+    </a>
+
+    <form method="POST" id="strategyForm">
+        {% csrf_token %}
+        <div class="form-layout">
+            <div class="strategy-card">
+                <div class="strategy-header">
+                    <span class="section-label">Inventory & Yield Optimization</span>
+                    <h1 class="strategy-title">
+                        {% if mode == 'edit' %}Refine Strategy{% else %}New Growth Engine{% endif %}
+                    </h1>
+                </div>
+
+                <div class="form-section">
+                    <div class="section-info">
+                        <h3>Strategy Core</h3>
+                        <p>Identify your campaign. High-impact titles correlate with better internal tracking.</p>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label class="premium-label">Strategic Property</label>
+                            <select name="hotel_id" class="premium-input" id="hotel_select" required>
+                                {% for hotel in owned_hotels %}
+                                <option value="{{ hotel.id }}" {% if offer.hotel.id==hotel.id %}selected{% endif %}>
+                                    {{ hotel.hotel_name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group full-width">
+                            <label class="premium-label">Campaign Name</label>
+                            <input type="text" name="name" class="premium-input" placeholder="e.g. Q1 Seasonal Boost"
+                                value="{{ offer.name }}" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="section-info">
+                        <h3>Economic Logic</h3>
+                        <p>Define the mathematical foundation of your discount architecture.</p>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label class="premium-label">Offer Algorithm</label>
+                            <div class="pill-grid" id="typePills">
+                                {% for val, label in offer.OFFER_TYPES %}
+                                <div class="premium-pill {% if offer.offer_type == val %}active{% elif not offer and forloop.first %}active{% endif %}"
+                                    data-value="{{ val }}">
+                                    {{ label }}
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <input type="hidden" name="offer_type" id="offer_type_input"
+                                value="{{ offer.offer_type|default:offer.OFFER_TYPES.0.0 }}">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="premium-label">Discount Metric</label>
+                            <select name="discount_type" class="premium-input" id="discount_type">
+                                <option value="PERCENT" {% if offer.discount_type=='PERCENT' %}selected{% endif %}>
+                                    Percentage (%)</option>
+                                <option value="FIXED" {% if offer.discount_type=='FIXED' %}selected{% endif %}>Flat (₹)
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="premium-label">Algorithm Value</label>
+                            <input type="number" name="discount_value" class="premium-input" id="discount_value"
+                                placeholder="0" value="{{ offer.discount_value }}" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="section-info">
+                        <h3>Target Architecture</h3>
+                        <p>Select inventory categories. Leave none selected to apply a global property-wide strategy.
+                        </p>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label class="premium-label">In-Scope Categories</label>
+                            <div id="roomCheckboxes">
+                                {% for r in room_types %}
+                                <label class="selection-row" data-hotel="{{ r.hotel.id }}"
+                                    data-price="{{ r.price_per_night }}">
+                                    <input type="checkbox" name="room_categories" value="{{ r.id }}" {% if
+                                        r.id|stringformat:"s" in offer.room_categories %}checked{% endif %}>
+                                    <span>{{ r.room_category_name }} • ₹{{ r.price_per_night }}/night</span>
+                                </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="premium-label">Min. Residency (Nights)</label>
+                            <input type="number" name="min_nights" class="premium-input"
+                                value="{{ offer.min_nights|default:1 }}" min="1">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="premium-label">Min. Order Value (₹)</label>
+                            <input type="number" name="min_amount" class="premium-input" id="min_amount"
+                                value="{{ offer.min_amount|default:0 }}">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="section-info">
+                        <h3>Deployment Window</h3>
+                        <p>Set active duration. System will auto-terminate strategy once window closes.</p>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="premium-label">Activation Start</label>
+                            <input type="date" name="valid_from" class="premium-input"
+                                value="{{ offer.valid_from|date:'Y-m-d' }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="premium-label">Termination Date</label>
+                            <input type="date" name="valid_to" class="premium-input"
+                                value="{{ offer.valid_to|date:'Y-m-d' }}" required>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="preview-sticky">
+                <div class="preview-header">
+                    <i class="fas fa-microchip"></i> Real-time Logic Preview
+                </div>
+
+                <div class="preview-price">
+                    <div class="price-label">Projected Customer Price:</div>
+                    <div class="current-strike" id="prev-old">₹0</div>
+                    <div class="growth-price" id="prev-new">₹0</div>
+                    <div class="impact-badge" id="prev-savings">0% REDUCTION</div>
+                </div>
+
+                <div style="border-top: 1px solid var(--glass-border); padding-top: 32px;">
+                    <div class="preview-header" style="font-size: 0.65rem; margin-bottom: 20px;">Unit Economics</div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                        <span style="color: var(--text-secondary); font-size: 0.85rem;">Base Yield</span>
+                        <span style="font-weight: 700; font-family: 'JetBrains Mono';" id="prev-base">₹0</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                        <span style="color: var(--text-secondary); font-size: 0.85rem;">Strategy Burn</span>
+                        <span style="color: #ef4444; font-weight: 700; font-family: 'JetBrains Mono';"
+                            id="prev-burn">-₹0</span>
+                    </div>
+                    <div
+                        style="display: flex; justify-content: space-between; margin-top: 24px; padding-top: 16px; border-top: 1px dashed var(--glass-border);">
+                        <span style="font-weight: 800; font-size: 0.95rem;">Net Impact</span>
+                        <span
+                            style="color: var(--success-emerald); font-weight: 900; font-size: 1.1rem; font-family: 'JetBrains Mono';"
+                            id="prev-net">₹0</span>
+                    </div>
+                </div>
+
+                <div class="analysis-card">
+                    <h4><i class="fas fa-chart-line"></i> Yield Analysis</h4>
+                    <p style="font-size: 0.75rem; color: var(--text-secondary); margin: 0; line-height: 1.4;">
+                        Recommended: Keep discount between 15-22% to maximize conversion while preserving RevPAR.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="deploy-bar">
+            <a href="{% url 'hotels:offers' %}" class="btn-abort">Cancel Strategy</a>
+            <div style="display: flex; gap: 32px; align-items: center;">
+                <span style="color: #404040; font-size: 0.75rem; font-weight: 800; letter-spacing: 1px;">
+                    ENCRYPTED TRANSMISSION • ISO-27001
+                </span>
+                <button type="submit" class="btn-deploy">
+                    {% if mode == 'edit' %}SAVE MODIFICATIONS{% else %}DEPLOY STRATEGY{% endif %}
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const pills = document.querySelectorAll('.premium-pill');
+    const typeInput = document.getElementById('offer_type_input');
+
+    pills.forEach(pill => {
+        pill.addEventListener('click', () => {
+            pills.forEach(p => p.classList.remove('active'));
+            pill.classList.add('active');
+            typeInput.value = pill.dataset.value;
+            runCalc();
+        });
+    });
+
+    const hSelect = document.getElementById('hotel_select');
+    const dVal = document.getElementById('discount_value');
+    const dType = document.getElementById('discount_type');
+    const rChecks = document.querySelectorAll('input[name="room_categories"]');
+
+    function runCalc() {
+        let maxBase = 0;
+        const hotelId = hSelect.value;
+        const visibleChecks = Array.from(document.querySelectorAll(`.selection-row[data-hotel="${hotelId}"]`));
+
+        document.querySelectorAll('.selection-row').forEach(row => {
+            row.style.display = row.dataset.hotel === hotelId ? 'flex' : 'none';
+        });
+
+        const checked = Array.from(rChecks).filter(c => c.checked && c.closest('.selection-row').style.display !== 'none');
+
+        if (checked.length > 0) {
+            maxBase = Math.max(...checked.map(c => parseFloat(c.closest('.selection-row').dataset.price)));
+        } else if (visibleChecks.length > 0) {
+            maxBase = Math.max(...visibleChecks.map(r => parseFloat(r.dataset.price)));
+        }
+
+        const discount = parseFloat(dVal.value) || 0;
+        let final = maxBase;
+        let savings = 0;
+
+        if (dType.value === 'PERCENT') {
+            final = maxBase * (1 - discount / 100);
+            savings = discount;
+        } else {
+            final = maxBase - discount;
+            savings = maxBase > 0 ? (discount / maxBase) * 100 : 0;
+        }
+
+        final = Math.max(0, final);
+
+        document.getElementById('prev-old').innerText = '₹' + maxBase.toLocaleString();
+        document.getElementById('prev-new').innerText = '₹' + Math.round(final).toLocaleString();
+        document.getElementById('prev-savings').innerText = Math.round(savings) + '% REDUCTION';
+
+        document.getElementById('prev-base').innerText = '₹' + maxBase.toLocaleString();
+        document.getElementById('prev-burn').innerText = '-₹' + Math.round(maxBase - final).toLocaleString();
+        document.getElementById('prev-net').innerText = '₹' + Math.round(final).toLocaleString();
+    }
+
+    [hSelect, dVal, dType, ...rChecks].forEach(el => {
+        el.addEventListener('input', runCalc);
+        el.addEventListener('change', runCalc);
+    });
+
+    runCalc();
+
+    document.getElementById('strategyForm').onsubmit = function () {
+        const b = document.querySelector('.btn-deploy');
+        b.innerHTML = '<i class="fas fa-spinner fa-spin"></i> SYNCING...';
+        b.style.opacity = '0.6';
+    };
+</script>
+{% endblock %}

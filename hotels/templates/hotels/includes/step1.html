@@ -1,0 +1,121 @@
+{% load static %}
+<!-- STEP 1: Basic Hotel Details -->
+<div class="onboarding-step active" id="step-1">
+    <div class="premium-card">
+        <h2 class="step-title"><i class="fas fa-hotel"></i> Basic Hotel Details</h2>
+        <p class="step-description">Establish your property's professional identity and central location.</p>
+
+        <div class="dense-grid">
+            <!-- Row 1: Name (col-8), Type (col-4) -->
+            <div class="input-group col-8">
+                <label for="{{ form.hotel_name.id_for_label }}">Hotel Name</label>
+                <div class="input-with-icon">
+                    {{ form.hotel_name }}
+                    <i class="fas fa-hotel"></i>
+                </div>
+            </div>
+            <div class="input-group col-4">
+                <label for="{{ form.hotel_type.id_for_label }}">Property Type</label>
+                <!-- Hidden Input for Form Submission -->
+                <select name="{{ form.hotel_type.name }}" id="{{ form.hotel_type.id_for_label }}"
+                    style="display: none !important;" required>
+                    {% for value, label in form.hotel_type.field.choices %}
+                    <option value="{{ value }}">{{ label }}</option>
+                    {% endfor %}
+                </select>
+
+                <!-- Professional Custom Dropdown UI -->
+                <div class="custom-select-container" id="customTypeSelect"
+                    data-target="{{ form.hotel_type.id_for_label }}">
+                    <div class="select-selected">
+                        <span class="selected-text">
+                            <i class="fas fa-star" style="color:var(--secondary);"></i>
+                            Select Type
+                        </span>
+                        <i class="fas fa-chevron-down arrow-icon"></i>
+                    </div>
+                    <div class="select-items">
+                        <div class="select-item" data-value="5_STAR">
+                            <i class="fas fa-crown" style="color: gold;"></i> 5 Star Premium
+                        </div>
+                        <div class="select-item" data-value="4_STAR">
+                            <i class="fas fa-star" style="color: silver;"></i> 4 Star Luxury
+                        </div>
+                        <div class="select-item" data-value="3_STAR">
+                            <i class="fas fa-briefcase" style="color: #64748b;"></i> 3 Star Business
+                        </div>
+                        <div class="select-item" data-value="RESORT">
+                            <i class="fas fa-umbrella-beach" style="color: var(--secondary);"></i> Resort / Villa
+                        </div>
+                        <div class="select-item" data-value="OTHER">
+                            <i class="fas fa-building" style="color: var(--text-muted);"></i> Other Property
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hidden Units/Rooms -->
+            <input type="hidden" name="{{ form.total_rooms.name }}" value="1" id="{{ form.total_rooms.id_for_label }}">
+
+            <!-- Row 2: Location (col-12) -->
+            <div class="input-group col-12">
+                <label>Property Location</label>
+                <div class="location-search-container">
+                    <div class="search-input-wrapper input-with-icon">
+                        <input type="text" name="address" id="location-search" class="input-address"
+                            placeholder="Search for address or drag map..." required>
+                        <i class="fas fa-map-marker-alt"></i>
+                        <button type="button" id="open-map-btn" class="map-trigger-btn" title="Open Map">
+                            <i class="fas fa-expand-arrows-alt"></i>
+                        </button>
+                    </div>
+                </div>
+                <!-- Hidden Location Metadata -->
+                {{ form.city }}
+                {{ form.state }}
+                {{ form.pincode }}
+                {{ form.lat }}
+                {{ form.lng }}
+            </div>
+
+            <!-- Row 3: Description (col-12) -->
+            <div class="input-group col-12">
+                <label for="{{ form.description.id_for_label }}">Property Overview</label>
+                <div class="input-with-icon">
+                    {{ form.description }}
+                    <i class="fas fa-quote-left" style="top: 20px; transform: none;"></i>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="button-group" style="margin-top: 32px;">
+            <span></span>
+            <button type="button" class="btn btn-primary next-step" data-target="2">
+                Next: 02. Inventory & Ops <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Address Map Popup -->
+<div id="locationPopup" class="location-popup">
+    <div class="popup-box">
+        <div class="popup-header">
+            <h3><i class="fas fa-map-marker-alt"></i> Confirm Your Location</h3>
+            <button type="button" id="close-map-btn" class="close-btn">&times;</button>
+        </div>
+
+        <div class="popup-body">
+            <p class="popup-instruction">Fine-tune your location by dragging the pin or clicking on the map.</p>
+            <div id="map-container" style="height:400px; border-radius: 8px; margin-bottom: 10px;"></div>
+            <div id="searchError" class="search-error-msg" style="display: none;"></div>
+        </div>
+
+        <div class="popup-footer">
+            <button type="button" id="confirm-location-btn" class="btn btn-primary full-width-btn">
+                Confirm Location
+            </button>
+        </div>
+    </div>
+</div>

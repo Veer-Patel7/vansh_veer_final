@@ -1,0 +1,76 @@
+{% extends 'hotels/dashboard_base.html' %}
+{% load static %}
+
+{% block title %}My Hotels | HotelPro Admin{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'hotels/css/common.css' %}">
+<style>
+    .empty-state {
+        text-align: center;
+        padding: 80px 40px;
+        background: var(--card-bg);
+        border: 2px dashed var(--border);
+        border-radius: 30px;
+        margin-top: 30px;
+        backdrop-filter: var(--glass-blur);
+    }
+
+    .empty-state i {
+        font-size: 4rem;
+        color: var(--text-dim);
+        margin-bottom: 20px;
+        opacity: 0.5;
+    }
+
+    .btn-primary-add {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 24px;
+        background: var(--secondary);
+        color: var(--primary);
+        border-radius: 12px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
+    }
+
+    .btn-primary-add:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(212, 175, 55, 0.3);
+        filter: brightness(1.1);
+    }
+</style>
+{% endblock %}
+
+{% block page_title %}My Properties{% endblock %}
+{% block page_subtitle %}Manage and monitor your professional portfolio.{% endblock %}
+
+{% block header_actions %}
+<a href="{% url 'hotels:hotelregister' %}" class="btn-primary-add">
+    <i class="fas fa-plus"></i> Add New Hotel
+</a>
+{% endblock %}
+
+{% block dashboard_content %}
+{% if owned_hotels %}
+<div class="hotel-grid">
+    {% for hotel in owned_hotels %}
+    {% include 'hotels/includes/dashboard/hotel_card.html' with hotel=hotel %}
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <i class="fas fa-building"></i>
+    <h2>No Hotels Registered</h2>
+    <p>You haven't added any properties to your portfolio yet.</p>
+    <div style="margin-top: 25px;">
+        <a href="{% url 'hotels:hotelregister' %}" class="btn-primary-add">
+            <i class="fas fa-plus"></i> Register Your First Hotel
+        </a>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends 'hotels/base.html' %}
+{% load static %}
+
+
+
+{% block extra_head %}
+<!-- all step styles are now consolidated in common.css -->
+{% endblock %}
+
+{% block content %}
+{% include 'hotels/includes/step1.html' %}
+{% include 'hotels/includes/step2.html' %}
+{% include 'hotels/includes/step3.html' %}
+{% include 'hotels/includes/step4.html' %}
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{% static 'hotels/js/onboarding_summary_pro.js' %}?v=110"></script>
+<script src="{% static 'hotels/js/onboarding_stepper_pro.js' %}?v=110"></script>
+<script src="{% static 'hotels/js/onboarding_rooms.js' %}?v=110"></script>
+<script src="{% static 'hotels/js/onboarding_services.js' %}?v=110"></script>
+<script src="{% static 'hotels/js/onboarding_gallery.js' %}?v=110"></script>
+<script src="{% static 'hotels/js/onboarding_map.js' %}?v=110"></script>
+<script src="{% static 'hotels/js/dropdown.js' %}?v=110"></script>
+<script src="{% static 'hotels/js/mascots.js' %}?v=110"></script>
+{% endblock %}

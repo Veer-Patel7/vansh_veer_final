@@ -1,0 +1,101 @@
+{% extends 'hotels/dashboard_base.html' %}
+{% load static %}
+
+{% block title %}Insights | HotelPro Admin{% endblock %}
+
+{% block page_title %}Business Intelligence{% endblock %}
+{% block page_subtitle %}Data-driven insights to optimize your property performance.{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="stats-grid" style="margin-top: 30px;">
+    <div class="stat-card">
+        <div class="stat-info">
+            <div class="label">Overall Occupancy</div>
+            <div class="value">78.5%</div>
+        </div>
+        <div class="trend up"><i class="fas fa-arrow-up"></i> +4.2% YoY</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-info">
+            <div class="label">Avg Daily Rate (ADR)</div>
+            <div class="value">₹4,850</div>
+        </div>
+        <div class="trend up"><i class="fas fa-arrow-up"></i> +12% YoY</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-info">
+            <div class="label">RevPAR</div>
+            <div class="value">₹3,807</div>
+        </div>
+        <div class="trend up"><i class="fas fa-arrow-up"></i> +8.5% YoY</div>
+    </div>
+</div>
+
+<div class="dashboard-row" style="margin-top: 30px;">
+    <div class="glass-panel">
+        <div class="panel-header">
+            <h3>Revenue Segmentation</h3>
+        </div>
+        <div style="height: 300px; display: flex; align-items: center; justify-content: center;">
+            <canvas id="propChart"></canvas>
+        </div>
+    </div>
+    <div class="glass-panel">
+        <div class="panel-header">
+            <h3>Guest Demographics</h3>
+        </div>
+        <div style="height: 300px; display: flex; align-items: center; justify-content: center;">
+            <canvas id="demoChart"></canvas>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // Revenue Chart
+    const ctx1 = document.getElementById('propChart').getContext('2d');
+    new Chart(ctx1, {
+        type: 'doughnut',
+        data: {
+            labels: ['Room Revenue', 'F&B', 'Services', 'Events'],
+            datasets: [{
+                data: [65, 20, 10, 5],
+                backgroundColor: ['#d4af37', '#06b6d4', '#22c55e', '#ef4444'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8' } } },
+            maintainAspectRatio: false
+        }
+    });
+
+    // Demographics Chart
+    const ctx2 = document.getElementById('demoChart').getContext('2d');
+    new Chart(ctx2, {
+        type: 'bar',
+        data: {
+            labels: ['Business', 'Leisure', 'Families', 'Solo'],
+            datasets: [{
+                label: '% of Guests',
+                data: [40, 35, 15, 10],
+                backgroundColor: '#06b6d4',
+                borderRadius: 8
+            }]
+        },
+        options: {
+            scales: {
+                y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8' } },
+                x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+            },
+            plugins: { legend: { display: false } },
+            maintainAspectRatio: false
+        }
+    });
+</script>
+{% endblock %}

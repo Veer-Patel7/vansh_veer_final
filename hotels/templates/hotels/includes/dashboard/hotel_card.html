@@ -1,0 +1,50 @@
+<div class="hotel-card">
+    <div class="card-image">
+        {% with primary_image=hotel.images.filter.first %}
+        {% if primary_image %}
+        <img src="{{ primary_image.image_path.url }}" alt="{{ hotel.hotel_name }}">
+        {% else %}
+        <i class="fas fa-hotel"></i>
+        {% endif %}
+        {% endwith %}
+
+        {% if hotel.is_live %}
+        <span class="status-pill status-live">● LIVE</span>
+        {% elif hotel.status == 'PENDING' %}
+        <span class="status-pill status-review">● IN REVIEW</span>
+        {% else %}
+        <span class="status-pill status-draft">● DRAFT</span>
+        {% endif %}
+    </div>
+
+    <div class="card-content">
+        <div class="hotel-info">
+            <h3>{{ hotel.hotel_name }}</h3>
+            <p><i class="fas fa-map-marker-alt"></i> {{ hotel.city }}, {{ hotel.state }}</p>
+        </div>
+
+        <div class="card-stats">
+            <div class="stat-shorthand">
+                <span class="label">Inventory</span>
+                <span class="val">{{ hotel.rooms.count }} Types</span>
+            </div>
+            <div class="stat-shorthand">
+                <span class="label">Gallery</span>
+                <span class="val">{{ hotel.images.count }} Photos</span>
+            </div>
+            <div class="stat-shorthand">
+                <span class="label">Earnings</span>
+                <span class="val">₹{{ hotel.total_revenue|default:"0" }}</span>
+            </div>
+        </div>
+
+        <div class="card-actions">
+            <a href="{% url 'hotels:hotel_dashboard' hotel.id %}" class="btn-manage">
+                <i class="fas fa-sliders-h"></i> Manage Property
+            </a>
+            <a href="#" class="btn-view" title="View Public Page">
+                <i class="fas fa-external-link-alt"></i>
+            </a>
+        </div>
+    </div>
+</div>

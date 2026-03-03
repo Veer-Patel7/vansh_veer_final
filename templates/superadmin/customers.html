@@ -1,0 +1,49 @@
+{% extends "superadmin/base.html" %}
+
+{% block content %}
+
+<h2>Customers Manage</h2>
+<hr>
+
+<div class="card">
+  <div class="card-body">
+
+    <table class="table table-bordered table-striped">
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Total Bookings</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+
+      {% for d in data %}
+      <tr>
+        <td>{{ d.obj.email }}</td>
+        <td>{{ d.obj.email }}</td>
+        <td>{{ d.total }}</td>
+
+        <td>
+          {% if d.obj.is_active %}
+            <span class="badge bg-success">Active</span>
+          {% else %}
+            <span class="badge bg-danger">Blacklisted</span>
+          {% endif %}
+        </td>
+
+        <td>
+          {% if d.obj.is_active %}
+            <a href="/super/blacklist/{{ d.obj.id }}/" class="btn btn-danger btn-sm">Blacklist</a>
+          {% else %}
+            <a href="/super/unblock/{{ d.obj.id }}/" class="btn btn-success btn-sm">Unblock</a>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+
+    </table>
+
+  </div>
+</div>
+
+{% endblock %}

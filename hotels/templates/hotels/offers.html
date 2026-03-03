@@ -1,0 +1,251 @@
+{% extends 'hotels/dashboard_base.html' %}
+{% load static %}
+
+{% block title %}Offers & Deals | HotelPro Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --accent-glow: rgba(200, 35, 51, 0.4);
+        --glass-white: rgba(255, 255, 255, 0.03);
+        --glass-border: rgba(255, 255, 255, 0.1);
+    }
+
+    .trend-up {
+        color: #22c55e;
+    }
+
+    .status-badge {
+        padding: 6px 16px;
+        border-radius: 30px;
+        font-size: 0.7rem;
+        font-weight: 800;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .status-draft {
+        background: rgba(115, 115, 115, 0.1);
+        color: #737373;
+        border: 1px solid rgba(115, 115, 115, 0.2);
+    }
+
+    .status-pending {
+        background: rgba(245, 158, 11, 0.1);
+        color: #f59e0b;
+        border: 1px solid rgba(245, 158, 11, 0.2);
+    }
+
+    .status-approved {
+        background: rgba(34, 197, 94, 0.1);
+        color: #22c55e;
+        border: 1px solid rgba(34, 197, 94, 0.2);
+    }
+
+    .status-rejected {
+        background: rgba(239, 68, 68, 0.1);
+        color: #ef4444;
+        border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+
+    .status-scheduled {
+        background: rgba(59, 130, 246, 0.1);
+        color: #3b82f6;
+        border: 1px solid rgba(59, 130, 246, 0.2);
+    }
+
+    .status-live {
+        background: rgba(34, 197, 94, 0.2);
+        color: #22c55e;
+        border: 1px solid #22c55e;
+        box-shadow: 0 0 10px rgba(34, 197, 94, 0.2);
+    }
+
+    .status-expired {
+        background: rgba(10, 10, 12, 0.5);
+        color: #525252;
+        border: 1px solid var(--glass-border);
+    }
+
+    .btn-submit {
+        background: var(--accent-red);
+        color: white;
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-decoration: none;
+        transition: all 0.3s;
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px var(--accent-red-glow);
+    }
+</style>
+{% endblock %}
+
+{% block page_title %}Offer Management{% endblock %}
+{% block page_subtitle %}Create and manage promotions to boost bookings.{% endblock %}
+
+{% block header_actions %}
+<a href="{% url 'hotels:create_offer' %}" class="btn-primary-add"
+    style="background: var(--accent); border: none; padding: 12px 28px; border-radius: 12px; font-weight: 700; color: white; box-shadow: 0 4px 12px rgba(200, 35, 51, 0.2); text-decoration: none; display: inline-flex; align-items: center; gap: 10px;">
+    <i class="fas fa-plus"></i> CREATE OFFER
+</a>
+{% endblock %}
+
+{% block dashboard_content %}
+<!-- KPI Summary Cards -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon" style="background: rgba(34, 197, 94, 0.05); color: #22c55e;">
+            <i class="fas fa-ticket-alt"></i>
+        </div>
+        <div class="stat-info">
+            <div class="label">Total Redemptions</div>
+            <div class="value">{{ stats.total_redemptions }}</div>
+            <div class="trend trend-up"><i class="fas fa-arrow-up"></i> +12%</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon" style="background: rgba(59, 130, 246, 0.05); color: #3b82f6;">
+            <i class="fas fa-chart-line"></i>
+        </div>
+        <div class="stat-info">
+            <div class="label">Offer Revenue</div>
+            <div class="value">₹{{ stats.offer_revenue|floatformat:0 }}</div>
+            <div class="trend trend-up"><i class="fas fa-arrow-up"></i> +8.5%</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon" style="background: rgba(168, 85, 247, 0.05); color: #a855f7;">
+            <i class="fas fa-percentage"></i>
+        </div>
+        <div class="stat-info">
+            <div class="label">Conversion Lift</div>
+            <div class="value">{{ stats.conversion_lift }}%</div>
+            <div class="trend trend-up"><i class="fas fa-arrow-up"></i> +1.2%</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon" style="background: rgba(34, 197, 94, 0.1); color: #22c55e;">
+            <i class="fas fa-play"></i>
+        </div>
+        <div class="stat-info">
+            <div class="label">Active Campaigns</div>
+            <div class="value">{{ stats.active_campaigns }}</div>
+            <div class="trend">LIVE</div>
+        </div>
+    </div>
+</div>
+
+<div class="glass-panel" style="margin-top: 30px; box-shadow: var(--shadow-lg);">
+    <div class="panel-header">
+        <h3 style="font-weight: 800; font-size: 1.5rem; letter-spacing: -0.5px;">Active Offers Table</h3>
+        <div style="display: flex; gap: 8px;">
+            <a href="?status=live" class="btn-action {% if request.GET.status == 'live' %}active{% endif %}"
+                style="padding: 8px 20px; border-radius: 10px;">Live</a>
+            <a href="?" class="btn-action {% if not request.GET.status %}active{% endif %}"
+                style="padding: 8px 20px; border-radius: 10px;">All Strategies</a>
+        </div>
+    </div>
+
+    <table class="hotel-table">
+        <thead>
+            <tr>
+                <th style="width: 25%;">Offer Name</th>
+                <th style="width: 15%;">Type</th>
+                <th style="width: 15%;">Benefit</th>
+                <th style="width: 20%;">Validity Window</th>
+                <th style="width: 15%;">Status</th>
+                <th style="width: 10%;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for offer in offers %}
+            <tr>
+                <td>
+                    <div style="font-weight: 700; font-size: 1.05rem;">{{ offer.name }}</div>
+                    <div style="font-size: 0.75rem; color: #64748b; margin-top: 4px;">{{ offer.hotel.hotel_name }}</div>
+                    {% if offer.rejection_reason %}
+                    <div
+                        style="font-size: 0.7rem; color: #ef4444; margin-top: 6px; background: rgba(239, 68, 68, 0.05); padding: 4px 8px; border-radius: 4px; border-left: 2px solid #ef4444;">
+                        <strong>Rejected:</strong> {{ offer.rejection_reason }}
+                    </div>
+                    {% endif %}
+                </td>
+                <td>
+                    <div style="font-size: 0.85rem; font-weight: 600;">{{ offer.get_offer_type_display }}</div>
+                    <div style="font-size: 0.7rem; color: #525252;">{{ offer.get_applicability_display }}</div>
+                </td>
+                <td>
+                    <div style="font-weight: 800; color: var(--accent);">
+                        {% if offer.discount_type == 'PERCENT' %}{{ offer.discount_value|floatformat:0 }}% OFF{% else
+                        %}₹{{ offer.discount_value|floatformat:0 }} FLAT{% endif %}
+                    </div>
+                    {% if offer.min_amount > 0 %}
+                    <div style="font-size: 0.7rem; color: #64748b;">Min Spend: ₹{{ offer.min_amount }}</div>
+                    {% endif %}
+                </td>
+                <td>
+                    <div style="font-size: 0.9rem; font-weight: 600;">{{ offer.valid_from|date:"d M" }} - {{
+                        offer.valid_to|date:"d M, Y" }}</div>
+                    <div style="font-size: 0.7rem; color: #525252;">{{ offer.applicable_days|length }}/7 Days Active
+                    </div>
+                </td>
+                <td>
+                    <span class="status-badge status-{{ offer.status|lower }}">
+                        {{ offer.get_status_display }}
+                    </span>
+                    {% if offer.status == 'DRAFT' or offer.status == 'REJECTED' %}
+                    <div style="margin-top: 8px;">
+                        <a href="{% url 'hotels:submit_offer' offer.id %}" class="btn-submit">SUBMIT</a>
+                    </div>
+                    {% endif %}
+                </td>
+                <td>
+                    <div style="display: flex; gap: 10px;">
+                        {% if offer.status == 'DRAFT' or offer.status == 'REJECTED' %}
+                        <a href="{% url 'hotels:edit_offer' offer.id %}" class="btn-action" title="Edit Strategy"><i
+                                class="fas fa-edit"></i></a>
+                        {% endif %}
+                        <button class="btn-action" data-id="{{ offer.id }}" onclick="handleDelete(this.dataset.id)"
+                            style="color: #ef4444;" title="Terminate"><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" style="text-align: center; padding: 80px; color: #64748b;">
+                    <div style="font-size: 3rem; margin-bottom: 20px; opacity: 0.2;"><i class="fas fa-tags"></i></div>
+                    <h3>No campaigns found.</h3>
+                    <p>Create your first promotion to boost property visibility and bookings.</p>
+                    <a href="{% url 'hotels:create_offer' %}" class="btn-primary"
+                        style="margin-top: 20px; display: inline-block;">Start Your First Strategy</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function handleDelete(id) {
+        if (!id) return;
+        if (confirm('Are you sure you want to terminate this strategy permanently? This action cannot be undone.')) {
+            fetch(`/hotels/offers/delete/${id}/`, {
+                method: 'POST',
+                headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+            })
+                .then(res => res.json())
+                .then(data => { if (data.status === 'success') location.reload(); });
+        }
+    }
+</script>
+{% endblock %}

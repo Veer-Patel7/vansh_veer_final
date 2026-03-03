@@ -1,0 +1,88 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Hotel Onboarding | HotelPro{% endblock %}</title>
+    <!-- common.css contains all core styles -->
+    <link rel="stylesheet" href="{% static 'hotels/css/common.css' %}?v=200">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Leaflet Map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    {% block extra_head %}{% endblock %}
+</head>
+
+<body>
+    <div class="onboarding-container">
+        <!-- Left Panel: Branding & Impact -->
+        <div class="onboarding-side-panel">
+            <div class="side-panel-logo">
+                <i class="fas fa-hotel"></i>
+                HotelPro
+            </div>
+
+            <h1 class="side-panel-heading">Partner with<br><span style="color: var(--secondary);">Excellence</span></h1>
+
+            <p class="side-panel-text">
+                Join the world's most exclusive premium hotel network. Manage your property with world-class,
+                enterprise-grade AI tools.
+            </p>
+
+            <div class="side-panel-badges">
+                <div class="side-panel-badge"><i class="fas fa-shield-alt"></i> Secure</div>
+                <div class="side-panel-badge"><i class="fas fa-globe"></i> Global</div>
+            </div>
+        </div>
+
+        <!-- Right Panel: Form Actions -->
+        <div class="onboarding-main-content">
+            <!-- Progress Stepper -->
+            <div class="stepper-wrapper">
+                <div class="stepper">
+                    <div class="step active" id="step-index-1">
+                        <div class="step-number">1</div>
+                        <div class="step-label">Basic Identity</div>
+                    </div>
+                    <div class="step" id="step-index-2">
+                        <div class="step-number">2</div>
+                        <div class="step-label">Inventory & Ops</div>
+                    </div>
+                    <div class="step" id="step-index-3">
+                        <div class="step-number">3</div>
+                        <div class="step-label">Compliance</div>
+                    </div>
+                    <div class="step" id="step-index-4">
+                        <div class="step-number">4</div>
+                        <div class="step-label">Final Dossier</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-body">
+                {% if messages %}
+                <div class="messages-container">
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        <i
+                            class="fas {% if message.tags == 'error' %}fa-exclamation-circle{% else %}fa-check-circle{% endif %}"></i>
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <form id="onboardingForm" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {% block content %}{% endblock %}
+                </form>
+            </div>
+        </div>
+    </div>
+
+    {% block extra_scripts %}{% endblock %}
+</body>
+
+</html>

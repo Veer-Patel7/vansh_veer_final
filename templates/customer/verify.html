@@ -1,0 +1,87 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>OTP Verification</title>
+    <link rel="stylesheet" href="{% static 'css/verify.css' %}">
+</head>
+<body>
+
+<div class="navbar">
+    HotelPro
+</div>
+
+<div class="container">
+
+    <h2>Verify your email address</h2>
+
+    <p>
+        We sent a verification code to <b>{{ email }}</b>
+    </p>
+
+    {% if messages %}
+        {% for message in messages %}
+            <p class="message">{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+
+    <!-- VERIFY FORM -->
+    <form method="post" id="otpForm">
+        {% csrf_token %}
+        <input type="hidden" name="email" value="{{ email }}">
+
+        <!-- 6 OTP Boxes -->
+        <div class="otp-inputs">
+            <input type="text" maxlength="1">
+            <input type="text" maxlength="1">
+            <input type="text" maxlength="1">
+            <input type="text" maxlength="1">
+            <input type="text" maxlength="1">
+            <input type="text" maxlength="1">
+        </div>
+
+        <!-- Hidden Combined OTP -->
+        <input type="hidden" name="otp" id="finalOtp">
+
+        <button type="submit">Verify OTP</button>
+    </form>
+
+    
+</div>
+
+<div class="footer">
+    © 2026 HotelPro.com™ All rights reserved.
+</div>
+
+<!-- AUTO MOVE + COMBINE OTP SCRIPT -->
+<script>
+const inputs = document.querySelectorAll(".otp-inputs input");
+const finalOtp = document.getElementById("finalOtp");
+const form = document.getElementById("otpForm");
+
+inputs.forEach((input, index) => {
+
+    input.addEventListener("input", () => {
+
+        if (input.value.length === 1 && index < inputs.length - 1) {
+            inputs[index + 1].focus();
+        }
+
+        // Combine OTP
+        let otp = "";
+        inputs.forEach(box => otp += box.value);
+        finalOtp.value = otp;
+    });
+
+    // Backspace support
+    input.addEventListener("keydown", (e) => {
+        if (e.key === "Backspace" && input.value === "" && index > 0) {
+            inputs[index - 1].focus();
+        }
+    });
+
+});
+</script>
+
+</body>
+</html>

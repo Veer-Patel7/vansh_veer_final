@@ -1,0 +1,68 @@
+{% extends 'hotels/dashboard_base.html' %}
+{% load static %}
+
+{% block title %}Bookings | HotelPro Admin{% endblock %}
+
+{% block page_title %}Reservations Manager{% endblock %}
+{% block page_subtitle %}Track your guests and manage upcoming stays efficiently.{% endblock %}
+
+{% block dashboard_content %}
+<div class="glass-panel" style="margin-top: 30px;">
+    <div class="panel-header">
+        <h3>Recent Bookings</h3>
+        <div style="display: flex; gap: 10px;">
+            <input type="text" placeholder="Search Guest Name/ID..." class="btn-action"
+                style="background: rgba(255,255,255,0.05); width: 250px; text-align: left; padding-left: 15px;">
+            <button class="btn-action"><i class="fas fa-filter"></i> Filter</button>
+            <button class="btn-action"><i class="fas fa-download"></i> Export</button>
+        </div>
+    </div>
+
+    <table class="hotel-table">
+        <thead>
+            <tr>
+                <th>Booking ID</th>
+                <th>Guest</th>
+                <th>Property</th>
+                <th>Room Type</th>
+                <th>Dates</th>
+                <th>Status</th>
+                <th>Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><span style="font-family: 'JetBrains Mono'; color: var(--accent);">#HP-9821</span></td>
+                <td><strong>Krish Kumar</strong></td>
+                <td>Breeze Bay Resort</td>
+                <td>Deluxe Suite</td>
+                <td>Feb 24 - Feb 26</td>
+                <td><span style="color: #22c55e;">● Confirmed</span></td>
+                <td>₹12,400</td>
+            </tr>
+            <tr>
+                <td><span style="font-family: 'JetBrains Mono'; color: var(--accent);">#HP-9819</span></td>
+                <td><strong>Aditya Singh</strong></td>
+                <td>Urban Elite Hotel</td>
+                <td>Standard King</td>
+                <td>Feb 23 - Feb 24</td>
+                <td><span style="color: #3b82f6;">● Checked In</span></td>
+                <td>₹5,200</td>
+            </tr>
+            <tr>
+                <td><span style="font-family: 'JetBrains Mono'; color: var(--accent);">#HP-9815</span></td>
+                <td><strong>Rohan Mehta</strong></td>
+                <td>The Grand Plaza</td>
+                <td>Executive Villa</td>
+                <td>Mar 02 - Mar 05</td>
+                <td><span style="color: #facc15;">● Pending</span></td>
+                <td>₹28,500</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div style="padding: 20px; text-align: center;">
+        <button class="btn-action">Load More Bookings</button>
+    </div>
+</div>
+{% endblock %}

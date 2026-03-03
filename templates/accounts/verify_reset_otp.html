@@ -1,0 +1,57 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Verify OTP</title>
+
+    <link rel="stylesheet" href="{% static 'adminlte/dist/css/adminlte.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+</head>
+
+<body class="login-page bg-body-secondary">
+
+<div class="login-box">
+    <div class="card card-outline card-info">
+
+        <div class="card-header text-center">
+            <h1><b>Verify</b> OTP</h1>
+        </div>
+
+        <div class="card-body login-card-body">
+            <p class="login-box-msg">
+                Enter the OTP sent to your email
+            </p>
+
+            <form method="post">
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+
+                <div class="input-group mb-3">
+                    {{ form.otp }}
+                    <div class="input-group-text">
+                        <span class="bi bi-shield-lock-fill"></span>
+                    </div>
+                </div>
+                {{ form.otp.errors }}
+
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-info">
+                        Verify OTP
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'adminlte/dist/js/adminlte.js' %}"></script>
+
+</body>
+</html>

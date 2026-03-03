@@ -1,0 +1,31 @@
+<tr>
+    <td>
+        <div class="hotel-name">
+            <div class="hotel-thumb"
+                style="background: var(--secondary); height: 40px; width: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--primary);">
+                <i class="fas fa-building"></i>
+            </div>
+            <a href="{% url 'hotels:hotel_dashboard' hotel.id %}" style="text-decoration: none; color: inherit;">
+                <span>{{ hotel.hotel_name }}</span>
+            </a>
+        </div>
+    </td>
+    <td>{{ hotel.city }}</td>
+    <td>
+        {% if hotel.is_live %}
+        <span style="color: #22c55e;">● Live</span>
+        {% elif hotel.status == 'PENDING' %}
+        <span style="color: #facc15;">● In Review</span>
+        {% else %}
+        <span style="color: #64748b;">● Draft</span>
+        {% endif %}
+    </td>
+    <td>₹{{ hotel.total_revenue|default:"0" }}</td>
+    <td>
+        <div style="display: flex; gap: 8px;">
+            <a href="{% url 'hotels:hotel_dashboard' hotel.id %}" class="btn-action" title="View Dashboard"><i
+                    class="fas fa-eye"></i></a>
+            <button class="btn-action" title="Edit Property"><i class="fas fa-edit"></i></button>
+        </div>
+    </td>
+</tr>
