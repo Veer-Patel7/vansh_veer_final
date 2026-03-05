@@ -14,24 +14,47 @@ class Hotel(models.Model):
         ('4_STAR', '4 Star Luxury'),
         ('3_STAR', '3 Star Business'),
         ('RESORT', 'Resort / Villa'),
-        ('OTHER', 'Other Property'),
         ('HOTEL', 'Hotel'),
-        ('VILLA', 'Villa'),
+        ('BOUTIQUE', 'Boutique Hotel'),
+        ('BUSINESS', 'Business Hotel'),
+        ('BUDGET', 'Budget Hotel'),
+        ('LUXURY', 'Luxury Hotel'),
+        ('HERITAGE', 'Heritage Hotel'),
+        ('AIRPORT', 'Airport Hotel'),
+        ('BEACH_RESORT', 'Beach Resort'),
+        ('HILL_RESORT', 'Hill Resort'),
+        ('SERVICED_APT', 'Serviced Apartments'),
+        ('VACATION_RENTAL', 'Vacation Rentals'),
+        ('HOMESTAY', 'Homestay'),
         ('GUESTHOUSE', 'Guest House'),
         ('HOSTEL', 'Hostel'),
+        ('LODGE', 'Lodge'),
+        ('MOTEL', 'Motel'),
+        ('VILLA', 'Villa'),
+        ('ECO_RESORT', 'Eco Resort'),
+        ('WELLNESS', 'Wellness Retreat'),
+        ('PALACE', 'Palace Hotel'),
+        ('CASINO', 'Casino Resort'),
+        ('SPA_RESORT', 'Spa Resort'),
+        ('GOLF_RESORT', 'Golf Resort'),
+        ('SKI_RESORT', 'Ski Resort'),
+        ('DESERT_CAMP', 'Desert Camp'),
+        ('HOUSEBOAT', 'Houseboat'),
+        ('FARM_STAY', 'Farm Stay'),
+        ('OTHER', 'Other Property'),
     ]
 
     # --- Ownership & Identity ---
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='hotels')
     hotel_name = models.CharField(max_length=255)
-    hotel_type = models.CharField(max_length=20, choices=HOTEL_TYPES)
+    hotel_type = models.CharField(max_length=50, choices=HOTEL_TYPES)
     services = models.JSONField(default=list, blank=True)
     description = models.TextField(blank=True)
     total_rooms = models.PositiveIntegerField(help_text="Total unit count of the property", default=0, blank=True)
 
     # --- Operational Information (Step 2C) ---
-    check_in = models.CharField(max_length=10, default="14:00")
-    check_out = models.CharField(max_length=10, default="11:00")
+    check_in = models.TimeField(default="14:00")
+    check_out = models.TimeField(default="11:00")
     cancellation_policy = models.TextField(default="Standard Rules Apply")
 
     # --- Compliance Documents (Files & Numbers) ---
@@ -56,8 +79,8 @@ class Hotel(models.Model):
     city = models.CharField(max_length=100, null=True, blank=True)
     state = models.CharField(max_length=100, null=True, blank=True)
     pincode = models.CharField(max_length=10, null=True, blank=True)
-    lat = models.DecimalField(max_digits=12, decimal_places=9, null=True, blank=True)
-    lng = models.DecimalField(max_digits=12, decimal_places=9, null=True, blank=True)
+    lat = models.DecimalField(max_digits=22, decimal_places=16, null=True, blank=True)
+    lng = models.DecimalField(max_digits=22, decimal_places=16, null=True, blank=True)
 
     # --- System Status ---
     status = models.CharField(
@@ -109,8 +132,17 @@ class RoomType(models.Model):
         ('DELUXE', 'Deluxe Room'),
         ('SUITE', 'Suite'),
         ('LUXURY', 'Luxury / Presidential Room'),
+        ('ECONOMY', 'Economy Room'),
+        ('PREMIUM', 'Premium Room'),
+        ('EXECUTIVE', 'Executive Room'),
+        ('CLUB', 'Club Room'),
+        ('PRESIDENTIAL', 'Presidential Suite'),
+        ('ROYAL', 'Royal Suite'),
+        ('FAMILY', 'Family Room'),
+        ('SPECIALTY', 'Specialty Room'),
         ('DORM', 'Dormitory Bed'),
         ('PRIVATE', 'Private Room'),
+        ('CUSTOM', 'Custom Category'),
     ]
 
     hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE, related_name='rooms')
@@ -278,4 +310,3 @@ class LocationHistory(models.Model):
 
     def __str__(self):
         return f"{self.location_name or self.city or 'Unknown Area'} - {self.user.email}"
-

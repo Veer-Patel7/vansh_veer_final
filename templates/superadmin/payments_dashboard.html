@@ -12,7 +12,7 @@
     <div class="section-body text-center">
       <h4>Generate Monthly Commission</h4>
       <br>
-      <a href="/super/payments/generate/" class="btn-approve">
+      <a href="{% url 'superadmin:generate_commission' %}">
         Generate
       </a>
     </div>
@@ -23,7 +23,7 @@
     <div class="section-body text-center">
       <h4>View All Invoices</h4>
       <br>
-      <a href="/super/payments/invoices/" class="btn-approve">
+      <a href="{% url 'superadmin:invoices' %}">
         View Invoices
       </a>
     </div>

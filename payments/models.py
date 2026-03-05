@@ -28,5 +28,6 @@ class HotelCommission(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
 
+    @property
     def total_payable(self):
         return self.commission_amount + self.penalty_amount

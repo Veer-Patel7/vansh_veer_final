@@ -11,7 +11,7 @@ from payments.models import HotelCommission
 from datetime import date, timedelta
 from django.conf import settings
 from reviews.models import Review
-
+from datetime import date, timedelta, datetime
 
 
 
@@ -280,14 +280,20 @@ def payments_dashboard(request):
 @login_required(login_url="/super/")
 def generate_commission(request):
 
-    today = date.today()
-    month = today.month
-    year = today.year
+    month_input = request.GET.get("month")
+
+    if month_input:
+        dt = datetime.strptime(month_input, "%Y-%m")
+        month = dt.month
+        year = dt.year
+    else:
+        today = date.today()
+        month = today.month
+        year = today.year
 
     hotels = Hotel.objects.filter(status="LIVE")
 
     for h in hotels:
-
         bookings = Booking.objects.filter(
             hotel=h,
             booking_status="confirmed",
@@ -295,13 +301,18 @@ def generate_commission(request):
             checkin_date__year=year
         )
 
-        total_revenue = sum([b.room.price_per_night for b in bookings])
+        total_revenue = 0
+
+        for b in bookings:
+            nights = (b.checkout_date - b.checkin_date).days
+            total_revenue += b.room.price_per_night * nights
+
         total_bookings = bookings.count()
 
         commission_percent = 10
         commission_amount = total_revenue * commission_percent / 100
 
-        due_date = today + timedelta(days=5)
+        due_date = date.today() + timedelta(days=5)
 
         HotelCommission.objects.update_or_create(
             hotel=h,
@@ -312,10 +323,9 @@ def generate_commission(request):
                 "total_revenue": total_revenue,
                 "commission_amount": commission_amount,
                 "due_date": due_date,
-                "status": "pending"
+                "status": "unpaid"
             }
         )
-
     return redirect("/super/payments/invoices/")
 
 
@@ -323,24 +333,38 @@ def generate_commission(request):
 @login_required(login_url="/super/")
 def commissions(request):
 
-    invoices = HotelCommission.objects.all().order_by("-id")
+    month_input = request.GET.get("month")  # e.g. "2026-02"
     today = date.today()
 
-    for i in invoices:
+    if month_input:
+        dt = datetime.strptime(month_input, "%Y-%m")
+        month = dt.month
+        year = dt.year
 
-        if i.status == "pending" and today > i.due_date:
+        invoices = HotelCommission.objects.filter(
+            month=month,
+            year=year
+        ).order_by("-id")
+    else:
+        invoices = HotelCommission.objects.all().order_by("-id")
+
+    # penalty update only on shown invoices
+    for i in invoices:
+        if i.status == "unpaid" and today > i.due_date:
             i.status = "overdue"
-            i.penalty = i.commission_amount * 0.05
+            i.penalty_amount = i.commission_amount * 0.05
             i.save()
 
-    return render(request, "superadmin/commissions.html", {"data": invoices})
-
+    return render(request, "superadmin/commissions.html", {
+        "data": invoices,
+        "selected_month": month_input
+    })
 
 # ================= MARK PAID =================
 @login_required(login_url="/super/")
 def mark_paid(request, id):
 
-    p = HotelCommission.objects.get(id=id)
+    p = get_object_or_404(HotelCommission, id=id)
     p.status = "paid"
     p.penalty = 0
     p.save()

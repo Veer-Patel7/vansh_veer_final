@@ -24,42 +24,55 @@ from django.db import transaction
 def add_hotel(request):
     """Professional Multi-step Hotel Onboarding View"""
     if request.method == 'POST':
-        form = HotelDeploymentForm(request.POST, request.FILES)
+        # Professional Pre-processing: Clean coordinates to avoid validation crashes
+        post_data = request.POST.copy()
+        for field in ['lat', 'lng']:
+            val = post_data.get(field)
+            if val:
+                try:
+                    # Round to 10 decimal places to safely fit in DecimalField
+                    post_data[field] = str(round(float(val), 10))
+                except (ValueError, TypeError):
+                    pass
+        
+        form = HotelDeploymentForm(post_data, request.FILES)
         if form.is_valid():
             try:
                 with transaction.atomic():
-                    # 1. Save Hotel Base
+                    # 1. Primary Save (Hotel Base + Policies)
                     hotel = form.save(commit=False)
                     hotel.owner = request.user
                     
                     # 2. Add Services (Step 2B)
                     services = request.POST.getlist('services')
                     hotel.services = services
+                    
+                    # Initial save to get ID for related objects
                     hotel.save()
 
-                    # 3. Save Hotel Policy (Step 2C) directly to Hotel model
-                    hotel.check_in = request.POST.get('check_in', '14:00')
-                    hotel.check_out = request.POST.get('check_out', '11:00')
-                    hotel.cancellation_policy = request.POST.get('cancellation_rules', 'Standard Rules Apply')
-                    hotel.save()
-
-                    # 4. Save Dynamic Room Types (Step 2A)
+                    # 3. Save Dynamic Room Types (Step 2A)
+                    total_inventory = 0
                     room_idx = 1
                     while f'room_name_{room_idx}' in request.POST:
                         room_name = request.POST.get(f'room_name_{room_idx}')
                         room_class = request.POST.get(f'room_class_{room_idx}', 'STANDARD')
-                        price = int(request.POST.get(f'room_price_{room_idx}', 0))
-                        guests = int(request.POST.get(f'room_guests_{room_idx}', 2))
-                        inventory = int(request.POST.get(f'room_count_{room_idx}', 1))
-                        amenities_json = request.POST.get(f'room_amenities_{room_idx}', '[]')
                         
-                        import json
+                        # Robust Data Extraction
+                        try:
+                            price_str = request.POST.get(f'room_price_{room_idx}', '0').replace(',', '')
+                            price = int(float(price_str))
+                            guests = int(request.POST.get(f'room_guests_{room_idx}', '2') or '2')
+                            inventory = int(request.POST.get(f'room_count_{room_idx}', '1') or '1')
+                        except (ValueError, TypeError):
+                            price, guests, inventory = 0, 2, 1
+
+                        amenities_json = request.POST.get(f'room_amenities_{room_idx}', '[]')
                         try:
                             amenities = json.loads(amenities_json)
                         except:
                             amenities = []
 
-                        RoomType.objects.create(
+                        room = RoomType.objects.create(
                             hotel=hotel,
                             room_category_name=room_name,
                             room_type=room_class.upper(),
@@ -68,14 +81,38 @@ def add_hotel(request):
                             total_rooms=inventory,
                             amenities=amenities
                         )
+                        
+                        # Room Photo (Step 2A Individual)
+                        room_photos = request.FILES.getlist(f'room_photos_{room_idx}')
+                        if room_photos:
+                            room.room_image = room_photos[0]
+                            room.save()
+                            
+                        total_inventory += inventory
                         room_idx += 1
 
-                    messages.success(request, f"Welcome ABOARD! {hotel.hotel_name} is now in review.")
+                    # 4. Save Property Gallery Images (Step 2C)
+                    property_images = request.FILES.getlist('property_images')
+                    for img in property_images:
+                        HotelImage.objects.create(hotel=hotel, image_path=img)
+
+                    # 5. Finalize Deployment Metadata
+                    hotel.total_rooms = total_inventory
+                    hotel.submitted_at = timezone.now()
+                    hotel.status = 'PENDING'
+                    hotel.save()
+
+                    messages.success(request, f"Welcome to Pal! {hotel.hotel_name} is now in the verification queue.")
                     return redirect('hotels:admin_dashboard_pro')
             except Exception as e:
-                messages.error(request, f"Onboarding failed: {str(e)}")
+                import traceback
+                print(f"[Onboarding Error] {traceback.format_exc()}")
+                messages.error(request, f"Registration failed: {str(e)}")
         else:
-            messages.error(request, "Please correct the errors in the form.")
+            # Enhanced Error Reporting (Professional UX)
+            errors = form.errors.as_data()
+            print(f"[Form Errors] {errors}")
+            messages.error(request, "Please check the highlighted fields and retry.")
     else:
         form = HotelDeploymentForm()
     return render(request, 'hotels/add_hotel.html', {'form': form})

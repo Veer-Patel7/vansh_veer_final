@@ -7,7 +7,7 @@ def customer_required(view_func):
     """
     actual_decorator = user_passes_test(
         lambda u: u.is_active and u.is_customer,
-        login_url='account:login'
+        login_url='accounts:customer_login'
     )
     return actual_decorator(view_func)
 
@@ -17,7 +17,7 @@ def hotel_admin_required(view_func):
     """
     actual_decorator = user_passes_test(
         lambda u: u.is_active and u.is_hotel_admin,
-        login_url='account:login'
+        login_url='accounts:hotel_login'
     )
     return actual_decorator(view_func)
 
@@ -27,6 +27,6 @@ def super_admin_required(view_func):
     """
     actual_decorator = user_passes_test(
         lambda u: u.is_active and u.is_super_admin,
-        login_url='account:login'
+        login_url='accounts:super_login'
     )
     return actual_decorator(view_func)

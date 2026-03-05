@@ -2993,3 +2993,39 @@ body::-webkit-scrollbar-thumb:hover {
     filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.1));
     pointer-events: auto;
 }
+
+/* --- Form Validation --- */
+.field-error-msg {
+    color: #ef4444 !important;
+    font-size: 0.75rem;
+    font-weight: 700;
+    margin-top: 6px;
+    margin-left: 2px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    animation: slideInLow 0.3s ease-out;
+}
+
+.field-error-msg::before {
+    content: '\f06a';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+}
+
+@keyframes slideInLow {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.input-error {
+    border-color: #ef4444 !important;
+    background-color: #fef2f2 !important;
+}

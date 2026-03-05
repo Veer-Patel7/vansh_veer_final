@@ -10,6 +10,7 @@ class HotelDeploymentForm(forms.ModelForm):
         model = Hotel
         fields = [
             'hotel_name', 'hotel_type', 'total_rooms', 'description',
+            'check_in', 'check_out', 'cancellation_policy',
             'id_type', 'id_number', 'doc_mandatory',
             'govt_reg_number', 'doc_certificate',
             'gst_number', 'doc_gst',
@@ -17,6 +18,9 @@ class HotelDeploymentForm(forms.ModelForm):
         ]
         widgets = {
             'description': forms.Textarea(attrs={'rows': 4, 'placeholder': 'Overview of the property...', 'required': 'true'}),
+            'check_in': forms.TimeInput(attrs={'type': 'time', 'required': 'true'}),
+            'check_out': forms.TimeInput(attrs={'type': 'time', 'required': 'true'}),
+            'cancellation_policy': forms.Textarea(attrs={'rows': 3, 'required': 'true'}),
             'address': forms.TextInput(attrs={'placeholder': 'Search for address or drag map...', 'id': 'location-search', 'class': 'input-address', 'required': 'true'}),
             'lat': forms.HiddenInput(),
             'lng': forms.HiddenInput(),

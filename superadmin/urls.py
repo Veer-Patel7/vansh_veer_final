@@ -25,11 +25,11 @@ urlpatterns = [
     path("update-booking/<int:booking_id>/", views.update_booking),
 
     # PAYMENTS MAIN PAGE
-    path('payments/', views.payments_dashboard),
+    path('payments/', views.payments_dashboard, name="payments"),
     # COMMISSION
-    path('payments/generate/', views.generate_commission),
-    path('payments/invoices/', views.commissions),
-    path('payments/mark-paid/<int:id>/', views.mark_paid),
+    path('payments/generate/', views.generate_commission, name="generate_commission"),
+    path('payments/invoices/', views.commissions, name="invoices"),
+    path('payments/mark-paid/<int:id>/', views.mark_paid, name="mark_paid"),
     
     # CUSTOMER MANAGE
     path("customers/", views.customers_manage),

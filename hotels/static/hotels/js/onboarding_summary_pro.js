@@ -58,7 +58,7 @@ class SummaryEngine {
     }
 
     /**
-     * Renders the final Executive Dossier
+     * Renders the final Registration Summary
      */
     render() {
         if (!this.container) return;
@@ -101,7 +101,7 @@ class SummaryEngine {
                             </div>
                         </div>
                         <div class="tier-badge" style="background: white; padding: 15px 25px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.05); border: 1px solid var(--border);">
-                            <span style="display:block; font-size:0.65rem; font-weight:800; color:var(--text-muted); text-transform:uppercase; margin-bottom: 2px;">Property Tier</span>
+                            <span style="block; font-size:0.65rem; font-weight:800; color:var(--text-muted); text-transform:uppercase; margin-bottom: 2px;">Hotel Category</span>
                             <div style="font-size: 1.4rem; font-weight: 800; color: var(--primary); display: flex; align-items: center; gap: 10px;">
                                 <i class="fas fa-crown" style="color:var(--secondary);"></i> 
                                 ${data.hotelType}
@@ -111,11 +111,11 @@ class SummaryEngine {
                 </div>
 
                 <div style="padding: 60px;">
-                    ${this.renderSection('01', 'Property Foundation', `
+                    ${this.renderSection('01', 'Hotel Details', `
                         <div class="col-12">
                             <div class="summary-room-item" style="gap:40px; border-bottom: none; border-radius: 20px 20px 0 0;">
                                 <div style="flex: 1;">
-                                    <span style="font-size: 0.7rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;">Legal Designation & Location</span>
+                                    <span style="font-size: 0.7rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;">Hotel Name & Address</span>
                                     <h4 style="font-size: 1.8rem; font-weight: 800; color: var(--primary); margin-top: 8px;">${data.hotelName || 'Property Name'}</h4>
                                     <p style="font-size: 1rem; margin-top: 12px; color: var(--text-muted);"><i class="fas fa-map-location-dot" style="color:var(--secondary);"></i> ${data.address}</p>
                                 </div>
@@ -128,10 +128,10 @@ class SummaryEngine {
                             <div class="summary-portfolio-showcase" style="background: rgba(15, 23, 42, 0.02); padding: 30px; border: 1px solid var(--border); border-top: none; border-radius: 0 0 20px 20px;">
                                 <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 20px;">
                                     <div>
-                                        <h5 style="font-size: 0.8rem; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 2px;">Property Portfolio Showcase</h5>
-                                        <p style="font-size: 0.7rem; color: var(--text-muted);">Displaying all ${propertyPhotos.length} verified physical assets</p>
+                                        <h5 style="font-size: 0.8rem; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 2px;">Hotel Photos</h5>
+                                        <p style="font-size: 0.7rem; color: var(--text-muted);">Displaying verified property photos</p>
                                     </div>
-                                    <div style="font-size: 0.7rem; font-weight: 700; color: var(--secondary);"><i class="fas fa-expand-arrows-alt"></i> TAP TO INSPECT</div>
+                                    <div style="font-size: 0.7rem; font-weight: 700; color: var(--secondary);"><i class="fas fa-expand-arrows-alt"></i> TAP TO VIEW</div>
                                 </div>
                                 <div class="summary-media-grid" style="grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));">
                                     ${propertyPhotos.map((fileObj, idx) => `
@@ -144,7 +144,7 @@ class SummaryEngine {
                         </div>
                     `)}
 
-                    ${this.renderSection('02', 'Operational Inventory', `
+                    ${this.renderSection('02', 'Room Details', `
                         <div class="col-12">
                             <div id="summary-room-list" style="display: grid; gap: 15px;">
                                 ${this.renderRoomSummary()}
@@ -152,7 +152,7 @@ class SummaryEngine {
                         </div>
                     `)}
 
-                    ${this.renderSection('03', 'Elite Service Registry', `
+                    ${this.renderSection('03', 'Hotel Services', `
                         <div class="col-12">
                             <div class="elite-pills-container" style="margin-top: 0;">
                                 ${data.services.length > 0
@@ -162,12 +162,12 @@ class SummaryEngine {
                         </div>
                     `)}
 
-                    ${this.renderSection('04', 'Operational Standards', `
+                    ${this.renderSection('04', 'Check-in & Policies', `
                         <div class="col-6">
                             <div class="summary-room-item">
                                 <i class="fas fa-clock fa-2x" style="color:var(--secondary);"></i>
-                                <div>
-                                    <span style="font-size: 0.7rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">Standard Schedule</span>
+                                <div style="flex:1;">
+                                    <span style="font-size: 0.7rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">Standard Times</span>
                                     <div style="font-size: 1.1rem; font-weight: 800;">IN: ${data.checkIn} | OUT: ${data.checkOut}</div>
                                 </div>
                             </div>
@@ -176,7 +176,7 @@ class SummaryEngine {
                             <div class="summary-room-item">
                                 <i class="fas fa-shield-halved fa-2x" style="color:var(--secondary);"></i>
                                 <div style="flex:1;">
-                                    <span style="font-size: 0.7rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">Policy Protocol</span>
+                                    <span style="font-size: 0.7rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">Rules & Policies</span>
                                     <div style="font-size: 0.85rem; font-weight: 600; line-height: 1.4;">${this.formatPolicy(data.cancellation)}</div>
                                 </div>
                             </div>
@@ -193,12 +193,12 @@ class SummaryEngine {
                                     <div style="flex:1;">
                                         <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                                             <div>
-                                                <span style="font-size: 0.75rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;">Primary Identification</span>
+                                                <span style="font-size: 0.75rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;">ID Information</span>
                                                 <div style="font-size: 1.1rem; font-weight: 800; color: var(--secondary); margin: 4px 0;">${data.idType}</div>
                                                 <div style="font-size: 1.8rem; font-weight: 800; letter-spacing: 2px; color: var(--primary);">${this.formatID(data.idNumber)}</div>
                                             </div>
                                             <div style="text-align: right;">
-                                                <span class="compliance-badge" style="background: #22c55e; color: white; border: none; font-size: 0.6rem; padding: 4px 12px;">ACTIVE VALIDATION</span>
+                                                <span class="compliance-badge" style="background: #22c55e; color: white; border: none; font-size: 0.6rem; padding: 4px 12px;">VERIFIED</span>
                                             </div>
                                         </div>
                                     </div>
@@ -207,7 +207,7 @@ class SummaryEngine {
                         </div>
                     `)}
 
-                    ${this.renderSection('06', 'Business Authentication', `
+                    ${this.renderSection('06', 'Business Documents', `
                         <div class="col-6">
                             <div class="summary-room-item" style="height: 100%; align-items: flex-start;">
                                 <div style="display:flex; gap:15px; width: 100%;">
@@ -215,7 +215,7 @@ class SummaryEngine {
                                         ${this.renderFilePreview(gstDocs[0], 'fa-building-circle-check')}
                                     </div>
                                     <div style="flex:1;">
-                                        <span style="font-size: 0.7rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">Tax Authentication</span>
+                                        <span style="font-size: 0.7rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">Tax Information</span>
                                         <div style="font-size: 0.85rem; font-weight: 800; color: var(--secondary); margin-bottom: 2px;">GST CERTIFICATE</div>
                                         <div style="font-size: 1.1rem; font-weight: 800;">${data.gstNumber || 'Not Provided'}</div>
                                     </div>
@@ -229,7 +229,7 @@ class SummaryEngine {
                                         ${this.renderFilePreview(regDocs[0], 'fa-gavel')}
                                     </div>
                                     <div style="flex:1;">
-                                        <span style="font-size: 0.7rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">Govt. Mandate</span>
+                                        <span style="font-size: 0.7rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">Registration</span>
                                         <div style="font-size: 0.85rem; font-weight: 800; color: var(--secondary); margin-bottom: 2px;">REGISTRATION</div>
                                         <div style="font-size: 1.1rem; font-weight: 800;">${data.govtRegNumber || 'Not Provided'}</div>
                                     </div>
@@ -243,8 +243,8 @@ class SummaryEngine {
                     <div class="summary-footer-brand">
                         <i class="fas fa-shield-check fa-2x" style="color:var(--secondary);"></i>
                         <div>
-                            <div style="font-size:0.7rem; opacity:0.6; text-transform:uppercase; font-weight:800;">Identity Authentication</div>
-                            <div style="font-weight:800; font-size:1.1rem;">Secured by HotelPro Elite</div>
+                            <div style="font-size:0.7rem; opacity:0.6; text-transform:uppercase; font-weight:800;">Identity Verified</div>
+                            <div style="font-weight:800; font-size:1.1rem;">Secured by HotelPro</div>
                         </div>
                     </div>
                     <div class="footer-timestamp">
@@ -373,7 +373,7 @@ class SummaryEngine {
      */
     formatPolicy(text) {
         if (!text || text.toLowerCase() === 'no' || text.length < 5) {
-            return '<span style="color:var(--text-muted); font-style:italic;">Standard Property Revocation & Refund Protocols Apply.</span>';
+            return '<span style="color:var(--text-muted); font-style:italic;">Standard refund and cancellation rules apply.</span>';
         }
         return text;
     }

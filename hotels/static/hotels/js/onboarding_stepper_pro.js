@@ -103,12 +103,28 @@ class StepperManager {
     }
 
     isVisible(el) {
-        if (!el || el.type === 'hidden') return false;
+        if (!el) return false;
+        // If it's a hidden input that is REQUIRED, we MUST validate it (it's likely a custom component target)
+        if (el.type === 'hidden' && el.required) return true;
+        // If it's display:none but REQUIRED, it might be a hidden select for a custom dropdown
+        if (el.required && window.getComputedStyle(el).display === 'none') return true;
+
         const style = window.getComputedStyle(el);
         return style.display !== 'none' && style.visibility !== 'hidden' && el.offsetParent !== null;
     }
 
     setupNavigation() {
+        const form = document.getElementById('onboardingForm');
+        if (form) {
+            form.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
+                    e.preventDefault();
+                    const nextBtn = document.querySelector(`.onboarding-step.active .next-step`);
+                    if (nextBtn) nextBtn.click();
+                }
+            });
+        }
+
         document.addEventListener('click', (e) => {
             const nextBtn = e.target.closest('.next-step');
             const prevBtn = e.target.closest('.prev-step');

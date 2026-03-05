@@ -2,23 +2,51 @@
 
 {% block content %}
 
-<h2>Monthly Commission</h2>
+<div style="display:flex; align-items:center; justify-content:space-between;">
+    
+    <div style="display:flex; align-items:center; gap:10px;">
+        
+        <a href="/super/payments/" class="btn-approve" style="padding:6px 14px;">
+            ← Back
+        </a>
+
+        <h2 style="margin:0;">Monthly Commission</h2>
+
+    </div>
+
+</div>
+
 <hr>
 
 <div class="section-card">
   <div class="section-body">
 
-    <form method="get" action="/super/payments/generate/">
+    <form method="get" action="/super/payments/invoices/">
       <div class="info-item">
         <label class="info-label">Select Month</label>
-        <input type="month" name="month" class="sa-input" required>
-      </div>
 
+        <input
+          type="month"
+          name="month"
+          class="sa-input"
+          value="{{ selected_month }}"
+        >
+      </div>
       <br>
 
-      <button type="submit" class="btn-approve">Generate</button>
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+      <button type="submit" class="btn-approve">
+        Filter
+      </button>
+
+      <a href="/super/payments/generate/?month={{ selected_month }}" class="btn-approve">
+        Generate Commission
+      </a>
+
     </form>
 
+    <br>
+    
   </div>
 </div>
 
@@ -55,8 +83,10 @@
         <td>
           {% if p.status == "paid" %}
             <span class="status-LIVE">Paid</span>
+          {% elif p.status == "overdue" %}
+            <span class="status-REJECTED">Overdue</span>
           {% else %}
-            <span class="status-PENDING">Pending</span>
+            <span class="status-PENDING">Unpaid</span>
           {% endif %}
         </td>
 
