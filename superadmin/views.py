@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
 from django.utils import timezone
-from hotels.models import Hotel
+from hotels.models import Hotel, RoomType, HotelImage
 from accounts.models import User
 from bookings.models import Booking
 from payments.models import HotelCommission
@@ -20,11 +20,70 @@ User = get_user_model()
 
 @login_required(login_url="/super/")
 def dashboard(request):
-    return render(request, "superadmin/dashboard.html")
+    if request.user.role != "super_admin":
+        return HttpResponse("Unauthorized")
+        
+    # Hotel Stats
+    hotels = Hotel.objects.all()
+    hotel_stats = {
+        'total': hotels.count(),
+        'pending': hotels.filter(status="PENDING").count(),
+        'live': hotels.filter(status="LIVE").count(),
+    }
+    
+    # User Stats
+    total_owners = User.objects.filter(role="hotel_admin").count()
+    total_customers = User.objects.filter(role="customer").count()
+    
+    # Financial Stats
+    commissions = HotelCommission.objects.all()
+    total_revenue = sum([c.commission_amount for c in commissions if c.status == 'paid'])
+    pending_revenue = sum([c.commission_amount for c in commissions if c.status == 'pending'])
+    
+    # Booking Stats
+    total_bookings = Booking.objects.count()
+    
+    # Recent Activities
+    recent_hotels = Hotel.objects.all().order_by('-created_at')[:5]
+    
+    context = {
+        'hotel_stats': hotel_stats,
+        'total_owners': total_owners,
+        'total_customers': total_customers,
+        'total_revenue': total_revenue,
+        'pending_revenue': pending_revenue,
+        'total_bookings': total_bookings,
+        'recent_hotels': recent_hotels,
+    }
+    
+    return render(request, "superadmin/dashboard.html", context)
 
-@login_required(login_url="/super/")
+
+#------------ profile -----------
+@login_required
 def profile(request):
-    return render(request, "superadmin/profile.html")
+
+    if request.method == "POST":
+
+        request.user.username = request.POST.get("username")
+        request.user.email = request.POST.get("email")
+
+        if request.FILES.get("profile_photo"):
+            request.user.profile_photo = request.FILES.get("profile_photo")
+
+        request.user.save()
+
+        return redirect("/super/profile/")
+
+    context = {
+
+        "hotels_count": Hotel.objects.count(),
+        "bookings_count": Booking.objects.count(),
+        "customers_count": User.objects.filter(role="customer").count()
+
+    }
+
+    return render(request,"superadmin/profile.html",context)
 
 #--------- hotel owner login req approve ---------
 
@@ -72,7 +131,32 @@ def hotels_approve(request):
         return HttpResponse("Unauthorized")
 
     hotels = Hotel.objects.all().order_by("-created_at")
-    return render(request, "superadmin/hotels.html", {"hotels": hotels})
+    pending_count  = hotels.filter(status="PENDING").count()
+    live_count     = hotels.filter(status="LIVE").count()
+    rejected_count = hotels.filter(status="REJECTED").count()
+    return render(request, "superadmin/hotels.html", {
+        "hotels": hotels,
+        "pending_count": pending_count,
+        "live_count": live_count,
+        "rejected_count": rejected_count,
+    })
+
+
+@login_required(login_url="/super/")
+def hotel_detail_view(request, hotel_id):
+    """Full hotel detail for Super Admin review — shows all onboarding data."""
+    if request.user.role != "super_admin":
+        return HttpResponse("Unauthorized")
+
+    hotel  = get_object_or_404(Hotel, id=hotel_id)
+    rooms  = RoomType.objects.filter(hotel=hotel)
+    images = HotelImage.objects.filter(hotel=hotel)
+
+    return render(request, "superadmin/hotel_detail.html", {
+        "hotel":  hotel,
+        "rooms":  rooms,
+        "images": images,
+    })
 
 
 @login_required(login_url="/super/")

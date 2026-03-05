@@ -2,70 +2,126 @@
 
 {% block content %}
 
-<h2>Review Delete Requests</h2>
-<hr>
+<div class="container-fluid px-0" style="max-width:1200px;margin:0 auto;padding:1rem;">
 
-<div class="card">
-  <div class="card-body">
+    <!-- ===== Page Header ===== -->
+    <div class="page-header"
+        style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:2rem;border-bottom:1px solid var(--border);padding-bottom:1.5rem;">
+        <div>
+            <h1 class="sa-page-title m-0">Review Delete Requests</h1>
+            <p class="mt-1 text-low small">Moderate review deletion requests from hotel owners</p>
+        </div>
+    </div>
 
-    <table class="table table-bordered table-striped">
-      <tr>
-        <th>Hotel</th>
-        <th>Customer</th>
-        <th>Rating</th>
-        <th>Comment</th>
-        <th>Recommend</th>
-        <th>Action</th>
-      </tr>
+    <!-- ===== Reviews Table ===== -->
+    <div class="section-card">
 
-      {% for r in reviews %}
-      <tr>
-        <td>{{ r.hotel.hotel_name }}</td>
-        <td>{{ r.user.email }}</td>
+        <div class="section-header">
+            <h3>Pending Review Requests</h3>
+        </div>
 
-        <td>
-          <span class="badge bg-info">{{ r.rating }}</span>
-        </td>
+        <div class="section-body">
 
-        <td>{{ r.comment }}</td>
+            <table class="sa-table">
 
-        <td>
-          {% if r.recommend %}
-            <span class="badge bg-success">Yes</span>
-          {% else %}
-            <span class="badge bg-secondary">No</span>
-          {% endif %}
-        </td>
+                <thead>
+                    <tr>
+                        <th>Hotel</th>
+                        <th>Customer</th>
+                        <th>Rating</th>
+                        <th>Comment</th>
+                        <th>Recommend</th>
+                        <th style="width:240px;">Action</th>
+                    </tr>
+                </thead>
 
-        <td>
-          <a href="/super/approve-review/{{ r.id }}/"
-             class="btn btn-success btn-sm">
-             Approve Delete
-          </a>
+                <tbody>
 
-          <a href="/super/reject-review/{{ r.id }}/"
-             class="btn btn-warning btn-sm">
-             Reject
-          </a>
+                {% for r in reviews %}
+                <tr>
 
-          <a href="/super/fake-review/{{ r.id }}/"
-             class="btn btn-danger btn-sm">
-             Mark Fake
-          </a>
-        </td>
-      </tr>
+                    <td>
+                        <div style="font-weight:600;color:var(--text-high);">
+                            {{ r.hotel.hotel_name }}
+                        </div>
+                    </td>
 
-      {% empty %}
-      <tr>
-        <td colspan="6" class="text-center">
-          No delete requests
-        </td>
-      </tr>
-      {% endfor %}
+                    <td class="text-low">
+                        {{ r.user.email }}
+                    </td>
 
-    </table>
+                    <td>
+                        <span class="status-badge status-PENDING">
+                            ⭐ {{ r.rating }}
+                        </span>
+                    </td>
 
-  </div>
+                    <td class="text-low">
+                        {{ r.comment }}
+                    </td>
+
+                    <td>
+                        {% if r.recommend %}
+                        <span class="status-badge status-LIVE">
+                            Yes
+                        </span>
+                        {% else %}
+                        <span class="status-badge status-REJECTED">
+                            No
+                        </span>
+                        {% endif %}
+                    </td>
+
+                    <td>
+
+                        <div class="action-group">
+
+                            <a href="/super/approve-review/{{ r.id }}/"
+                               class="btn-approve">
+                               Approve Delete
+                            </a>
+
+                            <a href="/super/reject-review/{{ r.id }}/"
+                               class="btn-approve"
+                               style="background:#f59e0b;">
+                               Reject
+                            </a>
+
+                            <a href="/super/fake-review/{{ r.id }}/"
+                               class="btn-approve"
+                               style="background:#ef4444;">
+                               Mark Fake
+                            </a>
+
+                        </div>
+
+                    </td>
+
+                </tr>
+
+                {% empty %}
+
+                <tr>
+                    <td colspan="6">
+
+                        <div class="empty-state">
+                            <i class="fas fa-star"></i>
+                            <p>No delete requests.</p>
+                        </div>
+
+                    </td>
+                </tr>
+
+                {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
 </div>
 
 {% endblock %}

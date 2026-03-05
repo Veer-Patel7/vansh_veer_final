@@ -1,5 +1,227 @@
 {% extends "superadmin/base.html" %}
+{% load static %}
 
 {% block content %}
-<h1>Dashboard</h1>
+<div class="container-fluid py-4 animate-in fade-in duration-700">
+    <!-- Header Section -->
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <div>
+            <h1 class="font-weight-bold text-high mb-1" style="font-size: 1.75rem; letter-spacing: -0.5px;">Admin
+                Dashboard</h1>
+            <p class="text-low mb-0">Overview of hotels, bookings, and revenue.</p>
+        </div>
+        <div>
+            <button class="btn btn-approve d-flex align-items-center gap-2">
+                <i class="fas fa-download"></i> Export Reports
+            </button>
+        </div>
+    </div>
+
+    <!-- Quick Metrics -->
+    <div class="row mb-5">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="stat-card live h-100 transition-all hover-lift">
+                <div class="stat-icon"><i class="fas fa-hotel"></i></div>
+                <div>
+                    <div class="stat-num">{{ hotel_stats.live }}</div>
+                    <div class="stat-label">Live Properties</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="stat-card pending h-100 transition-all hover-lift">
+                <div class="stat-icon"><i class="fas fa-hourglass-half"></i></div>
+                <div>
+                    <div class="stat-num">{{ hotel_stats.pending }}</div>
+                    <div class="stat-label">Pending Review</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="stat-card h-100 transition-all hover-lift" style="border-left: 4px solid var(--primary);">
+                <div class="stat-icon" style="color: var(--primary); background: rgba(59, 130, 246, 0.1);"><i
+                        class="fas fa-calendar-check"></i></div>
+                <div>
+                    <div class="stat-num">{{ total_bookings }}</div>
+                    <div class="stat-label">Total Bookings</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="stat-card h-100 transition-all hover-lift" style="border-left: 4px solid var(--success);">
+                <div class="stat-icon" style="color: var(--success); background: rgba(16, 185, 129, 0.1);"><i
+                        class="fas fa-indian-rupee-sign"></i></div>
+                <div>
+                    <div class="stat-num">₹{{ total_revenue|floatformat:0 }}</div>
+                    <div class="stat-label">Total Revenue</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="row">
+        <!-- Recent Registrations -->
+        <div class="col-lg-8 mb-4">
+            <div class="section-box border-0 shadow-lg h-100">
+                <div class="section-header d-flex justify-content-between align-items-center px-4">
+                    <h3>Recent Hotel Signups</h3>
+                    <a href="/super/hotels/"
+                        class="text-[10px] font-bold text-primary uppercase tracking-widest hover-underline"
+                        style="text-decoration: none;">View All <i class="fas fa-arrow-right ml-1"></i></a>
+                </div>
+                <div class="section-body p-0">
+                    <div class="table-responsive">
+                        <table class="sa-table">
+                            <thead>
+                                <tr>
+                                    <th>Hotel Name</th>
+                                    <th>City</th>
+                                    <th>Status</th>
+                                    <th class="text-right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for h in recent_hotels %}
+                                <tr class="hover-bg-target">
+                                    <td>
+                                        <div class="d-flex align-items-center gap-3">
+                                            <div
+                                                class="w-8 h-8 rounded bg-primary-900/30 flex items-center justify-center text-primary-500 font-bold border border-primary-500/20">
+                                                {{ h.hotel_name|first|upper }}
+                                            </div>
+                                            <span class="font-weight-600 text-high">{{ h.hotel_name }}</span>
+                                        </div>
+                                    </td>
+                                    <td class="text-low">{{ h.city }}</td>
+                                    <td>
+                                        {% if h.status == 'LIVE' %}
+                                        <span class="status-badge status-LIVE">Live</span>
+                                        {% elif h.status == 'PENDING' %}
+                                        <span class="status-badge status-PENDING">Pending</span>
+                                        {% else %}
+                                        <span class="status-badge status-REJECTED">Rejected</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-right">
+                                        <a href="/super/hotel/{{ h.id }}/"
+                                            class="btn btn-sm btn-outline-light rounded-pill px-3">
+                                            Manage
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" class="text-center py-5">
+                                        <div class="empty-state">
+                                            <i class="fas fa-folder-open mb-3"></i>
+                                            <p>No recent registrations found.</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Platform Users -->
+        <div class="col-lg-4 mb-4">
+            <div class="section-box border-0 shadow-lg h-100">
+                <div class="section-header px-4">
+                    <h3>Site Users</h3>
+                </div>
+                <div class="section-body d-flex flex-column gap-4 p-4">
+                    <div
+                        class="p-3 rounded bg-white/5 border border-white/5 d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center gap-3">
+                            <div
+                                class="w-10 h-10 rounded-circle bg-amber-500/10 flex items-center justify-center text-amber-500">
+                                <i class="fas fa-user-tie"></i>
+                            </div>
+                            <div>
+                                <div class="text-high font-weight-bold">{{ total_owners }}</div>
+                                <div class="text-[10px] text-low uppercase tracking-wider">Hotel Admins</div>
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-right text-low hidden"></i>
+                    </div>
+
+                    <div
+                        class="p-3 rounded bg-white/5 border border-white/5 d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center gap-3">
+                            <div
+                                class="w-10 h-10 rounded-circle bg-purple-500/10 flex items-center justify-center text-purple-500">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div>
+                                <div class="text-high font-weight-bold">{{ total_customers }}</div>
+                                <div class="text-[10px] text-low uppercase tracking-wider">Customers</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div
+                        class="mt-auto p-4 rounded-xl bg-gradient-to-br from-primary-600/20 to-transparent border border-primary-500/10">
+                        <h4 class="text-sm font-weight-bold text-high mb-2">System Performance</h4>
+                        <div class="progress mb-2" style="height: 6px; background: rgba(0,0,0,0.2);">
+                            <div class="progress-bar bg-primary" role="progressbar" style="width: 92%;"
+                                aria-valuenow="92" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                        <div
+                            class="d-flex justify-content-between text-[10px] text-low uppercase tracking-widest font-bold">
+                            <span>Efficiency</span>
+                            <span>92%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .hover-lift {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .hover-lift:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.5);
+    }
+
+    .text-low {
+        color: var(--text-low);
+    }
+
+    .font-weight-600 {
+        font-weight: 600;
+    }
+
+    .hover-bg-target:hover {
+        background: rgba(255, 255, 255, 0.02);
+    }
+
+    .animate-in {
+        animation: fadeIn 0.7s ease-out;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .hover-underline:hover {
+        text-decoration: underline !important;
+    }
+</style>
 {% endblock %}

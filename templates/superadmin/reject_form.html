@@ -5,25 +5,28 @@
 <h2>Reject Hotel</h2>
 <hr>
 
-<div class="card" style="max-width:600px;">
-  <div class="card-body">
+<div class="section-card" style="max-width:600px;">
+  <div class="section-body">
 
     <form method="post">
       {% csrf_token %}
 
-      <div class="form-group">
-        <label><b>Hotel:</b></label>
-        <p>{{ hotel.hotel_name }}</p>
-      </div>
-
-      <div class="form-group">
-        <label>Reason for rejection</label>
-        <textarea name="reason" class="form-control" rows="4" required></textarea>
+      <div class="info-item">
+        <label class="info-label"><b>Hotel:</b></label>
+        <p class="info-value">{{ hotel.hotel_name }}</p>
       </div>
 
       <br>
-      <button type="submit" class="btn btn-danger">Reject Hotel</button>
-      <a href="/super/hotels/" class="btn btn-secondary">Back</a>
+
+      <div class="info-item">
+        <label class="info-label">Reason for rejection</label>
+        <textarea name="reason" class="sa-input" rows="4" required></textarea>
+      </div>
+
+      <br>
+
+      <button type="submit" class="btn-approve">Reject Hotel</button>
+      <a href="/super/hotels/" class="btn-approve" style="background:#475569;">Back</a>
 
     </form>
 

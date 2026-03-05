@@ -5,16 +5,18 @@
 <h2>Monthly Commission</h2>
 <hr>
 
-<div class="card">
-  <div class="card-body">
+<div class="section-card">
+  <div class="section-body">
 
     <form method="get" action="/super/payments/generate/">
-      <div class="form-group">
-        <label>Select Month</label>
-        <input type="month" name="month" class="form-control" required>
+      <div class="info-item">
+        <label class="info-label">Select Month</label>
+        <input type="month" name="month" class="sa-input" required>
       </div>
+
       <br>
-      <button type="submit" class="btn btn-primary">Generate</button>
+
+      <button type="submit" class="btn-approve">Generate</button>
     </form>
 
   </div>
@@ -22,22 +24,25 @@
 
 <br>
 
-<div class="card">
-  <div class="card-body">
+<div class="section-card">
+  <div class="section-body">
 
-    <table class="table table-bordered table-striped">
-      <tr>
-        <th>Hotel</th>
-        <th>Month</th>
-        <th>Total Revenue</th>
-        <th>Commission</th>
-        <th>Penalty</th>
-        <th>Total Pay</th>
-        <th>Status</th>
-        <th>Due Date</th>
-        <th>Action</th>
-      </tr>
+    <table class="sa-table">
+      <thead>
+        <tr>
+          <th>Hotel</th>
+          <th>Month</th>
+          <th>Total Revenue</th>
+          <th>Commission</th>
+          <th>Penalty</th>
+          <th>Total Pay</th>
+          <th>Status</th>
+          <th>Due Date</th>
+          <th>Action</th>
+        </tr>
+      </thead>
 
+      <tbody>
       {% for p in data %}
       <tr>
         <td>{{ p.hotel.hotel_name }}</td>
@@ -49,9 +54,9 @@
 
         <td>
           {% if p.status == "paid" %}
-            <span class="badge bg-success">Paid</span>
+            <span class="status-LIVE">Paid</span>
           {% else %}
-            <span class="badge bg-warning">Pending</span>
+            <span class="status-PENDING">Pending</span>
           {% endif %}
         </td>
 
@@ -59,7 +64,9 @@
 
         <td>
           {% if p.status != "paid" %}
-            <a href="/super/payments/mark-paid/{{ p.id }}/" class="btn btn-success btn-sm">Mark Paid</a>
+            <a href="/super/payments/mark-paid/{{ p.id }}/" class="btn-approve">
+              Mark Paid
+            </a>
           {% else %}
             Paid
           {% endif %}
@@ -68,9 +75,10 @@
 
       {% empty %}
       <tr>
-        <td colspan="9" class="text-center">No commission data</td>
+        <td colspan="9" style="text-align:center;">No commission data</td>
       </tr>
       {% endfor %}
+      </tbody>
 
     </table>
 

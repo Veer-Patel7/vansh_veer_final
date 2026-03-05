@@ -1,0 +1,371 @@
+{% extends "superadmin/base.html" %}
+{% block content %}
+{% load static %}
+
+<div class="container-fluid px-0" style="max-width: 1200px; margin: 0 auto; padding: 1rem;">
+
+    <!-- ===== Page Header ===== -->
+    <div class="page-header"
+        style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 1.5rem;">
+        <div>
+            <a href="/super/hotels/" class="btn btn-sm btn-outline-secondary mb-3">
+                <i class="fas fa-arrow-left mr-1"></i> Back to Hotels
+            </a>
+            <h1 class="sa-page-title m-0">{{ hotel.hotel_name }}</h1>
+            <p class="mt-1 text-muted">{{ hotel.city }}, {{ hotel.state }} &nbsp;·&nbsp; ID #{{ hotel.id }}</p>
+        </div>
+        <div class="text-right">
+            <span class="status-badge status-{{ hotel.status }} mb-2 d-inline-block">
+                {{ hotel.get_status_display }}
+            </span>
+            <div class="text-low small">Submitted: {{ hotel.submitted_at|date:"M d, Y H:i"|default:"Recently" }}</div>
+        </div>
+    </div>
+
+    <!-- ===== Previous Remarks (If any) ===== -->
+    {% if hotel.verification_remarks %}
+    <div class="section-card border-warning"
+        style="background: rgba(245, 158, 11, 0.05); border-left: 4px solid var(--warning);">
+        <div class="section-body d-flex align-items-center gap-3">
+            <i class="fas fa-circle-exclamation text-warning" style="font-size: 1.25rem;"></i>
+            <div>
+                <span class="info-label text-warning">Previous Rejection Feedback</span>
+                <p class="m-0 text-white">{{ hotel.verification_remarks }}</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- ===== 1. PROPERTY IDENTITY ===== -->
+            <div class="section-card">
+                <div class="section-header">
+                    <h3><i class="fas fa-hotel mr-2 text-primary"></i> Property Identity</h3>
+                </div>
+                <div class="section-body">
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Property Type</span>
+                            <span class="info-value">{{ hotel.get_hotel_type_display }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Total Unit Count</span>
+                            <span class="info-value">{{ hotel.total_rooms }} Rooms</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Pincode</span>
+                            <span class="info-value">{{ hotel.pincode }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">City/State</span>
+                            <span class="info-value">{{ hotel.city }}, {{ hotel.state }}</span>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <span class="info-label">Full Address</span>
+                        <p class="info-value mb-0">{{ hotel.address }}</p>
+                    </div>
+                    {% if hotel.description %}
+                    <div class="mt-4">
+                        <span class="info-label">Description</span>
+                        <p class="text-medium small" style="line-height: 1.6;">{{ hotel.description }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- ===== 2. ROOM INVENTORY ===== -->
+            <div class="section-card">
+                <div class="section-header">
+                    <h3><i class="fas fa-bed mr-2 text-primary"></i> Room Inventory</h3>
+                </div>
+                <div class="section-body">
+                    {% if rooms %}
+                    <div class="rooms-grid"
+                        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
+                        {% for r in rooms %}
+                        <div class="room-card p-3"
+                            style="background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 12px;">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="font-weight-bold text-white">{{r.room_category_name|default:r.get_room_type_display }}</span>
+                                <span class="text-low small">{{ r.total_rooms }} Units</span>
+                            </div>
+                            <div class="text-primary font-weight-bold mb-2">₹{{ r.price_per_night }} <small
+                                    class="text-low">/night</small></div>
+                            <div class="small text-low">
+                                <i class="fas fa-users mr-1"></i> Max {{ r.max_guest }} Guests &nbsp;·&nbsp;
+                                <i class="fas fa-expand mr-1"></i> {{ r.room_size }} sqft
+                            </div>
+                            {% if r.amenities %}
+                            <div class="mt-3 d-flex flex-wrap gap-1">
+                                {% for am in r.amenities %}
+                                <span class="badge"
+                                    style="background: rgba(59, 130, 246, 0.1); color: var(--primary); font-size: 0.65rem; border: 1px solid rgba(59, 130, 246, 0.2);">{{
+                                    am }}</span>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-low italic m-0">No room types defined yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- ===== 3. OPERATIONAL POLICIES ===== -->
+            <div class="section-card">
+                <div class="section-header">
+                    <h3><i class="fas fa-clock mr-2 text-primary"></i> Operational Policies</h3>
+                </div>
+                <div class="section-body">
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Standard Check-In</span>
+                            <span class="info-value"><i class="fas fa-sign-in-alt mr-2 text-success"></i> {{hotel.check_in }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Standard Check-Out</span>
+                            <span class="info-value"><i class="fas fa-sign-out-alt mr-2 text-danger"></i> {{hotel.check_out }}</span>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <span class="info-label">Cancellation & Refund Policy</span>
+                        <div class="p-3 mt-2 rounded"
+                            style="background: rgba(255,255,255,0.02); border: 1px solid var(--border);">
+                            <p class="text-medium m-0 small">{{ hotel.cancellation_policy|default:"Standard rules apply." }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== 4. SERVICES & FACILITIES ===== -->
+            <div class="section-card">
+                <div class="section-header">
+                    <h3><i class="fas fa-concierge-bell mr-2 text-primary"></i> Services & Facilities</h3>
+                </div>
+                <div class="section-body">
+                    {% if hotel.services %}
+                    <div class="d-flex flex-wrap gap-2">
+                        {% for service in hotel.services %}
+                        <div class="p-2 px-3 rounded-pill"
+                            style="background: rgba(255,255,255,0.03); border: 1px solid var(--border); font-size: 0.8rem; display: flex; align-items: center; gap: 8px;">
+                            <i class="fas fa-check-circle text-primary" style="font-size: 0.7rem;"></i>
+                            <span class="text-white">{{ service }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-low italic m-0 small">No additional services specified.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- ===== 5. PROPERTY GALLERY ===== -->
+            <div class="section-card">
+                <div class="section-header">
+                    <h3><i class="fas fa-images mr-2 text-primary"></i> Property Gallery</h3>
+                </div>
+                <div class="section-body">
+                    {% if images %}
+                    <div class="gallery-grid"
+                        style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px;">
+                        {% for img in images %}
+                        <div class="gallery-item"
+                            style="aspect-ratio: 1; border-radius: 8px; overflow: hidden; border: 1px solid var(--border);">
+                            <img src="{{ img.image_path.url }}" class="w-100 h-100"
+                                style="object-fit: cover; cursor: pointer;" onclick="window.open(this.src)">
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-image"></i>
+                        <p>No photos uploaded yet.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <!-- ===== OWNER SIDEBAR ===== -->
+            <div class="section-card">
+                <div class="section-header">
+                    <h3><i class="fas fa-user-tie mr-2 text-primary"></i> Owner Info</h3>
+                </div>
+                <div class="section-body">
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="mr-3"
+                            style="width: 50px; height: 50px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; font-size: 1.2rem;">
+                            {{ hotel.owner.email|slice:":1"|upper }}
+                        </div>
+                        <div>
+                            <div class="font-weight-bold text-white">{{hotel.owner.get_full_name|default:hotel.owner.username }}</div>
+                            <div class="text-low small">{{ hotel.owner.email }}</div>
+                        </div>
+                    </div>
+                    <div class="info-item mb-3">
+                        <span class="info-label">Phone Number</span>
+                        <span class="info-value">{{ hotel.owner.phone|default:"Not Provided" }}</span>
+                    </div>
+                    <div class="info-item mb-0">
+                        <span class="info-label">Account Creation</span>
+                        <span class="info-value">{{ hotel.owner.date_joined|date:"M d, Y" }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== COMPLIANCE DOCUMENTS ===== -->
+            <div class="section-card">
+                <div class="section-header">
+                    <h3><i class="fas fa-shield-halved mr-2 text-primary"></i> Compliance</h3>
+                </div>
+                <div class="section-body">
+                    <div class="mb-4">
+                        <span class="info-label d-block mb-2">{{ hotel.id_type }} Verification</span>
+                        <div class="d-flex align-items-center justify-content-between p-2 rounded"
+                            style="background: rgba(255,255,255,0.03); border: 1px solid var(--border);">
+                            <div class="small">
+                                <div class="text-low">{{ hotel.id_type }} Number</div>
+                                <div class="text-white font-weight-bold">{{ hotel.id_number|default:"—" }}</div>
+                            </div>
+                            {% if hotel.doc_mandatory %}
+                            <a href="{{ hotel.doc_mandatory.url }}" target="_blank"
+                                class="btn btn-xs btn-outline-primary">View Doc</a>
+                            {% else %}
+                            <span class="text-danger small">Missing</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <span class="info-label d-block mb-2">Govt Registration</span>
+                        <div class="d-flex align-items-center justify-content-between p-2 rounded"
+                            style="background: rgba(255,255,255,0.03); border: 1px solid var(--border);">
+                            <div class="small">
+                                <div class="text-low">Reg Number</div>
+                                <div class="text-white font-weight-bold">{{ hotel.govt_reg_number|default:"—" }}</div>
+                            </div>
+                            {% if hotel.doc_certificate %}
+                            <a href="{{ hotel.doc_certificate.url }}" target="_blank"
+                                class="btn btn-xs btn-outline-primary">View Doc</a>
+                            {% else %}
+                            <span class="text-danger small">Missing</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="mb-0">
+                        <span class="info-label d-block mb-2">GST Details</span>
+                        <div class="d-flex align-items-center justify-content-between p-2 rounded"
+                            style="background: rgba(255,255,255,0.03); border: 1px solid var(--border);">
+                            <div class="small">
+                                <div class="text-low">GSTIN</div>
+                                <div class="text-white font-weight-bold">{{ hotel.gst_number|default:"Not Registered" }}
+                                </div>
+                            </div>
+                            {% if hotel.doc_gst %}
+                            <a href="{{ hotel.doc_gst.url }}" target="_blank"
+                                class="btn btn-xs btn-outline-primary">View Doc</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== FINANCIAL DETAILS ===== -->
+            <div class="section-card">
+                <div class="section-header">
+                    <h3><i class="fas fa-university mr-2 text-primary"></i> Bank Details</h3>
+                </div>
+                <div class="section-body">
+                    <div class="info-item mb-3">
+                        <span class="info-label">Bank Name</span>
+                        <span class="info-value">{{ hotel.bank_name|default:"—" }}</span>
+                    </div>
+                    <div class="info-item mb-3">
+                        <span class="info-label">Account Number</span>
+                        <span class="info-value">{{ hotel.account_number|default:"—" }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">IFSC Code</span>
+                        <span class="info-value">{{ hotel.ifsc_code|default:"—" }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== DECISION PANEL (Always Active for Re-Verification) ===== -->
+    <div class="decision-panel mt-4 mb-5"
+        style="display: flex; justify-content: space-between; align-items: center; background: #1e293b; padding: 1.5rem 2rem; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+        <div>
+            <h4 class="m-0 text-white">Action Centre</h4>
+            <p class="m-0 text-low small">Current Status: <b class="text-white">{{ hotel.get_status_display }}</b></p>
+        </div>
+        <div class="d-flex align-items-center">
+            <!-- Approve Button (Visible if not currently Live) -->
+            {% if hotel.status != 'LIVE' %}
+            <a href="/super/approve-hotel/{{ hotel.id }}/" class="btn btn-success px-4 py-2 font-weight-bold">
+                <i class="fas fa-check-circle mr-1"></i> Approve Property
+            </a>
+            {% else %}
+            <div class="text-success font-weight-bold mr-3">
+                <i class="fas fa-check-double"></i> Already Approved
+            </div>
+            {% endif %}
+
+            <!-- Reject Button (Always available to withdraw or change decision) -->
+            <button class="btn btn-danger px-4 py-2 font-weight-bold ml-2" id="openRejectModal">
+                <i class="fas fa-times-circle mr-1"></i>
+                {% if hotel.status == 'LIVE' %}Withdraw & Reject{% else %}Reject Application{% endif %}
+            </button>
+        </div>
+    </div>
+
+</div>
+
+<!-- ===== REJECT MODAL ===== -->
+<div class="modal-overlay" id="rejectModal"
+    style="position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 1050;">
+    <div class="modal-box p-4"
+        style="background: var(--surface); border: 1px solid var(--border); border-radius: 16px; width: 450px;">
+        <h4 class="text-white mb-2">Reject Application</h4>
+        <p class="text-low small mb-4">Provide feedback to the owner on what needs to be corrected.</p>
+        <form method="POST" action="/super/reject-hotel/{{ hotel.id }}/">
+            {% csrf_token %}
+            <textarea name="reason" class="form-control bg-dark text-white border-secondary mb-4" rows="4"
+                placeholder="e.g. GST document is blurry, please re-upload..." required></textarea>
+            <div class="d-flex justify-content-end gap-2">
+                <button type="button" class="btn btn-link text-low" id="closeRejectModal">Cancel</button>
+                <button type="submit" class="btn btn-danger px-4 ml-2">Confirm Rejection</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    const modal = document.getElementById('rejectModal');
+    const openBtn = document.getElementById('openRejectModal');
+    const closeBtn = document.getElementById('closeRejectModal');
+
+    if (openBtn) {
+        openBtn.addEventListener('click', () => {
+            modal.style.display = 'flex';
+        });
+    }
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+    }
+    // Close on outside click
+    window.addEventListener('click', (e) => {
+        if (e.target === modal) modal.style.display = 'none';
+    });
+</script>
+
+{% endblock %}

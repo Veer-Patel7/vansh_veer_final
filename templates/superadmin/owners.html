@@ -1,47 +1,98 @@
 {% extends "superadmin/base.html" %}
-
 {% block content %}
 
-<h2>Hotel Owners Manage</h2>
-<hr>
+<div class="container-fluid px-0" style="max-width:1200px;margin:0 auto;padding:1rem;">
 
-<div class="card">
-  <div class="card-body">
+    <!-- ===== Page Header ===== -->
+    <div class="page-header"
+        style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:2rem;border-bottom:1px solid var(--border);padding-bottom:1.5rem;">
+        <div>
+            <h1 class="sa-page-title m-0">Hotel Owners</h1>
+            <p class="mt-1 text-low small">Manage all registered hotel owners</p>
+        </div>
+    </div>
 
-    <table class="table table-bordered">
-      <tr>
-        <th>Name</th>
-        <th>Email</th>
-        <th>Status</th>
-        <th>Action</th>
-      </tr>
+    <!-- ===== Owners Table ===== -->
+    <div class="section-card">
+        <div class="section-header">
+            <h3>Owner Accounts</h3>
+        </div>
 
-      {% for o in owners %}
-      <tr>
-        <td>{{ o.first_name }} {{ o.last_name }}</td>
-        <td>{{ o.email }}</td>
+        <div class="section-body">
 
-        <td>
-          {% if o.is_active %}
-            <span class="badge bg-success">Active</span>
-          {% else %}
-            <span class="badge bg-warning">Pending</span>
-          {% endif %}
-        </td>
+            <table class="sa-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Status</th>
+                        <th style="width:140px;">Action</th>
+                    </tr>
+                </thead>
 
-        <td>
-          {% if not o.is_active %}
-            <a href="/super/approve-owner/{{ o.id }}/" class="btn btn-success btn-sm">Approve</a>
-          {% else %}
-            <a href="/super/disable-owner/{{ o.id }}/" class="btn btn-danger btn-sm">Disable</a>
-          {% endif %}
-        </td>
-      </tr>
-      {% endfor %}
+                <tbody>
+                    {% for o in owners %}
+                    <tr>
 
-    </table>
+                        <td>
+                            <div style="font-weight:600;color:var(--text-high);">
+                                {{ o.first_name }} {{ o.last_name }}
+                            </div>
+                        </td>
 
-  </div>
+                        <td class="text-low">
+                            {{ o.email }}
+                        </td>
+
+                        <td>
+                            {% if o.is_active %}
+                            <span class="status-badge status-LIVE">
+                                Active
+                            </span>
+                            {% else %}
+                            <span class="status-badge status-PENDING">
+                                Pending
+                            </span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+
+                            {% if not o.is_active %}
+                            <a href="/super/approve-owner/{{ o.id }}/"
+                                class="btn-approve">
+                                Approve
+                            </a>
+                            {% else %}
+                            <a href="/super/disable-owner/{{ o.id }}/"
+                                class="btn-approve"
+                                style="background:#ef4444;">
+                                Disable
+                            </a>
+                            {% endif %}
+
+                        </td>
+
+                    </tr>
+                    {% empty %}
+
+                    <tr>
+                        <td colspan="4">
+                            <div class="empty-state">
+                                <i class="fas fa-user"></i>
+                                <p>No owners found.</p>
+                            </div>
+                        </td>
+                    </tr>
+
+                    {% endfor %}
+                </tbody>
+
+            </table>
+
+        </div>
+    </div>
+
 </div>
 
 {% endblock %}
