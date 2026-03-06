@@ -14,15 +14,16 @@
 
     <section class="results-section">
         <div class="hotel-container">
-            {% if rooms %}
-                {% for room in rooms %}
+            {% if hotels %}
+                {% for hotel in hotels %}
                 <div class="hotel-card">
-                    <h3 class="hotel-name">{{ room.hotel.hotel_name }}</h3>
-                    <p><strong>Location:</strong> {{ room.hotel.address }}</p>
-                    <p><strong>Price:</strong> ₹{{room.price_per_night}} / night</p>
-                    <p><strong>Room Type:</strong> {{ room.get_room_type_display }}</p>
-                    <p><strong>Max Guests:</strong> {{ room.max_guest }}</p>
-                    <a href="{% url 'customer:hotel_detail' room.hotel.id  %}" class="btn-book">View Details</a>
+                    <h3 class="hotel-name">{{ hotel.hotel_name }}</h3>
+                    <p><strong>Location:</strong> {{ hotel.address }}</p>
+                    <p><strong>Range upto: ₹ {{ hotel.min_price }}-{{ hotel.max_price }}</strong></p>
+                    {% comment %} <h5>₹ {{ hotel.max_price }} Totals</h5> {% endcomment %}
+                    {% comment %} <p><strong>Room Type:</strong> {{ room.get_room_type_display }}</p> {% endcomment %}
+                    {% comment %} <p><strong>Max Guests:</strong> {{ room.max_guest }}</p> {% endcomment %}
+                    <a href="{% url 'customer:hotel_detail' hotel.id  %}" class="btn-book">View Details</a>
                 </div>
                 {% endfor %}
             {% else %}

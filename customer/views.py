@@ -89,16 +89,20 @@ def search_results(request):
     location = request.GET.get("location", "").strip()
     persons = request.GET.get("persons")
 
-    rooms = RoomType.objects.select_related("hotel")
+    hotels = Hotel.objects.all()
 
     if location:
-        rooms = rooms.filter(hotel__address__icontains=location)
+        hotels = hotels.filter(address__icontains=location)
 
-    if persons:
-        rooms = rooms.filter(max_guest__gte=persons)
+    hotels = hotels.annotate(
+        min_price=Min("rooms__price_per_night"),
+        max_price=Max("rooms__price_per_night")
+    )
 
-    return render(request, "customer/search_results.html", {"rooms": rooms})
-
+    return render(request, "customer/search_results.html", {
+        "hotels": hotels
+    })
+    
 def hotel_detail(request, pk):
     hotel = get_object_or_404(Hotel, pk=pk)
     rooms = RoomType.objects.filter(hotel=hotel)
@@ -110,14 +114,16 @@ def hotel_detail(request, pk):
         checkin = date.fromisoformat(checkin)
         checkout = date.fromisoformat(checkout)
 
-        for room in hotel.rooms.all():
+        for room in rooms:
             room.available = room.available_rooms(checkin, checkout)
+    else:
+        for room in rooms:
+            room.available = room.total_rooms
 
     return render(request, "customer/hotel_detail.html", {
         "hotel": hotel,
         "rooms": rooms
     })
-
 
 def room_select(request, room_id):
     return render(request, "customer/room_select.html", {"room_id": room_id})

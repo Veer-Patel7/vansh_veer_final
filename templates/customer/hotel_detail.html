@@ -44,19 +44,18 @@
         <div class="room-info">
             <h2>{{ room.get_room_type_display }}</h2>
             <h3>{{ room.get_total_rooms }}</h3>
-            <p>Room Size: {{ room.room_size }} sq.ft</p>
-            <p>Max Guests: {{ room.total_rooms }}</p>
+            {% comment %} <p>Max Rooms: {{ room.total_rooms }}</p> {% endcomment %}
             <p>Max Guests: {{ room.max_guest }}</p>
             <p class="price">
                 ₹ {{ room.price_per_night }} / night
             </p>
-            <p>Available: {{ room.available }} rooms</p>
+            <p>{{ room.available }} rooms Availables</p>
         </div>
 
         <div class="room-action">
             <a href="{% url 'customer:booking_details' hotel.id room.id %}" class="btn btn-outline-primary">
                 Book Now
-            </a>
+            </a>    
         </div>
 
     </div>

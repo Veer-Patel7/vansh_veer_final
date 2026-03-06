@@ -21,12 +21,15 @@ from .serializers import (
 from django.db import transaction
 
 # --- 1. Property Identity (Unified Onboarding) ---
+
 @hotel_admin_required
 def add_hotel(request):
 
     if request.method == 'POST':
 
         post_data = request.POST.copy()
+
+        # Fix lat lng rounding
         for field in ['lat', 'lng']:
             val = post_data.get(field)
             if val:
@@ -39,14 +42,20 @@ def add_hotel(request):
 
         if form.is_valid():
 
-        
             cleaned = form.cleaned_data
 
+            # SAFE STRIP (Fix NoneType error)
+            hotel_name = (cleaned.get('hotel_name') or "").strip()
+            city = (cleaned.get('city') or "").strip()
+            state = (cleaned.get('state') or "").strip()
+            address = (cleaned.get('address') or "").strip()
+
+            # Check duplicate hotel
             existing_hotel = Hotel.objects.filter(
-                hotel_name__iexact=cleaned['hotel_name'].strip(),
-                city__iexact=cleaned['city'].strip(),
-                state__iexact=cleaned['state'].strip(),
-                address__iexact=cleaned['address'].strip()
+                hotel_name__iexact=hotel_name,
+                city__iexact=city,
+                state__iexact=state,
+                address__iexact=address
             ).exclude(status='REJECTED').first()
 
             if existing_hotel:
@@ -106,6 +115,7 @@ def add_hotel(request):
                         total_inventory += inventory
                         room_idx += 1
 
+                    # Property Images
                     property_images = request.FILES.getlist('property_images')
                     for img in property_images:
                         HotelImage.objects.create(hotel=hotel, image_path=img)
@@ -119,6 +129,7 @@ def add_hotel(request):
                         request,
                         f"{hotel.hotel_name} is now in verification queue."
                     )
+
                     return redirect('hotels:admin_dashboard_pro')
 
             except Exception as e:
