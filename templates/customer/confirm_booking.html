@@ -15,6 +15,14 @@
     <div class="confirm-wrapper">
         <div class="confirm-card">
 
+        {% if messages %}
+            {% for message in messages %}
+                <p style="color:red; text-align:center;">
+                    {{ message }}
+                </p>
+            {% endfor %}
+        {% endif %}
+
             <h2>Confirm Booking</h2>
 
             <div class="booking-details">
@@ -26,6 +34,9 @@
                 <p><span>Adults</span> <strong>{{ data.adults }}</strong></p>
                 <p><span>Children</span> <strong>{{ data.children }}</strong></p>
                 <p><span>Payment</span> <strong>{{ data.payment_method }}</strong></p>
+                <p><span>Total Nights:</span> <strong>{{ nights }}</strong></p>
+                <p><span>Total Price: ₹</span> <strong>{{ total_price }}</strong></p>
+
             </div>
 
             <form method="POST">

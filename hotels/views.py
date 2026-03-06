@@ -22,42 +22,57 @@ from django.db import transaction
 # --- 1. Property Identity (Unified Onboarding) ---
 @hotel_admin_required
 def add_hotel(request):
-    """Professional Multi-step Hotel Onboarding View"""
+
     if request.method == 'POST':
-        # Professional Pre-processing: Clean coordinates to avoid validation crashes
+
         post_data = request.POST.copy()
         for field in ['lat', 'lng']:
             val = post_data.get(field)
             if val:
                 try:
-                    # Round to 10 decimal places to safely fit in DecimalField
                     post_data[field] = str(round(float(val), 10))
                 except (ValueError, TypeError):
                     pass
-        
+
         form = HotelDeploymentForm(post_data, request.FILES)
+
         if form.is_valid():
+
+            # 🔥 Duplicate Protection
+            cleaned = form.cleaned_data
+
+            existing_hotel = Hotel.objects.filter(
+                hotel_name__iexact=cleaned['hotel_name'].strip(),
+                city__iexact=cleaned['city'].strip(),
+                state__iexact=cleaned['state'].strip(),
+                address__iexact=cleaned['address'].strip()
+            ).exclude(status='REJECTED').first()
+
+            if existing_hotel:
+                messages.error(
+                    request,
+                    "A hotel with the same name and location already exists."
+                )
+                return render(request, 'hotels/add_hotel.html', {'form': form})
+
             try:
                 with transaction.atomic():
-                    # 1. Primary Save (Hotel Base + Policies)
+
                     hotel = form.save(commit=False)
                     hotel.owner = request.user
-                    
-                    # 2. Add Services (Step 2B)
+
                     services = request.POST.getlist('services')
                     hotel.services = services
-                    
-                    # Initial save to get ID for related objects
                     hotel.save()
 
-                    # 3. Save Dynamic Room Types (Step 2A)
                     total_inventory = 0
                     room_idx = 1
+
                     while f'room_name_{room_idx}' in request.POST:
+
                         room_name = request.POST.get(f'room_name_{room_idx}')
                         room_class = request.POST.get(f'room_class_{room_idx}', 'STANDARD')
-                        
-                        # Robust Data Extraction
+
                         try:
                             price_str = request.POST.get(f'room_price_{room_idx}', '0').replace(',', '')
                             price = int(float(price_str))
@@ -81,40 +96,39 @@ def add_hotel(request):
                             total_rooms=inventory,
                             amenities=amenities
                         )
-                        
-                        # Room Photo (Step 2A Individual)
+
                         room_photos = request.FILES.getlist(f'room_photos_{room_idx}')
                         if room_photos:
                             room.room_image = room_photos[0]
                             room.save()
-                            
+
                         total_inventory += inventory
                         room_idx += 1
 
-                    # 4. Save Property Gallery Images (Step 2C)
                     property_images = request.FILES.getlist('property_images')
                     for img in property_images:
                         HotelImage.objects.create(hotel=hotel, image_path=img)
 
-                    # 5. Finalize Deployment Metadata
                     hotel.total_rooms = total_inventory
                     hotel.submitted_at = timezone.now()
                     hotel.status = 'PENDING'
                     hotel.save()
 
-                    messages.success(request, f"Welcome to Pal! {hotel.hotel_name} is now in the verification queue.")
+                    messages.success(
+                        request,
+                        f"{hotel.hotel_name} is now in verification queue."
+                    )
                     return redirect('hotels:admin_dashboard_pro')
+
             except Exception as e:
-                import traceback
-                print(f"[Onboarding Error] {traceback.format_exc()}")
                 messages.error(request, f"Registration failed: {str(e)}")
+
         else:
-            # Enhanced Error Reporting (Professional UX)
-            errors = form.errors.as_data()
-            print(f"[Form Errors] {errors}")
-            messages.error(request, "Please check the highlighted fields and retry.")
+            messages.error(request, "Please check the highlighted fields.")
+
     else:
         form = HotelDeploymentForm()
+
     return render(request, 'hotels/add_hotel.html', {'form': form})
 
 # --- 2. Room Inventory (Module 2) ---
@@ -390,30 +404,127 @@ def settings_view(request):
 @hotel_admin_required
 def property_edit_detail(request, hotel_id, category):
     hotel = get_object_or_404(Hotel, id=hotel_id, owner=request.user)
-    # Simple JSON data response for the modal
-    data = {
-        'hotel_name': hotel.hotel_name,
-        'hotel_type': hotel.hotel_type,
-        'description': hotel.description,
-        'city': hotel.city,
-        'address': hotel.address,
-    }
-    return JsonResponse(data)
+
+    category = category.upper()
+
+    from .forms import HotelIdentityForm, RoomTypeForm
+
+    # -------------------------------
+    # IDENTITY EDIT
+    # -------------------------------
+    if category == "IDENTITY":
+
+        if request.method == "POST":
+            form = HotelIdentityForm(request.POST, instance=hotel)
+
+            if form.is_valid():
+
+                if ChangeRequest.objects.filter(
+                    hotel=hotel,
+                    category="IDENTITY",
+                    status="PENDING"
+                ).exists():
+                    return JsonResponse({
+                        "success": False,
+                        "message": "Update request already pending approval."
+                    })
+
+                ChangeRequest.objects.create(
+                    hotel=hotel,
+                    category="IDENTITY",
+                    requested_data=form.cleaned_data
+                )
+
+                if hotel.status == "REJECTED":
+                    hotel.status = "PENDING"
+                    hotel.save()
+
+                return JsonResponse({"success": True})
+
+            return JsonResponse({"success": False, "errors": form.errors})
+
+        form = HotelIdentityForm(instance=hotel)
+
+        return render(request, "hotels/partials/edit_identity.html", {
+            "form": form,
+            "hotel": hotel,
+            "category": category
+        })
+
+
+    # -------------------------------
+    # INVENTORY (Rooms & Service)
+    # -------------------------------
+    elif category == "INVENTORY":
+
+        if request.method == "POST":
+
+            form = RoomTypeForm(request.POST)
+
+            if form.is_valid():
+
+                if ChangeRequest.objects.filter(
+                    hotel=hotel,
+                    category="INVENTORY",
+                    status="PENDING"
+                ).exists():
+                    return JsonResponse({
+                        "success": False,
+                        "message": "Room update already pending approval."
+                    })
+
+                ChangeRequest.objects.create(
+                    hotel=hotel,
+                    category="INVENTORY",
+                    requested_data=form.cleaned_data
+                )
+
+                return JsonResponse({"success": True})
+
+            return JsonResponse({"success": False, "errors": form.errors})
+
+        form = RoomTypeForm()
+
+        return render(request, "hotels/partials/edit_inventory.html", {
+            "form": form,
+            "hotel": hotel,
+            "category": category
+        })
+
+    return HttpResponseForbidden("Invalid Category")
 
 @hotel_admin_required
 def submit_edit_request(request, hotel_id, category):
     hotel = get_object_or_404(Hotel, id=hotel_id, owner=request.user)
-    if request.method == 'POST':
+
+    if request.method == "POST":
         import json
         requested_data = json.loads(request.body)
+
+        # Prevent duplicate pending request
+        if ChangeRequest.objects.filter(
+            hotel=hotel,
+            category=category.upper(),
+            status="PENDING"
+        ).exists():
+            return JsonResponse({
+                "status": "error",
+                "message": "Request already pending approval."
+            })
+
         ChangeRequest.objects.create(
             hotel=hotel,
             category=category.upper(),
             requested_data=requested_data,
-            status='PENDING'
+            status="PENDING"
         )
-        return JsonResponse({'status': 'success', 'message': 'Request submitted!'})
-    return JsonResponse({'status': 'error'}, status=400)
+
+        return JsonResponse({
+            "status": "success",
+            "message": "Update request sent for approval."
+        })
+
+    return JsonResponse({"status": "error"}, status=400)
 
 
 class HotelViewSet(viewsets.ModelViewSet):

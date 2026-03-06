@@ -68,11 +68,6 @@ class Hotel(models.Model):
     gst_number = models.CharField(max_length=15, help_text="GST Identification Number", null=True, blank=True)
     doc_gst = models.FileField(upload_to='compliance/gst/', help_text="GST Certificate File", null=True, blank=True)
 
-    # --- Financial Layer (Optional/Removed from UI) ---
-    bank_name = models.CharField(max_length=100, null=True, blank=True)
-    account_number = models.CharField(max_length=50, null=True, blank=True)
-    ifsc_code = models.CharField(max_length=20, null=True, blank=True)
-    account_holder = models.CharField(max_length=100, null=True, blank=True)
 
     # --- Geolocation Layer ---
     address = models.TextField()
@@ -150,7 +145,6 @@ class RoomType(models.Model):
     room_type = models.CharField(max_length=20, choices=ROOM_CATEGORIES)
     price_per_night = models.PositiveIntegerField(default=0, verbose_name="Price per Night")
     max_guest = models.PositiveIntegerField(default=2, verbose_name="Max Guests")
-    room_size = models.PositiveIntegerField(default=0, help_text="Room size in sqft", verbose_name="Room Size")
     total_rooms = models.PositiveIntegerField(help_text="Inventory count for this specific type")
     room_image = models.ImageField(upload_to='room_categories/', null=True, blank=True)
     amenities = models.JSONField(default=list, blank=True)

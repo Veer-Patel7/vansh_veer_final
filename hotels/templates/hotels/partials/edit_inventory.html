@@ -1,0 +1,42 @@
+<form id="editForm">
+    {% csrf_token %}
+
+    <div class="space-y-6">
+
+        <div>
+            <label class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">
+                Room Category Name
+            </label>
+            {{ form.room_category_name }}
+        </div>
+
+        <div>
+            <label class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">
+                Room Type
+            </label>
+            {{ form.room_type }}
+        </div>
+
+        <div>
+            <label class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">
+                Price Per Night
+            </label>
+            {{ form.price_per_night }}
+        </div>
+
+        <div>
+            <label class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">
+                Max Guests
+            </label>
+            {{ form.max_guest }}
+        </div>
+
+        <div>
+            <label class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">
+                Total Rooms
+            </label>
+            {{ form.total_rooms }}
+        </div>
+
+    </div>
+</form>

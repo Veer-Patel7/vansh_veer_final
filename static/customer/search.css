@@ -11,6 +11,57 @@ body{
 }
 
 /* ================= NAVBAR ================= */
+
+.auth-section {
+    position: relative;
+
+}
+
+.profile-dropdown {
+    color: black;
+    /* background-color: #04537a; */
+    position: relative;
+    display: inline-block;
+}
+
+.profile-btn {
+    /* background: rgb(93, 21, 64); */
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    right: 0;
+    background-color: rgb(32, 15, 192);
+    color: black;
+    min-width: 160px;
+    border-radius: 8px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    overflow: hidden;
+}
+
+.dropdown-content a {
+    color: black;
+    padding: 12px;
+    display: block;
+    text-decoration: none;
+}
+
+.dropdown-content a:hover {
+    background-color: white;
+    color: black;
+    border-radius: 40%;
+}
+
+.profile-dropdown:hover .dropdown-content {
+    display: block;
+}
 .navbar{
     position:fixed;
     top:0;
@@ -22,6 +73,30 @@ body{
     align-items:center;
     background:#054ab9;
     z-index:10;
+}
+
+        
+.navbar a {
+    color: white;
+    text-decoration: none;
+    margin: 0 15px;
+}
+section {
+    height: 100vh;
+    padding-top: 120px;
+    text-align: center;
+}
+
+.navbar nav a{
+    color:white;
+    text-decoration:none;
+    margin:0 15px;
+    font-weight:500;
+    transition:0.3s;
+}
+
+.navbar nav a:hover{
+    color:#cbd5e1;
 }
 
 .logo{
@@ -52,8 +127,10 @@ body{
     background:url("../image/Hotel.jpg") center/cover no-repeat;
     position:relative;
     display:flex;
+    justify-content:center;
     align-items:center;
-    padding:0 8%;
+    flex-direction:column;
+    text-align:center;
     color:white;
 }
 
@@ -68,9 +145,13 @@ body{
 }
 
 .hero-content{
-    position:relative;
+    position:absolute;
+    top:40%;
+    left:8%;
+    transform:translateY(-40%);
     z-index:2;
     max-width:600px;
+    color:white;
 }
 
 .hero-content h2{
@@ -177,4 +258,114 @@ body{
 
 .btn-book:hover{
     background:#2563eb;
+}
+
+.profile-wrapper{
+    position:absolute;
+    top:270px;  
+    left:50%;
+    transform:translateX(-50%);
+    z-index:10;
+}
+
+.profile-card{
+    background:white;
+    width:500px;
+    padding:60px;
+    border-radius:20px;
+    text-align:center;
+    box-shadow:0 5px 15px rgba(0,0,0,0.15);
+}
+
+.profile-icon{
+    width:80px;
+    height:80px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:30px;
+    font-weight:bold;
+    color:white;
+    margin:auto;
+    margin-bottom:15px;
+
+    background: linear-gradient(135deg,#1e5bb8,#4da3ff);
+    box-shadow:0 8px 20px rgba(0,0,0,0.25);
+    transition:0.3s;
+}
+
+.profile-info p{
+    margin:10px 0;
+    font-size:16px;
+}
+
+
+.profile-icon{
+    width:80px;
+    height:80px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:30px;
+    font-weight:bold;
+    color:white;
+    margin:auto;
+    margin-bottom:15px;
+
+    background: linear-gradient(135deg,#1e5bb8,#4da3ff);
+    box-shadow:0 8px 20px rgba(0,0,0,0.25);
+    transition:0.3s;
+}
+
+
+
+.my-bookings{
+    position:absolute;
+    top:270px;
+    left:50%;
+    transform:translateX(-50%);
+    z-index:10;
+
+    background:white;
+    width:900px;   /* card size control */
+    padding:40px;
+    border-radius:20px;
+    text-align:center;
+    box-shadow:0 5px 15px rgba(0,0,0,0.15);
+}
+
+/* Title */
+
+.my-bookings h2{
+    margin-bottom:20px;
+}
+
+/* Table */
+
+.bookings-table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+/* Table Header */
+
+.bookings-table th{
+    background:linear-gradient(135deg,#1e5bb8,#4da3ff);
+    color:white;
+    padding:10px;
+}
+
+/* Table Data */
+
+.bookings-table td{
+    padding:30px;
+    border-bottom:1px solid #eee;
+}
+
+/* Hover */
+
+.bookings-table tr:hover{
+    background:#f1f5f9;
 }

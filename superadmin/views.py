@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
 from django.utils import timezone
-from hotels.models import Hotel, RoomType, HotelImage
+from hotels.models import ChangeRequest, Hotel, RoomType, HotelImage
 from accounts.models import User
 from bookings.models import Booking
 from payments.models import HotelCommission
@@ -281,6 +281,10 @@ def payments_dashboard(request):
 def generate_commission(request):
 
     month_input = request.GET.get("month")
+    
+
+    if not month_input:
+        return redirect("/super/payments/invoices/")
 
     if month_input:
         dt = datetime.strptime(month_input, "%Y-%m")
@@ -470,3 +474,64 @@ def mark_fake_review(request, id):
     r.save()
 
     return redirect("/super/reviews/")
+
+@login_required(login_url="/super/")
+def change_requests_list(request):
+    if request.user.role != "super_admin":
+        return HttpResponse("Unauthorized")
+    
+    requests = ChangeRequest.objects.filter(status='PENDING').order_by('-requested_at')
+    return render(request, "superadmin/change_requests.html", {"change_requests": requests})
+
+@login_required(login_url="/super/")
+def approve_change_request(request, request_id):
+    if request.user.role != "super_admin":
+        return HttpResponse("Unauthorized")
+        
+    change_req = get_object_or_404(ChangeRequest, id=request_id)
+    hotel = change_req.hotel
+    
+    # Apply changes
+    for field, value in change_req.requested_data.items():
+        if hasattr(hotel, field):
+            setattr(hotel, field, value)
+    
+    hotel.save()
+    change_req.status = 'APPROVED'
+    change_req.reviewed_at = timezone.now()
+    change_req.save()
+    
+    send_mail(
+        "Hotel Update Approved",
+        f"Your requested updates for '{hotel.hotel_name}' have been approved and are now live.",
+        settings.EMAIL_HOST_USER,
+        [hotel.owner.email],
+        fail_silently=True,
+    )
+    
+    return redirect("/super/change-requests/")
+
+@login_required(login_url="/super/")
+def reject_change_request(request, request_id):
+    if request.user.role != "super_admin":
+        return HttpResponse("Unauthorized")
+        
+    change_req = get_object_or_404(ChangeRequest, id=request_id)
+    
+    if request.method == "POST":
+        remarks = request.POST.get("remarks")
+        change_req.status = 'REJECTED'
+        change_req.remarks = remarks
+        change_req.reviewed_at = timezone.now()
+        change_req.save()
+        
+        send_mail(
+            "Hotel Update Rejected",
+            f"Your requested updates for '{change_req.hotel.hotel_name}' were rejected.\nReason: {remarks}",
+            settings.EMAIL_HOST_USER,
+            [change_req.hotel.owner.email],
+            fail_silently=True,
+        )
+        return redirect("/super/change-requests/")
+        
+    return render(request, "superadmin/reject_change_form.html", {"change_req": change_req})

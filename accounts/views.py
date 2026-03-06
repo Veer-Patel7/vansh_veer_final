@@ -26,7 +26,7 @@ def dashboard_redirect(request):
         return redirect("hotels:hotelregister")
 
     elif request.user.role == "customer":
-        return redirect("customer:booking_success")
+        return redirect("customer:home")
 
     return redirect("/")
 
@@ -34,31 +34,35 @@ def dashboard_redirect(request):
 # ========================== CUSTOMER LOGIN ==========================
 def customer_login(request):
     if request.method == "POST":
-        form = UserLoginForm(request.POST)
+        email = request.POST.get("email")
+        password = request.POST.get("password")
 
-        if form.is_valid():
-            email = form.cleaned_data["email"]
-            password = form.cleaned_data["password"]
+        user = authenticate(request, username=email, password=password)
 
-            user_obj = User.objects.filter(email=email, role="customer").first()
+        if user is None:
+            messages.error(request, "Invalid email or password")
+            return redirect("accounts:auth")
 
-            if not user_obj:
-                form.add_error(None, "Invalid email or password")
-            else:
-                user = authenticate(request, username=user_obj.username, password=password)
+        if user.role != "customer":
+            messages.error(request, "This is not a customer account")
+            return redirect("accounts:auth")
 
-                if user is None:
-                    form.add_error(None, "Invalid email or password")
-                elif not user.is_verified:
-                    form.add_error(None, "Please verify OTP first")
-                else:
-                    login(request, user)
-                    return redirect("customer:customer_dashboard")
-    else:
-        form = UserLoginForm()
+        if not user.is_verified:
+            messages.error(request, "Please verify OTP first")
+            return redirect("accounts:auth")
 
-    return render(request, "accounts/customer_login.html", {"form": form})
+        # ✅ LOGIN FIRST
+        login(request, user)
 
+        # ✅ THEN HANDLE NEXT
+        next_url = request.GET.get("next") or request.POST.get("next")
+        if next_url:
+            return redirect(next_url)
+
+        messages.success(request, "Customer login successful")
+        return redirect("customer:home")
+
+    return render(request, "customer/auth.html")
 
 # ========================== SUPER ADMIN LOGIN ==========================
 def super_login(request):
@@ -123,46 +127,45 @@ def hotel_login(request):
     return render(request, "accounts/hotel_login.html", {"form": form})
 # ========================== CUSTOMER SIGNUP ==========================
 def customer_signup(request):
+
     if request.method == "POST":
-        form = UserRegistrationForm(request.POST)
+        first = request.POST.get("first_name")
+        last = request.POST.get("last_name")
+        email = request.POST.get("email")
+        password = request.POST.get("password")
+        confirm = request.POST.get("confirm_password")
 
-        if form.is_valid():
-            username = form.cleaned_data["username"]
-            email = form.cleaned_data["email"]
-            password = form.cleaned_data["password"]
+        if password != confirm:
+            messages.error(request, "Passwords do not match")
+            # return redirect("customer_signup")
 
-            if User.objects.filter(username=username).exists():
-                form.add_error("username", "Username already taken")
+        if User.objects.filter(email=email).exists():
+            messages.error(request, "Email already registered")
+            # return redirect("customer_signup")
+        otp = generate_otp()
 
-            elif User.objects.filter(email=email).exists():
-                form.add_error("email", "Email already registered")
+        user = User.objects.create_user(
+            username=email, 
+            email=email,
+            password=password,
+            first_name=first,
+            last_name=last,
+            role="customer",
+            otp=otp,
+            is_active=False
+        )
 
-            else:
-                otp = generate_otp()
+        send_mail(
+            "OTP Verification",
+            f"Your OTP is {otp}",
+            settings.EMAIL_HOST_USER,
+            [email],
+        )
 
-                User.objects.create_user(
-                    username=username,
-                    email=email,
-                    password=password,
-                    role="customer",
-                    otp=otp,
-                    is_active=False,
-                    is_verified=False,
-                )
-
-                send_mail(
-                    "OTP Verification",
-                    f"Your OTP is {otp}",
-                    settings.EMAIL_HOST_USER,
-                    [email],
-                )
-
-                return redirect(f"{reverse('accounts:verify')}?email={email}")
-    else:
-        form = UserRegistrationForm()
-
-    return render(request, "accounts/customer_signup.html", {"form": form})
-
+        messages.success(request, "OTP sent to your email")
+        return redirect(f"/verify/?email={email}",user="user")
+        
+    return render(request, "customer_signup")
 
 # ========================== HOTEL SIGNUP ==========================
 def hotel_signup(request):
@@ -235,7 +238,7 @@ def verify(request):
 
         messages.error(request, "Invalid OTP")
 
-    return render(request, "accounts/verify.html", {"email": email})
+    return render(request, "customer/verify.html", {"email": email})
 
 
 # ========================== FORGOT PASSWORD ==========================

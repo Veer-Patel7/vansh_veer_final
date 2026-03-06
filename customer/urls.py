@@ -7,6 +7,8 @@ urlpatterns = [
     path('', views.customer_search, name="home"),
     path('search_results/', views.search_results, name="search_results"),
     
+    path("profile/", views.profile_view, name="profile"),
+    path("my-bookings/", views.my_bookings, name="my_bookings"),
     
     # Hotel and Room details
     path('hotel/<int:pk>/', views.hotel_detail, name="hotel_detail"),
@@ -18,4 +20,6 @@ urlpatterns = [
     path("confirm/", views.confirm_booking, name="confirm_booking"),
     # Review add
     path('add-review/<int:hotel_id>/', views.add_review, name="add_review"),
+    path('contact/', views.contact, name='contact'),
 ]
+

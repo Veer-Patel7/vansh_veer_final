@@ -1,0 +1,105 @@
+<form id="editForm" class="space-y-12">
+    {% csrf_token %}
+
+    <!-- Section 1: Core Property Identity -->
+    <div class="animate-in fade-in slide-in-from-left-4 duration-500">
+        <div class="flex items-center gap-4 mb-8">
+            <div
+                class="w-10 h-10 rounded-xl bg-primary-50 text-primary-600 flex items-center justify-center shadow-inner">
+                <i class="fas fa-hotel"></i>
+            </div>
+            <div>
+                <h4 class="text-sm font-bold text-slate-900 uppercase tracking-wider">Property Essence</h4>
+                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Core Branding & Category</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="form-group space-y-2">
+                <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Hotel Title</label>
+                {{ form.hotel_name }}
+            </div>
+
+            <div class="form-group space-y-2">
+                <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Asset
+                    Classification</label>
+                {{ form.hotel_type }}
+            </div>
+
+            <div class="md:col-span-2 form-group space-y-2">
+                <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Executive Summary /
+                    Description</label>
+                {{ form.description }}
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Section 2: Geographic Intelligence -->
+    <div class="animate-in fade-in slide-in-from-left-4 duration-700">
+        <div class="flex items-center gap-4 mb-8">
+            <div
+                class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shadow-inner">
+                <i class="fas fa-map-location-dot"></i>
+            </div>
+            <div>
+                <h4 class="text-sm font-bold text-slate-900 uppercase tracking-wider">Location Portfolio</h4>
+                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Address & Regional Mapping</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="md:col-span-2 form-group space-y-2">
+                <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Primary Street
+                    Address</label>
+                {{ form.address }}
+            </div>
+
+            <div class="form-group space-y-2">
+                <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">City / Hub</label>
+                {{ form.city }}
+            </div>
+
+            <div class="form-group space-y-2">
+                <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">State /
+                    Province</label>
+                {{ form.state }}
+            </div>
+
+            <div class="form-group space-y-2">
+                <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">ZIP / Pincode</label>
+                {{ form.pincode }}
+            </div>
+        </div>
+    </div>
+
+
+<style>
+    .console-input {
+        width: 100%;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 1rem;
+        padding: 0.875rem 1.25rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #1e293b;
+        transition: all 0.3s ease;
+    }
+
+    .console-input:focus {
+        background: white;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.08);
+        outline: none;
+    }
+
+    .console-input::placeholder {
+        color: #94a3b8;
+        font-weight: 400;
+    }
+
+    .console-input.uppercase {
+        text-transform: uppercase;
+    }
+</style>

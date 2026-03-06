@@ -1,0 +1,84 @@
+{% extends "customer/search.html" %}
+
+{% block content %}
+
+<section class="hero"id="home">
+</section>
+    <!-- HERO SECTION -->
+    
+
+        <!-- NAVBAR -->
+        <div class="navbar">
+            <h2 class="logo"><a href="{% url 'customer:home' %}">HotelPro</a></h2>
+
+            <nav>
+                <a href="{% url 'customer:home' %}">Home</a>
+                {% comment %} <a href="#hotels">Hotels</a> 
+                <a href="#contact">Contact Us</a>
+                <a href="#about">About Us</a> {% endcomment %}
+                
+            </nav>
+
+                
+
+            <div class="auth-section">
+                {% comment %} <a href="{%url 'accounts:hotel_signup'%}">List Your Property Here</a> {% endcomment %}
+                {% if user.is_authenticated %}
+                
+                <div class="profile-dropdown">
+                    <button class="profile-btn">
+                        {{ user.first_name|default:"👤"|slice:":1"|upper }}
+                        
+                    </button>
+                    <div class="dropdown-content">
+                        <a href="{% url 'customer:profile' %}">Profile</a>
+                        <a href="{% url 'customer:my_bookings' %}">My Bookings</a>
+                        <a href="{% url 'accounts:logout' %}">Logout</a>
+                    </div>
+                </div>
+
+                {% else %}
+                    <a href="{% url 'accounts:auth' %}" class="signin-btn">Sign In</a>
+                {% endif %}
+            </div>
+        </div>
+        
+<div class="my-bookings">
+    <h2>My Bookings</h2>
+
+    {% if bookings %}
+    <table class="bookings-table">
+        <thead>
+            <tr>
+                <th>Hotel</th>
+                <th>Room Type</th>
+                <th>Check-in</th>
+                <th>Check-out</th>
+                <th>Guests</th>
+                <th>Total Price</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for booking in bookings %}
+            <tr>
+                <td>{{ booking.hotel.hotel_name }}</td>
+                <td>{{ booking.room.room_type }}</td>
+                <td>{{ booking.checkin_date }}</td>
+                <td>{{ booking.checkout_date }}</td>
+                <td>{{ booking.total_guests }}</td>
+                <td>₹{{ booking.total_price }}</td>
+                <td>
+                <span class="badge bg-success">Confirmed</span>
+                </td>            
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% else %}
+        <p class="no-booking">You have no bookings yet.</p>
+    {% endif %}
+</div>
+ {% endblock %}

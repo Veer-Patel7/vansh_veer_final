@@ -1,0 +1,79 @@
+{% extends "customer/search.html" %}
+
+{% block content %}
+
+<section class="hero"id="home">
+</section>
+    <!-- HERO SECTION -->
+    
+
+        <!-- NAVBAR -->
+        <div class="navbar">
+            <h2 class="logo"><a href="{% url 'customer:home' %}">HotelPro</a></h2>
+
+            <nav>
+                <a href="{% url 'customer:home' %}">Home</a>
+                {% comment %} <a href="#hotels">Hotels</a> 
+                <a href="#contact">Contact Us</a>
+                <a href="#about">About Us</a> {% endcomment %}
+                
+            </nav>
+
+                
+
+            <div class="auth-section">
+                <a href="{%url 'accounts:hotel_signup'%}">List Your Property Here</a>
+                {% if user.is_authenticated %}
+                
+                <div class="profile-dropdown">
+                    <button class="profile-btn">
+                        {{ user.first_name|default:"👤"|slice:":1"|upper }}
+                        
+                    </button>
+                    <div class="dropdown-content">
+                        <a href="{% url 'customer:profile' %}">Profile</a>
+                        <a href="{% url 'customer:my_bookings' %}">My Bookings</a>
+                        <a href="{% url 'accounts:logout' %}">Logout</a>
+                    </div>
+                </div>
+
+                {% else %}
+                    <a href="{% url 'accounts:auth' %}" class="signin-btn">Sign In</a>
+                {% endif %}
+            </div>
+        </div>
+    
+
+
+        <!-- HERO TEXT -->
+        {% comment %} <div class="hero-content">
+            <h1>WELCOME TO  HOTEL PRO</h1>
+            <br>
+            <h2>Find the best hotels at unbeatable prices. Book your stay with us today!</h2>
+        </div> {% endcomment %}
+
+
+<div class="profile-wrapper">
+
+    <div class="profile-card">
+
+        <div class="profile-icon">
+            {{ user.first_name|first|upper }}
+        </div>
+
+        <h2>My Profile</h2>
+
+        <div class="profile-info">
+            <p><strong>Name:</strong> {{ user.first_name }} {{ user.last_name }}</p>
+            <p><strong>Email:</strong> {{ user.email }}</p>
+        </div>
+<br><br>
+        <div class="profile-actions">
+            {% comment %} <a href="{% url 'customer:edit_profile' %}" class="btn btn-primary">Edit Profile</a> {% endcomment %}
+            <a href="{% url 'accounts:forgot_password' %}" class="btn btn-secondary">Change Password</a>
+        </div>
+        
+    </div>
+
+</div>
+{% endblock %}

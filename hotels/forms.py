@@ -43,7 +43,7 @@ class RoomTypeForm(forms.ModelForm):
     """
     class Meta:
         model = RoomType
-        fields = ['room_type', 'room_category_name', 'price_per_night', 'max_guest', 'room_size', 'total_rooms']
+        fields = ['room_type', 'room_category_name', 'price_per_night', 'max_guest', 'total_rooms']
         widgets = {
             'room_type': forms.Select(attrs={'class': 'console-input'}),
         }
@@ -95,4 +95,26 @@ class OfferForm(forms.ModelForm):
             'valid_from': forms.DateTimeInput(attrs={'class': 'console-input', 'type': 'datetime-local'}),
             'valid_to': forms.DateTimeInput(attrs={'class': 'console-input', 'type': 'datetime-local'}),
             'status': forms.Select(attrs={'class': 'console-input'}),
+        }
+
+class HotelIdentityForm(forms.ModelForm):
+    class Meta:
+        model = Hotel
+        fields = [
+            "hotel_name", "hotel_type", "total_rooms", "description",
+            "address", "city", "state", "pincode",
+            "gst_number", "id_type", "id_number",
+        ]
+        widgets = {
+            'hotel_name': forms.TextInput(attrs={'class': 'console-input', 'placeholder': 'e.g. Grand Plaza'}),
+            'hotel_type': forms.Select(attrs={'class': 'console-input'}),
+            'total_rooms': forms.NumberInput(attrs={'class': 'console-input', 'placeholder': '0'}),
+            'description': forms.Textarea(attrs={'class': 'console-input', 'rows': 4, 'placeholder': 'Write a compelling property summary...'}),
+            'address': forms.TextInput(attrs={'class': 'console-input', 'placeholder': 'Street address...'}),
+            'city': forms.TextInput(attrs={'class': 'console-input', 'placeholder': 'City name'}),
+            'state': forms.TextInput(attrs={'class': 'console-input', 'placeholder': 'State/Province'}),
+            'pincode': forms.TextInput(attrs={'class': 'console-input', 'placeholder': '######'}),
+            'gst_number': forms.TextInput(attrs={'class': 'console-input uppercase', 'placeholder': 'GSTIN'}),
+            'id_type': forms.Select(attrs={'class': 'console-input'}),
+            'id_number': forms.TextInput(attrs={'class': 'console-input', 'placeholder': 'Card Number'}),
         }

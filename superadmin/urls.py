@@ -23,6 +23,11 @@ urlpatterns = [
     # BOOKING MANAGE
     path("bookings/", views.bookings_manage),
     path("update-booking/<int:booking_id>/", views.update_booking),
+    
+     # HOTEL CHANGE REQUESTS
+    path('change-requests/', views.change_requests_list, name='change_requests'),
+    path('approve-change/<int:request_id>/', views.approve_change_request, name='approve_change'),
+    path('reject-change/<int:request_id>/', views.reject_change_request, name='reject_change'),
 
     # PAYMENTS MAIN PAGE
     path('payments/', views.payments_dashboard, name="payments"),
