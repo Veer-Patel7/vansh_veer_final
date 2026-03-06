@@ -22,7 +22,6 @@ urlpatterns = [
 
     # BOOKING MANAGE
     path("bookings/", views.bookings_manage),
-    path("update-booking/<int:booking_id>/", views.update_booking),
     
      # HOTEL CHANGE REQUESTS
     path('change-requests/', views.change_requests_list, name='change_requests'),

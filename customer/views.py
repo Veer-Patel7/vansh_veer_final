@@ -20,9 +20,6 @@ def dashboard(request):
 
 def customer_search(request):
     
-    if request.user.is_authenticated and request.user.role in ["super_admin", "hotel_admin"]:
-        return HttpResponse("Unauthorized")
-
     # ✅ CONTACT FORM
     if request.method == "POST":
         name = request.POST.get("name")
@@ -75,60 +72,7 @@ def customer_search(request):
         "checkin": checkin,
         "checkout": checkout
     })
-
-    # ✅ CONTACT FORM
-    if request.method == "POST":
-        name = request.POST.get("name")
-        email = request.POST.get("email")
-        message = request.POST.get("message")
-
-        subject = f"New Contact Message from {name}"
-        full_message = f"Name: {name}\nEmail: {email}\nMessage: {message}"
-
-        send_mail(
-            subject,
-            full_message,
-            settings.EMAIL_HOST_USER,
-            ['hotelpro1000@gmail.com'],
-        )
-
-    # ✅ SEARCH LOGIC
-    location = request.GET.get("location")
-    checkin = request.GET.get("checkin")
-    checkout = request.GET.get("checkout")
-
-    hotels = Hotel.objects.all().filter(status="LIVE").prefetch_related("rooms")
-
-    if location:
-        hotels = hotels.filter(city__icontains=location)
-
-    hotels = hotels.annotate(
-        min_price=Min("rooms__price_per_night"),
-        max_price=Max("rooms__price_per_night")
-    )
-
-    if checkin and checkout:
-        checkin = date.fromisoformat(checkin)
-        checkout = date.fromisoformat(checkout)
-
-        for hotel in hotels:
-            total_available = 0
-            for room in hotel.rooms.all():
-                total_available += room.available_rooms(checkin, checkout)
-
-            hotel.available_rooms = total_available
-    else:
-        for hotel in hotels:
-            hotel.available_rooms = sum(
-                room.total_rooms for room in hotel.rooms.all()
-            )
-
-    return render(request, "customer/search.html", {
-        "hotels": hotels,
-        "checkin": checkin,
-        "checkout": checkout
-    })
-        
+       
 @login_required
 def profile_view(request):
 

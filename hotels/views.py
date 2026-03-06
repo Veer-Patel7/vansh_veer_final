@@ -8,9 +8,10 @@ import json
 from django.utils import timezone
 from datetime import timedelta
 from .forms import HotelDeploymentForm, RoomTypeForm, HotelPolicyForm, HotelImageForm, OfferForm
-from core.models import Review, Booking
+from core.models import Review
 from rest_framework import viewsets, permissions, status, parsers
 from rest_framework.response import Response
+from bookings.models import Booking
 from rest_framework.decorators import action
 from .serializers import (
     HotelSerializer, RoomTypeSerializer, 
@@ -38,7 +39,7 @@ def add_hotel(request):
 
         if form.is_valid():
 
-            # 🔥 Duplicate Protection
+        
             cleaned = form.cleaned_data
 
             existing_hotel = Hotel.objects.filter(
@@ -371,9 +372,8 @@ def admin_review_offer(request, offer_id):
 
 @hotel_admin_required
 def bookings_view(request):
-    owned_hotels = Hotel.objects.filter(owner=request.user)
-    bookings = Booking.objects.filter(hotel__in=owned_hotels).order_by('-created_at')
-    return render(request, 'hotels/bookings.html', {'bookings': bookings})
+    bookings = Booking.objects.filter(hotel__owner=request.user)
+    return render(request, "hotels/bookings.html", {"bookings": bookings})
 
 @hotel_admin_required
 def insights_view(request):

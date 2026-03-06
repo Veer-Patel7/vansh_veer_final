@@ -52,17 +52,22 @@ body{
     border-radius:20px;
     text-align:center;
     box-shadow:0 15px 35px rgba(0,0,0,0.2);
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    height:530px;
 }
 
 /* ===== INPUT ===== */
 .form-box input{
     width:100%;
     padding:12px;
-    margin:10px 0;
+    margin: 10px 0px;
     border:1px solid #ddd;
     border-radius:10px;
     outline:none;
     transition:0.3s;
+    justify-content: center;
 }
 
 .form-box input:focus{
@@ -97,3 +102,13 @@ body{
 .switch:hover{
     text-decoration:underline;
 }
+
+.forgot a{
+    color:#4f46e5;
+    text-decoration:none;   /* underline remove */
+    font-size:14px;
+}
+
+.forgot a:hover{
+    text-decoration:none;
+}   

@@ -1,7 +1,7 @@
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.core.files.uploadedfile import SimpleUploadedFile
-from account.models import User
+from accounts.models import User
 from .models import Hotel, RoomType, HotelImage
 
 class HotelOnboardingTest(TestCase):

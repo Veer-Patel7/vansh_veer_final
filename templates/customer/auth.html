@@ -13,7 +13,7 @@
         <!-- LOGIN FORM -->
         <div class="form-box">
             <h2>Login</h2>
-
+<br>
             <form method="POST" action="{% url 'accounts:customer_login' %}">
                 {% csrf_token %}
 
@@ -26,9 +26,11 @@
             <p onclick="moveRight()" class="switch">
                 Don't have account? Sign Up
             </p>
-            <a href="{% url 'accounts:forgot_password' %}" class="forgot">
-            Forgot Password?
-            </a>
+            <br>
+            <p class="forgot">
+               <a href="{% url 'accounts:forgot_password' %}">Forgot Password?</a>
+            </p>
+            
         </div>
 
         <!-- SIGNUP FORM -->

@@ -1,6 +1,6 @@
 from django.test import TestCase, Client
 from django.urls import reverse
-from account.models import User
+from accounts.models import User
 from .models import Hotel, ChangeRequest, RoomType
 import json
 

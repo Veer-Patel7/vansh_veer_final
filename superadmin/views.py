@@ -12,6 +12,8 @@ from datetime import date, timedelta
 from django.conf import settings
 from reviews.models import Review
 from datetime import date, timedelta, datetime
+from django.db.models import Sum
+from decimal import Decimal
 
 
 
@@ -215,60 +217,24 @@ def reject_hotel(request, hotel_id):
 
     return render(request, "superadmin/reject_form.html", {"hotel": hotel})
 
-
 #--------Booking manage---------
 
 @login_required(login_url="/super/")
 def bookings_manage(request):
-    
+
     if request.user.role != "super_admin":
         return HttpResponse("Unauthorized")
 
     bookings = Booking.objects.all().order_by("-id")
 
-    return render(request, "superadmin/bookings.html", {"bookings": bookings})
+    total_revenue = bookings.aggregate(Sum("total_price"))["total_price__sum"] or 0
+    total_commission = total_revenue * Decimal("0.10")
 
-@login_required(login_url="/super/")
-def update_booking(request, booking_id):
-    
-    if request.user.role != "super_admin":
-        return HttpResponse("Unauthorized")
-
-    b = get_object_or_404(Booking, id=booking_id)
-
-    if request.method == "POST":
-
-        if request.POST.get("force_cancel"):
-            reason = request.POST.get("reason")
-
-            b.booking_status = "cancelled"
-            b.cancel_reason = reason
-            b.save()
-
-            send_mail(
-                "Booking Cancelled",
-                f"Your booking #{b.id} was cancelled.\nReason: {reason}",
-                settings.EMAIL_HOST_USER,
-                [b.user.email],
-                fail_silently=True,
-            )
-
-            send_mail(
-                "Booking Cancelled by Super Admin",
-                f"Booking #{b.id} cancelled.\nReason: {reason}",
-                settings.EMAIL_HOST_USER,
-                [b.hotel.owner.email],
-                fail_silently=True,
-            )
-
-            return redirect("/super/bookings/")
-
-        status = request.POST.get("status")
-        if status:
-            b.booking_status = status
-
-        b.save()
-        return redirect("/super/bookings/")
+    return render(request,"superadmin/bookings.html",{
+        "bookings": bookings,
+        "total_revenue": total_revenue,
+        "total_commission": total_commission
+    })
 
 # ================= PAYMENTS DASHBOARD =================
 @login_required(login_url="/super/")

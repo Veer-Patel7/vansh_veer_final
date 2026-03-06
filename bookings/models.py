@@ -2,7 +2,7 @@ from django.db import models
 from django.conf import settings
 from hotels.models import Hotel, RoomType
 from django.core.exceptions import ValidationError
-
+from decimal import Decimal
 
 class Booking(models.Model):
 
@@ -30,5 +30,14 @@ class Booking(models.Model):
         if self.checkin_date >= self.checkout_date:
             raise ValidationError("Checkout date must be after checkin date")
 
+    def save(self, *args, **kwargs):
+        nights = (self.checkout_date - self.checkin_date).days
+        self.total_price = nights * self.room.price_per_night
+        super().save(*args, **kwargs)
+
+    @property
+    def commission(self):
+        return round(self.total_price * Decimal("0.10"), 2)
+    
     def __str__(self):
         return f"{self.user.email} - {self.room}"
