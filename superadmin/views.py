@@ -133,16 +133,26 @@ def hotels_approve(request):
         return HttpResponse("Unauthorized")
 
     hotels = Hotel.objects.all().order_by("-created_at")
+
     pending_count  = hotels.filter(status="PENDING").count()
     live_count     = hotels.filter(status="LIVE").count()
     rejected_count = hotels.filter(status="REJECTED").count()
+
+    # 🔵 Update requests
+    pending_requests = ChangeRequest.objects.filter(status="PENDING").order_by("-requested_at")
+    approved_requests = ChangeRequest.objects.filter(status="APPROVED").order_by("-requested_at")
+    rejected_requests = ChangeRequest.objects.filter(status="REJECTED").order_by("-requested_at")
+
     return render(request, "superadmin/hotels.html", {
         "hotels": hotels,
         "pending_count": pending_count,
         "live_count": live_count,
         "rejected_count": rejected_count,
-    })
 
+        "pending_requests": pending_requests,
+        "approved_requests": approved_requests,
+        "rejected_requests": rejected_requests,
+    })
 
 @login_required(login_url="/super/")
 def hotel_detail_view(request, hotel_id):
@@ -441,7 +451,6 @@ def mark_fake_review(request, id):
 
     return redirect("/super/reviews/")
 
-
 @login_required(login_url="/super/")
 def change_requests_list(request):
 
@@ -489,7 +498,7 @@ def approve_change_request(request, request_id):
         fail_silently=True,
     )
 
-    return redirect("/super/change-requests/")
+    return redirect("/super/hotels/")
 
 
 @login_required(login_url="/super/")
@@ -517,7 +526,7 @@ def reject_change_request(request, request_id):
             fail_silently=True,
         )
 
-        return redirect("/super/change-requests/")
+        return redirect("/super/hotels/")
 
     return render(
         request,

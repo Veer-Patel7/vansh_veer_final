@@ -1,241 +1,400 @@
 {% extends "superadmin/base.html" %}
 {% block content %}
+
 <div class="container-fluid py-4 animate-in fade-in duration-700">
-    <!-- Page Header -->
-    <div class="d-flex justify-content-between align-items-center mb-5">
-        <div>
-            <h1 class="font-weight-bold text-white mb-1" style="font-size: 1.75rem; letter-spacing: -0.5px;">Hotel
-                Management</h1>
-            <p class="text-low mb-0">Review pending applications and manage all hotels on the platform.</p>
+
+<!-- ================= PAGE HEADER ================= -->
+<div class="d-flex justify-content-between align-items-center mb-5">
+    <div>
+        <h1 class="font-weight-bold text-white mb-1"
+            style="font-size:1.75rem; letter-spacing:-0.5px;">
+            Hotel Management
+        </h1>
+
+        <p class="text-low mb-0">
+            Review pending applications and manage all hotels on the platform.
+        </p>
+    </div>
+</div>
+
+<!-- ================= SUMMARY CARDS ================= -->
+<div class="row mb-5">
+
+    <div class="col-md-4 mb-4">
+        <div class="stat-card pending h-100 shadow-lg">
+
+            <div class="stat-icon">
+                <i class="fas fa-hourglass-start"></i>
+            </div>
+
+            <div>
+                <div class="stat-num">
+                    {{ pending_count|default:"0" }}
+                </div>
+
+                <div class="stat-label">
+                    Pending Approval
+                </div>
+            </div>
+
         </div>
     </div>
 
-    <!-- Executive Summary Cards -->
-    <div class="row mb-5">
-        <div class="col-md-4 mb-4">
-            <div class="stat-card pending h-100 shadow-lg">
-                <div class="stat-icon"><i class="fas fa-hourglass-start"></i></div>
-                <div>
-                    <div class="stat-num">{{ pending_count|default:"0" }}</div>
-                    <div class="stat-label">Pending Approval</div>
+    <div class="col-md-4 mb-4">
+        <div class="stat-card live h-100 shadow-lg">
+
+            <div class="stat-icon">
+                <i class="fas fa-check-double"></i>
+            </div>
+
+            <div>
+                <div class="stat-num">
+                    {{ live_count|default:"0" }}
+                </div>
+
+                <div class="stat-label">
+                    Verified & Live
                 </div>
             </div>
-        </div>
-        <div class="col-md-4 mb-4">
-            <div class="stat-card live h-100 shadow-lg">
-                <div class="stat-icon"><i class="fas fa-check-double"></i></div>
-                <div>
-                    <div class="stat-num">{{ live_count|default:"0" }}</div>
-                    <div class="stat-label">Verified & Live</div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4 mb-4">
-            <div class="stat-card reject h-100 shadow-lg">
-                <div class="stat-icon"><i class="fas fa-circle-xmark"></i></div>
-                <div>
-                    <div class="stat-num">{{ rejected_count|default:"0" }}</div>
-                    <div class="stat-label">Rejected Hotels</div>
-                </div>
-            </div>
+
         </div>
     </div>
 
-    <!-- Management Interface -->
-    <div class="section-box border-0 shadow-2xl bg-surface/50 backdrop-blur-md">
-        <div class="section-header border-0 bg-transparent px-4 pt-4 pb-0">
-            <ul class="nav nav-pills gap-3" id="hotelTabs" role="tablist">
-                <li class="nav-item">
-                    <a class="nav-link active rounded-xl px-4 py-2 font-weight-bold" id="pending-tab" data-toggle="pill"
-                        href="#pending" role="tab">
-                        Pending <span class="ml-1 badge badge-pill bg-warning-800/20 text-warning">{{ pending_count}}</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link rounded-xl px-4 py-2 font-weight-bold" id="live-tab" data-toggle="pill"
-                        href="#live" role="tab">
-                        Approved
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link rounded-xl px-4 py-2 font-weight-bold" id="rejected-tab" data-toggle="pill"
-                        href="#rejected" role="tab">
-                        Rejected
-                    </a>
-                </li>
-            </ul>
+    <div class="col-md-4 mb-4">
+        <div class="stat-card reject h-100 shadow-lg">
+
+            <div class="stat-icon">
+                <i class="fas fa-circle-xmark"></i>
+            </div>
+
+            <div>
+                <div class="stat-num">
+                    {{ rejected_count|default:"0" }}
+                </div>
+
+                <div class="stat-label">
+                    Rejected Hotels
+                </div>
+            </div>
+
         </div>
+    </div>
 
-        <div class="section-body p-0 mt-4">
-            <div class="tab-content" id="hotelTabsContent">
-                <!-- Pending Tab -->
-                <div class="tab-pane fade show active" id="pending" role="tabpanel">
-                    <div class="table-responsive">
-                        <table class="sa-table">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Hotel Name</th>
-                                    <th>Location</th>
-                                    <th>Hotel Owner</th>
-                                    <th class="text-right">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for h in hotels %}
-                                {% if h.status == "PENDING" %}
-                                <tr class="hover-bg-target transition-all">
-                                    <td class="text-low font-monospace">#HP{{ h.id|stringformat:"04d" }}</td>
-                                    <td>
-                                        <div class="d-flex align-items-center gap-3">
-                                            <div
-                                                class="w-8 h-8 rounded bg-warning-500/10 flex items-center justify-center text-warning font-weight-bold border border-warning-500/20">
-                                                {{ h.hotel_name|first|upper }}
-                                            </div>
-                                            <span class="font-weight-600 text-white">{{ h.hotel_name }}</span>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="d-flex align-items-center text-low small">
-                                            <i class="fas fa-location-dot mr-2 text-primary"></i> {{ h.city }}
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="d-flex flex-column">
-                                            <span class="text-white small">{{ h.owner.username }}</span>
-                                            <span class="text-[10px] text-low uppercase tracking-tighter">{{h.owner.email }}</span>
-                                        </div>
-                                    </td>
-                                    <td class="text-right">
-                                        <a href="/super/hotel/{{ h.id }}/"
-                                            class="btn btn-sm btn-primary rounded-pill px-4 font-weight-bold">
-                                            Process Audit
-                                        </a>
-                                    </td>
-                                </tr>
-                                {% endif %}
-                                {% endfor %}
-                                {% if pending_count == 0 %}
-                                <tr>
-                                    <td colspan="5">
-                                        <div class="empty-state py-5">
-                                            <div
-                                                class="w-20 h-20 rounded-circle bg-emerald-500/10 flex items-center justify-center text-emerald-500 mx-auto mb-4">
-                                                <i class="fas fa-check-double text-2xl"></i>
-                                            </div>
-                                            <h4 class="text-white mb-1">Queue Clear</h4>
-                                            <p class="text-low">All pending hotel applications have been processed.</p>
-                                        </div>
-                                    </td>
-                                </tr>
-                                {% endif %}
-                            </tbody>
-                        </table>
-                    </div>
+</div>
+
+<!-- ================= MAIN SECTION ================= -->
+<div class="section-box border-0 shadow-2xl bg-surface/50 backdrop-blur-md">
+
+    <!-- ===== TABS ===== -->
+    <div class="section-header border-0 bg-transparent px-4 pt-4 pb-0">
+
+        <ul class="nav nav-pills gap-3" id="hotelTabs" role="tablist">
+
+            <li class="nav-item">
+                <a class="nav-link rounded-xl px-4 py-2 font-weight-bold"
+                   data-toggle="pill" href="#live">
+                   Approved
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link rounded-xl px-4 py-2 font-weight-bold"
+                   data-toggle="pill" href="#rejected">
+                   Rejected
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link active rounded-xl px-4 py-2 font-weight-bold"
+                   data-toggle="pill" href="#pending">
+                   Pending
+                    <span class="ml-1 badge badge-pill bg-warning-800/20 text-warning">
+                        {{ pending_count }}
+                    </span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link rounded-xl px-4 py-2 font-weight-bold"
+                   data-toggle="pill" href="#updates">
+                   Update Requests ({{ pending_requests|length }})
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- ================= TAB CONTENT ================= -->
+    <div class="section-body p-0 mt-4">
+        <div class="tab-content">
+
+            <!-- ================= PENDING HOTELS ================= -->
+            <div class="tab-pane fade show active" id="pending">
+
+                <div class="table-responsive">
+
+                    <table class="sa-table">
+
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Hotel Name</th>
+                                <th>Location</th>
+                                <th>Hotel Owner</th>
+                                <th class="text-right">Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            {% for h in hotels %}
+                            {% if h.status == "PENDING" %}
+
+                            <tr class="hover-bg-target">
+
+                                <td class="text-low font-monospace">
+                                    #HP{{ h.id|stringformat:"04d" }}
+                                </td>
+
+                                <td class="font-weight-600 text-white">
+                                    {{ h.hotel_name }}
+                                </td>
+
+                                <td class="text-low">
+                                    {{ h.city }}
+                                </td>
+
+                                <td>
+                                    <div class="d-flex flex-column">
+
+                                        <span class="text-white small">
+                                            {{ h.owner.username }}
+                                        </span>
+
+                                        <span class="text-low small">
+                                            {{ h.owner.email }}
+                                        </span>
+
+                                    </div>
+                                </td>
+
+                                <td class="text-right">
+                                    <a href="/super/hotel/{{ h.id }}/"
+                                       class="btn btn-sm btn-primary">
+
+                                        Process Audit
+
+                                    </a>
+                                </td>
+
+                            </tr>
+
+                            {% endif %}
+                            {% endfor %}
+
+                            {% if pending_count == 0 %}
+
+                            <tr>
+                                <td colspan="5" class="text-center py-4">
+                                    No pending hotels
+                                </td>
+                            </tr>
+
+                            {% endif %}
+
+                        </tbody>
+
+                    </table>
+
                 </div>
 
-                <!-- Live Tab -->
-                <div class="tab-pane fade" id="live" role="tabpanel">
-                    <div class="table-responsive">
-                        <table class="sa-table">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Hotel Name</th>
-                                    <th>Location</th>
-                                    <th>Status</th>
-                                    <th class="text-right">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for h in hotels %}
-                                {% if h.status == "LIVE" %}
-                                <tr class="hover-bg-target transition-all">
-                                    <td class="text-low font-monospace">#HP{{ h.id|stringformat:"04d" }}</td>
-                                    <td class="font-weight-600 text-white">{{ h.hotel_name }}</td>
-                                    <td class="text-low">{{ h.city }}</td>
-                                    <td><span class="status-badge status-LIVE">Verified Live</span></td>
-                                    <td class="text-right">
-                                        <a href="/super/hotel/{{ h.id }}/"
-                                            class="btn btn-sm btn-outline-light rounded-pill px-3">
-                                            Manage Assets
-                                        </a>
-                                    </td>
-                                </tr>
-                                {% endif %}
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+            </div>
 
-                <!-- Rejected Tab -->
-                <div class="tab-pane fade" id="rejected" role="tabpanel">
-                    <div class="table-responsive">
-                        <table class="sa-table">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Hotel Name</th>
-                                    <th>Reason</th>
-                                    <th class="text-right">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for h in hotels %}
-                                {% if h.status == "REJECTED" %}
-                                <tr class="hover-bg-target">
-                                    <td class="text-low font-monospace">#HP{{ h.id|stringformat:"04d" }}</td>
-                                    <td class="font-weight-600 text-white">{{ h.hotel_name }}</td>
-                                    <td>
-                                        <div class="text-low small italic max-w-xs truncate"
-                                            title="{{ h.verification_remarks }}">
-                                            "{{ h.verification_remarks }}"
+            <!-- ================= LIVE HOTELS ================= -->
+            <div class="tab-pane fade" id="live">
+                <table class="sa-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Hotel</th>
+                            <th>City</th>
+                            <th>Status</th>
+                            <th class="text-right">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        {% for h in hotels %}
+                        {% if h.status == "LIVE" %}
+
+                        <tr>
+                            <td>#HP{{ h.id|stringformat:"04d" }}</td>
+                            <td>{{ h.hotel_name }}</td>
+                            <td>{{ h.city }}</td>
+                            <td class="text-success">
+                                Verified
+                            </td>
+                            <td class="text-right">
+                                <a href="/super/hotel/{{ h.id }}/"
+                                   class="btn btn-outline-light btn-sm">
+                                    Manage
+                                </a>
+                            </td>
+                        </tr>
+
+                        {% endif %}
+                        {% endfor %}
+
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- ================= REJECTED HOTELS ================= -->
+            <div class="tab-pane fade" id="rejected">
+                <table class="sa-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Hotel</th>
+                            <th>Reason</th>
+                            <th class="text-right">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        {% for h in hotels %}
+                        {% if h.status == "REJECTED" %}
+
+                        <tr>
+                            <td>#HP{{ h.id|stringformat:"04d" }}</td>
+                            <td>{{ h.hotel_name }}</td>
+                            <td>{{ h.verification_remarks }}</td>
+                            <td class="text-right">
+                                <a href="/super/hotel/{{ h.id }}/"
+                                   class="btn btn-warning btn-sm">
+                                    Re-verify
+                                </a>
+                            </td>
+                        </tr>
+
+                        {% endif %}
+                        {% endfor %}
+
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- ================= UPDATE REQUESTS ================= -->
+            <div class="tab-pane fade" id="updates" role="tabpanel">
+                <div class="table-responsive">
+                    <table class="sa-table">
+                        <thead>
+                            <tr>
+                                <th>Hotel</th>
+                                <th>Category</th>
+                                <th>Proposed Changes</th>
+                                <th>Requested At</th>
+                                <th class="text-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            {% for req in pending_requests %}
+
+                            <tr class="hover-bg-target transition-all">
+                                <td>
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div>
+                                            <span class="font-weight-600 text-white d-block">
+                                                {{ req.hotel.hotel_name }}
+                                            </span>
+                                            <span class="text-[10px] text-low uppercase">
+                                                {{ req.hotel.city }}
+                                            </span>
                                         </div>
-                                    </td>
-                                    <td class="text-right">
-                                        <a href="/super/hotel/{{ h.id }}/"
-                                            class="btn btn-sm btn-outline-warning rounded-pill px-3">
-                                            Re-verify Data
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <span class="badge badge-pill bg-blue-500/10 text-blue-400 font-weight-bold"
+                                          style="padding:6px 12px;border:1px solid rgba(59,130,246,0.2);">
+                                        {{ req.get_category_display }}
+                                    </span>
+                                </td>
+
+                                <td class="small text-low">
+                                    <div class="bg-indigo-900/10 rounded-lg p-3 border border-indigo-500/10">
+                                        {% for key,value in req.requested_data.items %}
+                                        <div class="d-flex gap-2">
+                                            <span class="font-weight-bold text-primary-300"
+                                                  style="min-width:100px;">
+                                                {{ key|title }}:
+                                            </span>
+                                            <span class="text-white">
+                                                {{ value|default:"--" }}
+                                            </span>
+                                        </div>
+
+                                        {% endfor %}
+
+                                    </div>
+                                </td>
+
+                                <td class="text-low small">
+                                    <div class="d-flex flex-column">
+                                        <span class="text-white font-weight-500">
+                                            {{ req.requested_at|date:"M d, Y" }}
+                                        </span>
+                                        <span>
+                                            {{ req.requested_at|time }}
+                                        </span>
+                                    </div>
+                                </td>
+
+                                <td class="text-right">
+                                    <div class="d-flex justify-content-end gap-2">
+                                        <a href="/super/approve-change/{{ req.id }}/"
+                                           class="btn btn-sm btn-success rounded-pill px-4 font-weight-bold"
+                                           onclick="return confirm('Update property details now?')">
+                                            <i class="fas fa-check mr-1"></i>
+                                            Approve
                                         </a>
-                                    </td>
-                                </tr>
-                                {% endif %}
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
+                                        <a href="/super/reject-change/{{ req.id }}/"
+                                           class="btn btn-sm btn-outline-danger rounded-pill px-4 font-weight-bold">
+                                            <i class="fas fa-times mr-1"></i>
+                                            Reject
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            {% empty %}
+
+                            <tr>
+                                <td colspan="5">
+                                    <div class="empty-state py-5 text-center">
+                                        <div class="w-20 h-20 rounded-circle bg-emerald-500/10 flex items-center justify-center text-emerald-500 mx-auto mb-4 border border-emerald-500/20">
+                                            <i class="fas fa-check-double text-2xl"></i>
+                                        </div>
+                                        <h4 class="text-white font-weight-bold mb-1">
+                                            Queue Clear
+                                        </h4>
+                                        <p class="text-low">
+                                            No property update requests are pending review.
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<style>
-    .nav-pills .nav-link {
-        color: var(--text-low);
-        background: transparent;
-        border: 1px solid transparent;
-        transition: all 0.3s ease;
-    }
+</div>
 
-    .nav-pills .nav-link:hover {
-        color: var(--text-high);
-        background: rgba(255, 255, 255, 0.05);
-    }
-
-    .nav-pills .nav-link.active {
-        background: rgba(59, 130, 246, 0.1) !important;
-        color: var(--primary) !important;
-        border: 1px solid rgba(59, 130, 246, 0.2) !important;
-    }
-
-    .hover-bg-target:hover {
-        background: rgba(255, 255, 255, 0.02);
-    }
-
-    .font-monospace {
-        font-family: 'JetBrains Mono', 'Fira Code', monospace;
-    }
-</style>
 {% endblock %}
