@@ -3,23 +3,34 @@
 
 <div class="container-fluid py-4">
 
-<!-- Page Header -->
-<div class="mb-5">
-    <h1 class="font-weight-bold text-white mb-1" style="font-size:1.75rem;">
-        Update Requests
-    </h1>
+<h2 class="text-white mb-4">Update Requests</h2>
 
-    <p class="text-low">
-        Review and approve changes requested by hotel owners.
-    </p>
-</div>
+<ul class="nav nav-pills mb-4">
+<li class="nav-item">
+<a class="nav-link active" data-toggle="pill" href="#pending">
+Pending ({{ pending_requests|length }})
+</a>
+</li>
+
+<li class="nav-item">
+<a class="nav-link" data-toggle="pill" href="#approved">
+Approved ({{ approved_requests|length }})
+</a>
+</li>
+
+<li class="nav-item">
+<a class="nav-link" data-toggle="pill" href="#rejected">
+Rejected ({{ rejected_requests|length }})
+</a>
+</li>
+</ul>
 
 
-<div class="section-box">
+<div class="tab-content">
 
-<div class="section-body p-0">
+<!-- ================= PENDING ================= -->
 
-<div class="table-responsive">
+<div class="tab-pane fade show active" id="pending">
 
 <table class="sa-table">
 
@@ -27,179 +38,159 @@
 <tr>
 <th>Hotel</th>
 <th>Category</th>
-<th>Proposed Changes</th>
 <th>Requested At</th>
-<th class="text-right">Action</th>
+<th>Action</th>
 </tr>
 </thead>
 
-
 <tbody>
 
-{% for req in change_requests %}
+{% for req in pending_requests %}
 
-<tr class="hover-bg-target">
+<tr>
 
-<div class="section-box">
+<td>{{ req.hotel.hotel_name }}</td>
 
-<div class="section-header px-4 pt-4 pb-0">
+<td>{{ req.get_category_display }}</td>
 
-<ul class="nav nav-pills gap-3">
+<td>{{ req.requested_at|date:"M d, Y" }}</td>
 
-<li class="nav-item">
-<a class="nav-link active" data-toggle="pill" href="#pending">
-Pending
-</a>
-</li>
-
-<li class="nav-item">
-<a class="nav-link" data-toggle="pill" href="#approved">
-Approved
-</a>
-</li>
-
-<li class="nav-item">
-<a class="nav-link" data-toggle="pill" href="#rejected">
-Rejected
-</a>
-</li>
-
-</ul>
-
-</div>
-
-<!-- HOTEL -->
 <td>
-
-<div class="d-flex align-items-center gap-3">
-
-<div class="hotel-avatar">
-{{ req.hotel.hotel_name|first|upper }}
-</div>
-
-<div>
-
-<span class="font-weight-600 text-white">
-{{ req.hotel.hotel_name }}
-</span>
-
-<div class="text-low small">
-{{ req.hotel.city|default:"--" }}
-</div>
-
-</div>
-
-</div>
-
-</td>
-
-
-<!-- CATEGORY -->
-<td>
-
-<span class="status-PENDING">
-{{ req.get_category_display }}
-</span>
-
-</td>
-
-
-<!-- CHANGES -->
-<td>
-
-<div class="changes-card">
-
-{% for key,value in req.requested_data.items %}
-
-<div class="change-row">
-
-<span class="change-key">
-{{ key|title }}
-</span>
-
-<span class="change-value">
-{{ value|default:"--" }}
-</span>
-
-</div>
-
-{% endfor %}
-
-</div>
-
-</td>
-
-
-<!-- DATE -->
-<td>
-
-<div class="text-white">
-{{ req.requested_at|date:"M d, Y" }}
-</div>
-
-<div class="text-low small">
-{{ req.requested_at|time:"h:i A" }}
-</div>
-
-</td>
-
-
-<!-- ACTION -->
-<td class="text-right">
 
 <a href="/super/approve-change/{{ req.id }}/"
-class="btn btn-success btn-sm rounded-pill px-4"
-onclick="return confirm('Approve this update?')">
-
-<i class="fas fa-check mr-1"></i>
+class="btn btn-success btn-sm">
 Approve
-
 </a>
 
 <a href="/super/reject-change/{{ req.id }}/"
-class="btn btn-danger btn-sm rounded-pill px-4">
-
-<i class="fas fa-times mr-1"></i>
+class="btn btn-danger btn-sm">
 Reject
-
 </a>
 
 </td>
 
 </tr>
-
 
 {% empty %}
 
 <tr>
-<td colspan="5">
-
-<div class="empty-state">
-
-<i class="fas fa-check-circle"></i>
-
-<h4 class="text-white">
-Queue Clear
-</h4>
-
-<p class="text-low">
-No update requests pending review.
-</p>
-
-</div>
-
-</td>
+<td colspan="4">No pending requests</td>
 </tr>
 
 {% endfor %}
 
 </tbody>
-
 </table>
 
 </div>
 
+
+<!-- ================= APPROVED ================= -->
+
+<div class="tab-pane fade" id="approved">
+
+<table class="sa-table">
+
+<thead>
+<tr>
+<th>Hotel</th>
+<th>Category</th>
+<th>Status</th>
+<th>Action</th>
+</tr>
+</thead>
+
+<tbody>
+
+{% for req in approved_requests %}
+
+<tr>
+
+<td>{{ req.hotel.hotel_name }}</td>
+
+<td>{{ req.get_category_display }}</td>
+
+<td class="text-success">Approved</td>
+
+<td>
+
+<a href="/super/reject-change/{{ req.id }}/"
+class="btn btn-danger btn-sm">
+Reject
+</a>
+
+</td>
+
+</tr>
+
+{% empty %}
+
+<tr>
+<td colspan="4">No approved requests</td>
+</tr>
+
+{% endfor %}
+
+</tbody>
+</table>
+
 </div>
+
+
+<!-- ================= REJECTED ================= -->
+
+<div class="tab-pane fade" id="rejected">
+
+<table class="sa-table">
+
+<thead>
+<tr>
+<th>Hotel</th>
+<th>Category</th>
+<th>Reason</th>
+<th>Status</th>
+<th>Action</th>
+</tr>
+</thead>
+
+<tbody>
+
+{% for req in rejected_requests %}
+
+<tr>
+
+<td>{{ req.hotel.hotel_name }}</td>
+
+<td>{{ req.get_category_display }}</td>
+
+<td>{{ req.remarks|default:"--" }}</td>
+
+<td class="text-danger">Rejected</td>
+
+<td>
+
+<a href="/super/approve-change/{{ req.id }}/"
+class="btn btn-success btn-sm">
+Approve
+</a>
+
+</td>
+
+</tr>
+
+{% empty %}
+
+<tr>
+<td colspan="4">No rejected requests</td>
+</tr>
+
+{% endfor %}
+
+</tbody>
+</table>
+
+</div>
+
 
 </div>
 

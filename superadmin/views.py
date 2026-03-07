@@ -441,32 +441,46 @@ def mark_fake_review(request, id):
 
     return redirect("/super/reviews/")
 
+
 @login_required(login_url="/super/")
 def change_requests_list(request):
+
     if request.user.role != "super_admin":
         return HttpResponse("Unauthorized")
-    
-    requests = ChangeRequest.objects.filter(status='PENDING').order_by('-requested_at')
-    return render(request, "superadmin/change_requests.html", {"change_requests": requests})
+
+    pending_requests = ChangeRequest.objects.filter(status="PENDING").order_by("-requested_at")
+    approved_requests = ChangeRequest.objects.filter(status="APPROVED").order_by("-requested_at")
+    rejected_requests = ChangeRequest.objects.filter(status="REJECTED").order_by("-requested_at")
+
+    context = {
+        "pending_requests": pending_requests,
+        "approved_requests": approved_requests,
+        "rejected_requests": rejected_requests
+    }
+
+    return render(request, "superadmin/change_requests.html", context)
 
 @login_required(login_url="/super/")
 def approve_change_request(request, request_id):
+
     if request.user.role != "super_admin":
         return HttpResponse("Unauthorized")
-        
+
     change_req = get_object_or_404(ChangeRequest, id=request_id)
     hotel = change_req.hotel
-    
-    # Apply changes
+
+    # Apply requested changes to hotel
     for field, value in change_req.requested_data.items():
         if hasattr(hotel, field):
             setattr(hotel, field, value)
-    
+
     hotel.save()
-    change_req.status = 'APPROVED'
+
+    # Update request status
+    change_req.status = "APPROVED"
     change_req.reviewed_at = timezone.now()
     change_req.save()
-    
+
     send_mail(
         "Hotel Update Approved",
         f"Your requested updates for '{hotel.hotel_name}' have been approved and are now live.",
@@ -474,23 +488,27 @@ def approve_change_request(request, request_id):
         [hotel.owner.email],
         fail_silently=True,
     )
-    
+
     return redirect("/super/change-requests/")
+
 
 @login_required(login_url="/super/")
 def reject_change_request(request, request_id):
+
     if request.user.role != "super_admin":
         return HttpResponse("Unauthorized")
-        
+
     change_req = get_object_or_404(ChangeRequest, id=request_id)
-    
+
     if request.method == "POST":
+
         remarks = request.POST.get("remarks")
-        change_req.status = 'REJECTED'
+
+        change_req.status = "REJECTED"
         change_req.remarks = remarks
         change_req.reviewed_at = timezone.now()
         change_req.save()
-        
+
         send_mail(
             "Hotel Update Rejected",
             f"Your requested updates for '{change_req.hotel.hotel_name}' were rejected.\nReason: {remarks}",
@@ -498,6 +516,11 @@ def reject_change_request(request, request_id):
             [change_req.hotel.owner.email],
             fail_silently=True,
         )
+
         return redirect("/super/change-requests/")
-        
-    return render(request, "superadmin/reject_change_form.html", {"change_req": change_req})
+
+    return render(
+        request,
+        "superadmin/reject_change_form.html",
+        {"change_req": change_req}
+    )
