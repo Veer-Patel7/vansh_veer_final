@@ -473,3 +473,46 @@ body.light-mode .user-footer .btn:hover{
 background:#3b82f6 !important;
 color:white !important;
 }
+
+/* Update request change box */
+
+.changes-box{
+background:var(--surface);
+border:1px solid var(--border);
+border-radius:8px;
+padding:14px;
+}
+
+/* each row */
+
+.change-row{
+display:flex;
+gap:12px;
+margin-bottom:6px;
+}
+
+/* key */
+
+.change-key{
+font-weight:600;
+min-width:140px;
+color:var(--text-medium);
+}
+
+/* value */
+
+.change-value{
+color:var(--text-high);
+}
+
+.hotel-avatar{
+width:34px;
+height:34px;
+border-radius:8px;
+background:var(--primary);
+color:white;
+display:flex;
+align-items:center;
+justify-content:center;
+font-weight:700;
+}
