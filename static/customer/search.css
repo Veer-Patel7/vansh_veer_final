@@ -38,7 +38,7 @@ body{
     display: none;
     position: absolute;
     right: 0;
-    background-color: rgb(32, 15, 192);
+    background-color: #054ab9;
     color: black;
     min-width: 160px;
     border-radius: 8px;
@@ -52,11 +52,11 @@ body{
     display: block;
     text-decoration: none;
 }
-
+ /* Hover effect for dropdown items */
 .dropdown-content a:hover {
-    background-color: white;
+    background-color: rgb(255, 255, 255);
     color: black;
-    border-radius: 40%;
+    border-radius: 10%;
 }
 
 .profile-dropdown:hover .dropdown-content {
@@ -286,7 +286,7 @@ section {
     justify-content:center;
     font-size:30px;
     font-weight:bold;
-    color:white;
+    color:rgb(255, 255, 255);
     margin:auto;
     margin-bottom:15px;
 
@@ -369,3 +369,61 @@ section {
 .bookings-table tr:hover{
     background:#f1f5f9;
 }
+
+/* ===== CONTACT FORM ===== */
+
+.contact-wrapper{
+    display:flex;
+    justify-content:center;
+    margin-top:30px;
+}
+
+.contact-wrapper form{
+    width:400px;
+    background:white;
+    padding:30px;
+    border-radius:12px;
+    box-shadow:0 5px 15px rgba(0,0,0,0.15);
+
+    display:flex;
+    flex-direction:column;
+    gap:15px;
+}
+
+.contact-wrapper input,
+.contact-wrapper textarea{
+    width:100%;
+    padding:12px;
+    border:1px solid #ddd;
+    border-radius:6px;
+    font-size:14px;
+    outline:none;
+    transition:0.3s;
+}
+
+.contact-wrapper input:focus,
+.contact-wrapper textarea:focus{
+    border-color:#3b82f6;
+    box-shadow:0 0 5px rgba(59,130,246,0.4);
+}
+
+.contact-wrapper textarea{
+    height:120px;
+    resize:none;
+}
+
+.contact-wrapper button{
+    background:#3b82f6;
+    color:white;
+    border:none;
+    padding:12px;
+    border-radius:8px;
+    font-size:16px;
+    font-weight:600;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.contact-wrapper button:hover{
+    background:#2563eb;
+}   

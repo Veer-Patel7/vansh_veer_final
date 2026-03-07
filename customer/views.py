@@ -1,4 +1,3 @@
-from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from hotels.models import Hotel, RoomType
@@ -19,21 +18,21 @@ def dashboard(request):
     return render(request, "customer/dashboard.html")
 
 def customer_search(request):
-    
+
     # ✅ CONTACT FORM
     if request.method == "POST":
         name = request.POST.get("name")
         email = request.POST.get("email")
         message = request.POST.get("message")
 
-        subject = f"New Contact Message from {name}"
         full_message = f"Name: {name}\nEmail: {email}\nMessage: {message}"
 
         send_mail(
-            subject,
+            "New Contact Message",
             full_message,
             settings.EMAIL_HOST_USER,
-            ['hotelpro1000@gmail.com'],
+            ["hotelpro1000@gmail.com"],
+            fail_silently=False,
         )
 
     # ✅ SEARCH LOGIC
@@ -41,7 +40,7 @@ def customer_search(request):
     checkin = request.GET.get("checkin")
     checkout = request.GET.get("checkout")
 
-    hotels = Hotel.objects.filter(status="LIVE").prefetch_related("rooms")
+    hotels = Hotel.objects.all().filter(status="LIVE").prefetch_related("rooms")
 
     if location:
         hotels = hotels.filter(city__icontains=location)
@@ -72,7 +71,7 @@ def customer_search(request):
         "checkin": checkin,
         "checkout": checkout
     })
-       
+        
 @login_required
 def profile_view(request):
 
@@ -89,20 +88,31 @@ def search_results(request):
     location = request.GET.get("location", "").strip()
     persons = request.GET.get("persons")
 
-    hotels = Hotel.objects.all()
+    rooms = RoomType.objects.select_related("hotel")
+
+    checkin = request.GET.get("checkin")
+    checkout = request.GET.get("checkout")
 
     if location:
-        hotels = hotels.filter(address__icontains=location)
+        rooms = rooms.filter(hotel__address__icontains=location)
 
-    hotels = hotels.annotate(
-        min_price=Min("rooms__price_per_night"),
-        max_price=Max("rooms__price_per_night")
-    )
+    if persons:
+        rooms = rooms.filter(max_guest__gte=persons)
 
-    return render(request, "customer/search_results.html", {
-        "hotels": hotels
-    })
-    
+    if checkin and checkout:
+        checkin = date.fromisoformat(checkin)
+        checkout = date.fromisoformat(checkout)
+        
+        for room in rooms:
+            room.available = room.available_rooms(checkin, checkout)
+            
+    else:
+        for room in rooms:
+            room.available = room.total_rooms
+
+    return render(request, "customer/search_results.html", {"rooms": rooms})
+
+
 def hotel_detail(request, pk):
     hotel = get_object_or_404(Hotel, pk=pk)
     rooms = RoomType.objects.filter(hotel=hotel)
@@ -114,16 +124,14 @@ def hotel_detail(request, pk):
         checkin = date.fromisoformat(checkin)
         checkout = date.fromisoformat(checkout)
 
-        for room in rooms:
+        for room in hotel.rooms.all():
             room.available = room.available_rooms(checkin, checkout)
-    else:
-        for room in rooms:
-            room.available = room.total_rooms
 
     return render(request, "customer/hotel_detail.html", {
         "hotel": hotel,
         "rooms": rooms
     })
+
 
 def room_select(request, room_id):
     return render(request, "customer/room_select.html", {"room_id": room_id})
