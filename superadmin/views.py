@@ -467,7 +467,7 @@ def change_requests_list(request):
         "rejected_requests": rejected_requests
     }
 
-    return render(request, "superadmin/change_requests.html", context)
+    return render(request, "superadmin/hotels.html", context)
 
 @login_required(login_url="/super/")
 def approve_change_request(request, request_id):

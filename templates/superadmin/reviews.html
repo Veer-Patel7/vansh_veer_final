@@ -15,15 +15,12 @@
 
     <!-- ===== Reviews Table ===== -->
     <div class="section-card">
-
         <div class="section-header">
             <h3>Pending Review Requests</h3>
         </div>
 
         <div class="section-body">
-
             <table class="sa-table">
-
                 <thead>
                     <tr>
                         <th>Hotel</th>
@@ -34,12 +31,9 @@
                         <th style="width:240px;">Action</th>
                     </tr>
                 </thead>
-
                 <tbody>
-
                 {% for r in reviews %}
                 <tr>
-
                     <td>
                         <div style="font-weight:600;color:var(--text-high);">
                             {{ r.hotel.hotel_name }}
@@ -73,55 +67,37 @@
                     </td>
 
                     <td>
-
                         <div class="action-group">
-
                             <a href="/super/approve-review/{{ r.id }}/"
                                class="btn-approve">
                                Approve Delete
                             </a>
-
                             <a href="/super/reject-review/{{ r.id }}/"
                                class="btn-approve"
                                style="background:#f59e0b;">
                                Reject
                             </a>
-
                             <a href="/super/fake-review/{{ r.id }}/"
                                class="btn-approve"
                                style="background:#ef4444;">
                                Mark Fake
                             </a>
-
                         </div>
-
                     </td>
-
                 </tr>
-
                 {% empty %}
-
                 <tr>
                     <td colspan="6">
-
                         <div class="empty-state">
                             <i class="fas fa-star"></i>
                             <p>No delete requests.</p>
                         </div>
-
                     </td>
                 </tr>
-
                 {% endfor %}
-
                 </tbody>
-
             </table>
-
         </div>
-
     </div>
-
 </div>
-
 {% endblock %}

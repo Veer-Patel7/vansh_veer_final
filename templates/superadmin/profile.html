@@ -3,198 +3,117 @@
 
 {% block content %}
 
-<div class="container-fluid px-0" style="max-width:900px;margin:0 auto;padding:1rem;">
+<div class="container-fluid px-0"
+     style="max-width:900px;margin:0 auto;padding:1rem;">
 
-<!-- Header -->
+<!-- ================= HEADER ================= -->
 <div class="page-header"
-style="display:flex;justify-content:space-between;align-items:center;
-border-bottom:1px solid var(--border);padding-bottom:1rem;margin-bottom:2rem;">
+     style="display:flex;justify-content:space-between;align-items:center;
+     border-bottom:1px solid var(--border);
+     padding-bottom:1rem;margin-bottom:2rem;">
 
-<div>
-<h1 class="sa-page-title m-0">Your Profile</h1>
-<p class="text-low small">Manage your account settings</p>
+    <div>
+        <h1 class="sa-page-title m-0">Your Profile</h1>
+        <p class="text-low small"> Manage your account settings</p>
+    </div>
+
+    <button id="themeToggle" class="btn-approve" style="background:#475569;"> 🌙 Dark / ☀ Light </button>
 </div>
 
-<button id="themeToggle" class="btn-approve" style="background:#475569;">
-🌙 Dark / ☀ Light
-</button>
-
-</div>
-
-
-<!-- PROFILE CARD -->
+<!-- ================= PROFILE CARD ================= -->
 <div class="section-card">
-<div class="section-body">
+    <div class="section-body">
+        <div style="display:flex;align-items:center;gap:20px;">
+            {% if request.user.profile_photo %}
+                <img src="{{ request.user.profile_photo.url }}" style="width:80px;height:80px;border-radius:50%; object-fit:cover;border:2px solid var(--border);">
+            {% else %}
 
-<div style="display:flex;align-items:center;gap:20px;">
+                <img src="{% static 'images/default-user.png' %}" style="width:80px;height:80px;border-radius:50%; object-fit:cover;border:2px solid var(--border);">
+            {% endif %}
 
-{% if request.user.profile_photo %}
-<img src="{{ request.user.profile_photo.url }}"
-style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:2px solid var(--border);">
-{% else %}
-<img src="{% static 'images/default-user.png' %}"
-style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:2px solid var(--border);">
-{% endif %}
-
-<div>
-<h3 style="margin:0;color:var(--text-high);">{{ request.user.username }}</h3>
-<div class="text-low small">{{ request.user.email }}</div>
+            <div>
+                <h3 style="margin:0;color:var(--text-high);"> {{ request.user.username }} </h3>
+                <div class="text-low small"> {{ request.user.email }} </div>
+            </div>
+        </div>
+    </div>
 </div>
-
-</div>
-
-</div>
-</div>
-
-
 <br>
 
-
-<!-- UPDATE PROFILE -->
+<!-- ================= UPDATE PROFILE ================= -->
 <div class="section-card">
-<div class="section-header">
-<h3>Update Profile</h3>
+    <div class="section-header">
+        <h3>Update Profile</h3>
+    </div>
+
+    <div class="section-body">
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="info-grid">
+                <div class="info-item">
+                    <span class="info-label"> Username </span>
+                    <input type="text" name="username" class="sa-input" value="{{ request.user.username }}">
+                </div>
+
+                <div class="info-item">
+                    <span class="info-label"> Email </span>
+                    <input type="email" name="email" class="sa-input" value="{{ request.user.email }}">
+                </div>
+
+                <div class="info-item">
+                    <span class="info-label"> Profile Photo </span>
+                    <input type="file" name="profile_photo" class="sa-input">
+                </div>
+            </div>
+            <br>
+
+            <button type="submit" class="btn-approve"> Save Changes </button>
+        </form>
+    </div>
 </div>
-
-<div class="section-body">
-
-<form method="POST" enctype="multipart/form-data">
-{% csrf_token %}
-
-<div class="info-grid">
-
-<div class="info-item">
-<span class="info-label">Username</span>
-<input type="text" name="username" class="sa-input"
-value="{{ request.user.username }}">
-</div>
-
-<div class="info-item">
-<span class="info-label">Email</span>
-<input type="email" name="email" class="sa-input"
-value="{{ request.user.email }}">
-</div>
-
-<div class="info-item">
-<span class="info-label">Profile Photo</span>
-<input type="file" name="profile_photo" class="sa-input">
-</div>
-
-</div>
-
 <br>
 
-<button type="submit" class="btn-approve">
-Save Changes
-</button>
-
-</form>
-
-</div>
-</div>
-
-
-<br>
-
-
-<!-- CHANGE PASSWORD -->
+<!-- ================= CHANGE PASSWORD ================= -->
 <div class="section-card">
-<div class="section-header">
-<h3>Change Password</h3>
+    <div class="section-header"> <h3>Change Password</h3> </div>
+    <div class="section-body">
+        <form method="POST" action="/super/change-password/">
+            {% csrf_token %}
+            <div class="info-grid">
+                <div class="info-item">
+                    <span class="info-label"> Old Password </span>
+                    <input type="password" name="old_password" class="sa-input">
+                </div>
+
+                <div class="info-item">
+                    <span class="info-label"> New Password </span>
+                    <input type="password" name="new_password" class="sa-input">
+                </div>
+
+                <div class="info-item">
+                    <span class="info-label"> Confirm Password </span>
+                    <input type="password" name="confirm_password" class="sa-input">
+                </div>
+            </div>
+            <br>
+            <button type="submit" class="btn-approve"> Update Password </button>
+        </form>
+    </div>
 </div>
-
-<div class="section-body">
-
-<form method="POST" action="/super/change-password/">
-{% csrf_token %}
-
-<div class="info-grid">
-
-<div class="info-item">
-<span class="info-label">Old Password</span>
-<input type="password" name="old_password" class="sa-input">
-</div>
-
-<div class="info-item">
-<span class="info-label">New Password</span>
-<input type="password" name="new_password" class="sa-input">
-</div>
-
-<div class="info-item">
-<span class="info-label">Confirm Password</span>
-<input type="password" name="confirm_password" class="sa-input">
-</div>
-
-</div>
-
 <br>
 
-<button type="submit" class="btn-approve">
-Update Password
-</button>
-
-</form>
-
-</div>
-</div>
-
-
-<br>
-
-
-{% comment %} <!-- ADMIN STATS -->
-<div class="stat-cards">
-
-<div class="stat-card live">
-<div class="stat-icon"><i class="fas fa-hotel"></i></div>
-<div>
-<div class="stat-num">{{ hotels_count }}</div>
-<div class="stat-label">Hotels</div>
-</div>
-</div>
-
-<div class="stat-card pending">
-<div class="stat-icon"><i class="fas fa-calendar-check"></i></div>
-<div>
-<div class="stat-num">{{ bookings_count }}</div>
-<div class="stat-label">Bookings</div>
-</div>
-</div>
-
-<div class="stat-card reject">
-<div class="stat-icon"><i class="fas fa-users"></i></div>
-<div>
-<div class="stat-num">{{ customers_count }}</div>
-<div class="stat-label">Customers</div>
-</div>
-</div>
-
-</div>
-
-</div> {% endcomment %}
-
-
-<!-- THEME TOGGLE -->
+<!-- ================= THEME TOGGLE ================= -->
 <script>
-
-const toggleBtn = document.getElementById("themeToggle");
-
-if(localStorage.getItem("theme") === "light"){
-document.body.classList.add("light-mode");
-}
-
-toggleBtn.addEventListener("click",function(){
-
-document.body.classList.toggle("light-mode");
-
-if(document.body.classList.contains("light-mode")){
-localStorage.setItem("theme","light");
-}else{
-localStorage.setItem("theme","dark");
-}
-
-});
-
+    const toggleBtn = document.getElementById("themeToggle");
+    if (localStorage.getItem("theme") === "light") { document.body.classList.add("light-mode"); }
+    toggleBtn.addEventListener("click", function () {
+        document.body.classList.toggle("light-mode");
+        if (document.body.classList.contains("light-mode")) {
+            localStorage.setItem("theme", "light");
+        } else {
+            localStorage.setItem("theme", "dark");
+        }
+    });
 </script>
-
+</div>
 {% endblock %}
