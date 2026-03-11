@@ -1,96 +1,138 @@
-const pills = document.querySelectorAll('.premium-pill');
-const typeInput = document.getElementById('offer_type_input');
+/**
+ * Strategy Simulator & Offer Interactions
+ * HotelPro Enterprise Design System
+ */
 
-pills.forEach(pill => {
-    pill.addEventListener('click', () => {
-        pills.forEach(p => p.classList.remove('active'));
-        pill.classList.add('active');
-        typeInput.value = pill.dataset.value;
+document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('strategyForm');
+    if (!form) return;
 
-        // Visual feedback for archetype switch
-        pill.style.transform = 'scale(1.1)';
-        setTimeout(() => pill.style.transform = '', 200);
+    const discountType = document.getElementById('discount_type');
+    const discountValue = document.getElementById('discount_value');
+    const checkboxes = document.querySelectorAll('input[name="room_categories"]');
 
-        runCalc();
-    });
-});
-
-const hSelect = document.getElementById('hotel_select');
-const dVal = document.getElementById('discount_value');
-const dType = document.getElementById('discount_type');
-const rChecks = document.querySelectorAll('input[name="room_categories"]');
-
-function formatCurrency(val) {
-    return '₹' + Math.round(val).toLocaleString('en-IN');
-}
-
-function runCalc() {
-    let maxBase = 0;
-    const hotelId = hSelect.value;
-    const allRows = document.querySelectorAll('.selection-row');
-
-    allRows.forEach(row => {
-        const isMatch = row.dataset.hotel === hotelId;
-        row.style.display = isMatch ? 'flex' : 'none';
-        if (isMatch) {
-            row.style.animation = 'fadeIn 0.4s ease forwards';
-        }
-    });
-
-    const checked = Array.from(rChecks).filter(c => c.checked && c.closest('.selection-row').style.display !== 'none');
-
-    if (checked.length > 0) {
-        maxBase = Math.max(...checked.map(c => parseFloat(c.closest('.selection-row').dataset.price)));
-    } else {
-        const visibleRows = Array.from(allRows).filter(r => r.style.display !== 'none');
-        if (visibleRows.length > 0) {
-            maxBase = Math.max(...visibleRows.map(r => parseFloat(r.dataset.price)));
-        }
-    }
-
-    const discount = parseFloat(dVal.value) || 0;
-    let final = maxBase;
-    let savings = 0;
-
-    if (dType.value === 'PERCENT') {
-        final = maxBase * (1 - discount / 100);
-        savings = discount;
-    } else {
-        final = maxBase - discount;
-        savings = maxBase > 0 ? (discount / maxBase) * 100 : 0;
-    }
-
-    final = Math.max(0, final);
-
-    // Dynamic Updates with micro-transitions
+    // Preview Elements
     const prevOld = document.getElementById('prev-old');
     const prevNew = document.getElementById('prev-new');
     const prevSavings = document.getElementById('prev-savings');
+    const prevBase = document.getElementById('prev-base');
+    const prevBurn = document.getElementById('prev-burn');
+    const prevNet = document.getElementById('prev-net');
 
-    prevOld.innerText = formatCurrency(maxBase);
-    prevNew.innerText = formatCurrency(final);
-    prevSavings.innerText = Math.round(savings) + '% REDUCTION';
+    function updateSimulator() {
+        let totalOld = 0;
+        let selectedCount = 0;
 
-    document.getElementById('prev-base').innerText = formatCurrency(maxBase);
-    document.getElementById('prev-burn').innerText = '-' + formatCurrency(maxBase - final);
-    document.getElementById('prev-net').innerText = formatCurrency(final);
+        checkboxes.forEach(cb => {
+            if (cb.checked) {
+                const row = cb.closest('.selection-row');
+                totalOld += parseFloat(row.dataset.price);
+                selectedCount++;
+            }
+        });
 
-    // Impact Animation
-    prevNew.style.transform = 'scale(1.05)';
-    prevNew.style.transition = 'transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
-    setTimeout(() => prevNew.style.transform = 'scale(1)', 200);
-}
+        if (selectedCount === 0) {
+            resetSimulator();
+            return;
+        }
 
-[hSelect, dVal, dType, ...rChecks].forEach(el => {
-    el.addEventListener('input', runCalc);
-    el.addEventListener('change', runCalc);
+        const avgOld = totalOld / selectedCount;
+        const discType = discountType.value;
+        const discVal = parseFloat(discountValue.value) || 0;
+
+        let avgNew = avgOld;
+        let savingsPercent = 0;
+
+        if (discType === 'PERCENT') {
+            savingsPercent = discVal;
+            avgNew = avgOld * (1 - (discVal / 100));
+        } else {
+            avgNew = Math.max(0, avgOld - discVal);
+            savingsPercent = avgOld > 0 ? (discVal / avgOld) * 100 : 0;
+        }
+
+        const burn = (avgOld - avgNew) * selectedCount;
+        const base = avgOld * selectedCount;
+        const net = avgNew * selectedCount;
+
+        // Animate values
+        animateValue(prevOld, avgOld, '₹');
+        animateValue(prevNew, avgNew, '₹');
+        prevSavings.textContent = `${Math.round(savingsPercent)}% REDUCTION`;
+
+        animateValue(prevBase, base, '₹');
+        animateValue(prevBurn, -burn, '₹');
+        animateValue(prevNet, net, '₹');
+    }
+
+    function resetSimulator() {
+        prevOld.textContent = '₹0';
+        prevNew.textContent = '₹0';
+        prevSavings.textContent = '0% REDUCTION';
+        prevBase.textContent = '₹0';
+        prevBurn.textContent = '-₹0';
+        prevNet.textContent = '₹0';
+    }
+
+    function animateValue(el, val, prefix = '') {
+        const target = parseFloat(val) || 0;
+        const current = parseFloat(el.textContent.replace(/[^\d.-]/g, '')) || 0;
+        const duration = 500;
+        const start = performance.now();
+
+        function update(now) {
+            const progress = Math.min((now - start) / duration, 1);
+            const currentVal = current + (target - current) * progress;
+            el.textContent = `${prefix}${Math.round(currentVal).toLocaleString()}`;
+            if (progress < 1) requestAnimationFrame(update);
+        }
+        requestAnimationFrame(update);
+    }
+
+    // Event Listeners
+    discountType.addEventListener('change', updateSimulator);
+    discountValue.addEventListener('input', updateSimulator);
+    checkboxes.forEach(cb => cb.addEventListener('change', updateSimulator));
+
+    // Initial Update
+    updateSimulator();
+
+    // Archetype Selection Logic
+    document.querySelectorAll('.archetype-pill').forEach(pill => {
+        pill.addEventListener('click', () => {
+            document.querySelectorAll('.archetype-pill').forEach(p => p.classList.remove('active-archetype'));
+            pill.classList.add('active-archetype');
+            document.getElementById('offer_type_input').value = pill.dataset.value;
+
+            // Add a little punch animation
+            pill.style.transform = 'scale(0.95)';
+            setTimeout(() => pill.style.transform = '', 100);
+        });
+    });
 });
 
-runCalc();
+document.addEventListener('DOMContentLoaded', function () {
+    // Range slider dynamic readout
+    const slider = document.getElementById('discount');
+    const output = document.getElementById('discountValue');
+    if (slider && output) {
+        slider.oninput = function () {
+            output.innerHTML = this.value + "%";
+        }
+    }
 
-document.getElementById('strategyForm').onsubmit = function () {
-    const b = document.querySelector('.btn-deploy');
-    b.innerHTML = '<i class="fa-regular fa-spinner-third fa-spin"></i> SYNCING...';
-    b.style.opacity = '0.7';
-    b.style.pointerEvents = 'none';
-};
+    // Flatpickr initialization
+    if (typeof flatpickr !== 'undefined') {
+        const config = {
+            minDate: "today",
+            dateFormat: "Y-m-d",
+            disableMobile: "true",
+            animate: true,
+            onOpen: function (selectedDates, dateStr, instance) {
+                instance.calendarContainer.classList.add('animate-in', 'fade-in', 'zoom-in-95', 'duration-300');
+            }
+        };
+        flatpickr("#activationDate", config);
+        flatpickr("#expirationDate", config);
+    }
+});

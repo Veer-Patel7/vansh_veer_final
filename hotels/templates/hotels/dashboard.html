@@ -1,451 +1,326 @@
 {% extends 'hotels/dashboard_base.html' %}
 {% load static %}
 
-{% block title %}Property Onboarding | HotelPro{% endblock %}
+{% block title %}Hotel Onboarding | HotelPro{% endblock %}
 
-{% block page_title %}{{ hotel.hotel_name }} - Registration{% endblock %}
-{% block page_subtitle %}Complete your profile to start taking bookings on our platform.{% endblock %}
+{% block page_title %}WelCome Back: {{ hotel.name }}{% endblock %}
+{% block page_subtitle %}Complete your hotel setup to start attracting guests.{% endblock %}
 
 {% block extra_head %}
-<!-- Animation utilities -->
-<style>
-    @keyframes progressPulse {
-        0% {
-            opacity: 1;
-        }
-
-        50% {
-            opacity: 0.7;
-        }
-
-        100% {
-            opacity: 1;
-        }
-    }
-
-    .progress-pulse {
-        animation: progressPulse 2s infinite ease-in-out;
-    }
-
-    .progress-bar-fill {
-        width: var(--progress-width, 0%);
-    }
-</style>
+<!-- High-performance layout utilities -->
+<link rel="stylesheet" href="{% static 'hotels/css/dashboard.css' %}">
 {% endblock %}
 
+
 {% block dashboard_content %}
-<div class="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-1000">
-    <!-- Status Banners -->
-    {% if hotel.status == 'PENDING' %}
-    <div class="glass-panel p-8 rounded-panel-lg border-l-[6px] border-amber-500 overflow-hidden relative group">
-        <div class="absolute top-0 right-0 p-12 opacity-5 group-hover:opacity-10 transition-opacity">
-            <i class="fas fa-hourglass-half text-8xl text-amber-500"></i>
-        </div>
-        <div class="flex flex-col md:flex-row items-center gap-8 relative z-10">
+<div class="space-y-12 animate-in fade-in slide-in-from-bottom-8 duration-1000 pb-24">
+
+    <!-- Operational State Header -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-stretch">
+        <!-- Progress Mastery Card -->
+        <div
+            class="lg:col-span-8 premium-glass rounded-[3rem] p-12 shadow-2xl shadow-slate-200/50 border border-white/60 relative overflow-hidden group">
+            <!-- Background Decoration -->
             <div
-                class="w-20 h-20 rounded-3xl bg-amber-500/10 flex items-center justify-center text-amber-600 shadow-inner">
-                <i class="fas fa-shield-halved text-3xl"></i>
+                class="absolute -right-24 -top-24 w-96 h-96 bg-primary-600/5 rounded-full blur-[100px] pointer-events-none group-hover:bg-primary-600/10 transition-colors duration-1000">
             </div>
-            <div>
-                <h3 class="text-xl font-display font-bold text-slate-900 tracking-tight">Application Under Review
-                </h3>
-                <p class="text-sm font-semibold text-slate-500 mt-1">Our team is currently reviewing your hotel details
-                    and documentation.</p>
-                <div class="flex items-center gap-4 mt-4">
-                    <span
-                        class="px-4 py-1.5 rounded-full bg-amber-50 text-amber-600 text-[10px] font-bold uppercase tracking-widest border border-amber-100">Reviewing
-                        Details</span>
-                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest italic">Expected
-                        completion: 24-48 hours</span>
+
+            <div class="relative z-10 flex flex-col h-full justify-between">
+                <div class="flex items-start justify-between mb-12">
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-3">
+                            <span class="w-2 h-2 rounded-full bg-primary-600 status-pulse"></span>
+                            <h3 class="text-3xl font-display font-bold text-slate-900 tracking-tight">Your Progress</h3>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <span
+                                class="px-5 py-2 rounded-2xl bg-slate-900 text-white text-[10px] font-bold uppercase tracking-[0.3em] shadow-xl">
+                                {% if progress < 50 %}STARTING{% elif progress < 80 %}ALMOST THERE{%else%}READY{%endif%} </span>
+                                    <span
+                                        class="text-[10px] font-bold text-slate-400 uppercase tracking-widest italic">Step
+                                        {{ hotel.onboarding_step }} of 4 complete</span>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span
+                            class="text-7xl font-display font-bold text-slate-900 leading-none tracking-tighter">{{progress}}%</span>
+                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-3">Complete
+                        </p>
+                    </div>
+                </div>
+
+                <div class="space-y-6">
+                    <div
+                        class="h-6 bg-slate-100/50 rounded-full p-1.5 border border-slate-200 shadow-inner relative group/bar">
+                        <div class="progress-bar-fill h-full bg-gradient-to-r from-blue-600 via-primary-500 to-cyan-400 rounded-full relative shadow-[0_0_20px_rgba(37,99,235,0.3)]"
+                            data-progress="{{ progress }}">
+                            <div
+                                class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none">
+                            </div>
+                            <div
+                                class="absolute top-0 right-0 h-full w-24 bg-gradient-to-r from-transparent to-white/40 animate-pulse">
+                            </div>
+                        </div>
+                    </div>
+                    <div
+                        class="flex justify-between items-center text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] italic px-2">
+                        <span>Start</span>
+                        <span>Ready to Go Live</span>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    {% elif hotel.status == 'REJECTED' %}
-    <div class="glass-panel p-8 rounded-panel-lg border-l-[6px] border-rose-500 overflow-hidden relative group">
-        <div class="absolute top-0 right-0 p-12 opacity-5 group-hover:opacity-10 transition-opacity">
-            <i class="fas fa-circle-exclamation text-8xl text-rose-500"></i>
-        </div>
-        <div class="flex flex-col md:flex-row items-center gap-8 relative z-10">
+
+        <!-- Current Status Protocol -->
+        <div class="lg:col-span-4 space-y-8">
+            {% if hotel.status == 'PENDING' %}
             <div
-                class="w-20 h-20 rounded-3xl bg-rose-500/10 flex items-center justify-center text-rose-600 shadow-inner">
-                <i class="fas fa-triangle-exclamation text-3xl"></i>
+                class="h-full premium-glass rounded-[3rem] p-10 border border-white/60 shadow-2xl shadow-slate-200/50 flex flex-col justify-between border-l-[10px] border-amber-500">
+                <div class="space-y-6">
+                    <div
+                        class="w-14 h-14 rounded-2xl bg-amber-50 text-amber-500 flex items-center justify-center text-xl shadow-inner">
+                        <i class="fas fa-microchip status-pulse"></i>
+                    </div>
+                    <h4 class="text-xl font-display font-bold text-slate-800">Verification in progress</h4>
+                    <p class="text-xs font-semibold text-slate-400 leading-relaxed uppercase tracking-widest">We are
+                        currently reviewing your property details. This usually takes 24-48 hours.</p>
+                </div>
+                <div class="pt-8">
+                    <span
+                        class="text-[10px] font-bold text-amber-600 uppercase tracking-[0.2em] flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 bg-amber-500 rounded-full"></span> STATUS: UNDER REVIEW
+                    </span>
+                </div>
             </div>
-            <div>
-                <h3 class="text-xl font-display font-bold text-slate-900 tracking-tight">Updates Needed: Please Fix
-                    Issues</h3>
-                <p class="text-sm font-semibold text-slate-500 mt-1"><strong>Reason for Rejection:</strong> {{
-                    hotel.verification_remarks|default:"Please review your data and resubmit for evaluation." }}</p>
-                <div class="flex gap-3 mt-4">
-                    <button onclick="document.getElementById('edit-sections').scrollIntoView({behavior: 'smooth'})"
-                        class="px-6 py-2 bg-rose-600 text-white text-[10px] font-bold uppercase tracking-widest rounded-xl hover:bg-rose-700 transition-all shadow-lg shadow-rose-600/20">
-                        Fix Errors Below
-                    </button>
-                    <a href="mailto:support@hotelpro.com"
-                        class="px-6 py-2 bg-white border border-slate-200 text-slate-500 text-[10px] font-bold uppercase tracking-widest rounded-xl hover:bg-slate-50 transition-all">
-                        Contact Support
+            {% elif hotel.status == 'REJECTED' %}
+            <div
+                class="h-full premium-glass rounded-[3rem] p-10 border border-white/60 shadow-2xl shadow-slate-200/50 flex flex-col justify-between border-l-[10px] border-rose-600">
+                <div class="space-y-6">
+                    <div
+                        class="w-14 h-14 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center text-xl shadow-inner">
+                        <i class="fas fa-triangle-exclamation"></i>
+                    </div>
+                    <h4 class="text-xl font-display font-bold text-slate-800">Information Needed</h4>
+                    <p class="text-xs font-semibold text-slate-400 leading-relaxed uppercase tracking-widest">{{hotel.verification_remarks|default:"We need more information to verify your property. Please check your documents." }}</p>
+                </div>
+                <div class="pt-8">
+                    <a href="{% url 'hotels:hotelregister' %}"
+                        class="inline-flex items-center gap-2 text-[10px] font-bold text-rose-600 uppercase tracking-[0.2em] group hover:translate-x-1 transition-all">
+                        FIX NOW <i class="fas fa-arrow-right"></i>
                     </a>
                 </div>
             </div>
-        </div>
-    </div>
-    {% endif %}
-
-    <!-- Progress Overview -->
-    <div class="glass-panel rounded-executive p-10 lg:p-14 shadow-2xl shadow-slate-200/50">
-        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-8 mb-12">
-            <div>
-                <h2 class="text-2xl font-display font-bold text-slate-900 tracking-tight flex items-center gap-4">
-                    Profile Completion
-                    <span
-                        class="px-3 py-1 bg-primary-50 text-primary-600 text-[10px] font-bold uppercase tracking-widest rounded-full border border-primary-100">Live
-                        Status</span>
-                </h2>
-                <p class="text-sm font-semibold text-slate-500 mt-2 max-w-lg">Fill in all details to get your hotel listed and ready for guests.</p>
-            </div>
-            <div class="text-right flex flex-col items-end">
-                <div class="flex items-baseline gap-2">
-                    <span class="text-6xl font-display font-bold text-primary-600 tracking-tighter">{{progress}}%</span>
-                    <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Complete</span>
-                </div>
-                <div class="mt-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Progress: {% if progress == 100 %}Ready to go Live{% else %}Registration in Progress{% endif %}</div>
-            </div>
-        </div>
-
-        <div class="relative h-4 bg-slate-100 rounded-full overflow-hidden shadow-inner mb-16">
-            <div class="absolute inset-y-0 left-0 bg-gradient-to-r from-primary-600 via-blue-500 to-indigo-600 rounded-full transition-all duration-1000 ease-out progress-pulse progress-bar-fill"
-                style="--progress-width: {{ progress|default:0 }}%;">
-                <div class="absolute inset-0 bg-white/20 animate-shimmer scale-x-150"></div>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8" id="edit-sections">
-            <!-- Identity -->
-            <div class="glass-panel p-8 rounded-panel-lg hover-lift group border border-white/60 cursor-pointer"
-                onclick="openEditInterface('{{ hotel.id }}', 'IDENTITY')">
-                <div class="flex items-center justify-between mb-8">
-                    <div
-                        class="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-all duration-500 shadow-inner">
-                        <i class="fas fa-id-card text-xl"></i>
-                    </div>
-                    {% if 'IDENTITY' in pending_categories %}
-                    <span
-                        class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-50 text-amber-600 text-[9px] font-bold uppercase tracking-widest animate-pulse border border-amber-100">
-                        <i class="fas fa-clock"></i> Pending
-                    </span>
-                    {% else %}
-                    <span
-                        class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-600 text-[9px] font-bold uppercase tracking-widest border border-emerald-100">
-                        <i class="fas fa-check"></i> Done
-                    </span>
-                    {% endif %}
-                </div>
-                <h4 class="text-base font-bold text-slate-900 mb-2">Basic Details</h4>
-                <p class="text-xs text-slate-500 font-semibold mb-6">Hotel name,hotel type,hotel address.
-                </p>
-                <div onclick="openEditInterface('{{ hotel.id }}', 'IDENTITY')"
-                    class="flex items-center gap-2 text-[10px] font-bold text-primary-600 uppercase tracking-widest hover:underline cursor-pointer">
-                    <i class="fas fa-pen-to-square"></i> Edit Details
-                </div>
-            </div>
-
-            <!-- Inventory -->
-            <div class="glass-panel p-8 rounded-panel-lg hover-lift group border border-white/60 cursor-pointer"
-                onclick="openEditInterface('{{ hotel.id }}', 'INVENTORY')">
-                <div class="flex items-center justify-between mb-8">
-                    <div
-                        class="w-14 h-14 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white transition-all duration-500 shadow-inner">
-                        <i class="fas fa-bed text-xl"></i>
-                    </div>
-                    {% if 'INVENTORY' in pending_categories %}
-                    <span
-                        class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-50 text-amber-600 text-[9px] font-bold uppercase tracking-widest animate-pulse border border-amber-100">
-                        <i class="fas fa-clock"></i> Pending
-                    </span>
-                    {% else %}
-                    <span
-                        class="flex items-center gap-1.5 px-3 py-1.5 rounded-full {% if has_rooms %}bg-emerald-50 text-emerald-600 border border-emerald-100{% else %}bg-slate-50 text-slate-400 border border-slate-100{% endif %} text-[9px] font-bold uppercase tracking-widest">
-                        <i class="fas {% if has_rooms %}fa-check{% else %}fa-list{% endif %}"></i> {% if has_rooms%}Done{% else %}To-Do{% endif %}
-                    </span>
-                    {% endif %}
-                </div>
-                <h4 class="text-base font-bold text-slate-900 mb-2">Rooms & Service</h4>
-                <p class="text-xs text-slate-500 font-semibold mb-6">Add room types,guest capacity, prices per night,
-                    and amenities.
-                </p>
-                <div
-                    class="flex items-center gap-2 text-[10px] font-bold text-primary-600 uppercase tracking-widest group-hover:underline">
-                    <i class="fas fa-pen-to-square"></i> Add Rooms
-                </div>
-            </div>
-
-            <!-- Gallery -->
-            <div class="glass-panel p-8 rounded-panel-lg hover-lift group border border-white/60 cursor-pointer"
-                onclick="openEditInterface('{{ hotel.id }}', 'GALLERY')">
-                <div class="flex items-center justify-between mb-8">
-                    <div
-                        class="w-14 h-14 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center group-hover:bg-purple-600 group-hover:text-white transition-all duration-500 shadow-inner">
-                        <i class="fas fa-images text-xl"></i>
-                    </div>
-                    {% if 'GALLERY' in pending_categories %}
-                    <span
-                        class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-50 text-amber-600 text-[9px] font-bold uppercase tracking-widest animate-pulse border border-amber-100">
-                        <i class="fas fa-clock"></i> Pending
-                    </span>
-                    {% else %}
-                    <span
-                        class="flex items-center gap-1.5 px-3 py-1.5 rounded-full {% if image_count >= 5 %}bg-emerald-50 text-emerald-600 border border-emerald-100{% else %}bg-slate-50 text-slate-400 border border-slate-100{% endif %} text-[9px] font-bold uppercase tracking-widest">
-                        <i class="fas {% if image_count >= 5 %}fa-check{% else %}fa-image{% endif %}"></i> {% if image_count >= 5 %}Done{% else %}{{ image_count }}/5 Shots{% endif %}
-                    </span>
-                    {% endif %}
-                </div>
-                <h4 class="text-base font-bold text-slate-900 mb-2">verification</h4>
-                <p class="text-xs text-slate-500 font-semibold mb-6">aadhar/pan cards and Gstcertificate/hotel
-                    Registration certi details of the hotel owner and the hotel license details.
-                </p>
-                <div
-                    class="flex items-center gap-2 text-[10px] font-bold text-primary-600 uppercase tracking-widest group-hover:underline">
-                    <i class="fas fa-camera"></i> Manage Photos
-                </div>
-            </div>
-
-
-            {% if progress == 100 and hotel.status == 'PENDING' %}
+            {% else %}
             <div
-                class="mt-20 p-10 bg-primary-950/5 rounded-panel-lg border border-primary-900/10 text-center relative overflow-hidden group">
-                <div
-                    class="absolute -top-10 -right-10 w-40 h-40 bg-primary-600/5 rounded-full blur-3xl group-hover:bg-primary-600/10 transition-all duration-700">
+                class="h-full premium-glass rounded-[3rem] p-10 border border-white/60 shadow-2xl shadow-slate-200/50 flex flex-col justify-between">
+                <div class="space-y-6">
+                    <div
+                        class="w-14 h-14 rounded-2xl bg-slate-50 text-slate-400 flex items-center justify-center text-xl shadow-inner">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <h4 class="text-xl font-display font-bold text-slate-800">Get More Bookings</h4>
+                    <p class="text-xs font-semibold text-slate-400 leading-relaxed uppercase tracking-widest">Finish
+                        your setup to start receiving bookings and increasing your revenue.</p>
                 </div>
-                <div
-                    class="w-24 h-24 rounded-full bg-white border border-slate-100 flex items-center justify-center text-primary-600 mx-auto mb-8 shadow-2xl shadow-primary-900/10 transition-transform duration-700 group-hover:scale-110">
-                    <i class="fas fa-check-double text-4xl"></i>
-                </div>
-                <h3 class="text-2xl font-display font-bold text-slate-900 tracking-tight">Registration Submitted</h3>
-                <p class="text-sm font-semibold text-slate-500 mt-3 max-w-sm mx-auto leading-relaxed">Your details have
-                    been
-                    submitted for review. We are currently checking everything and will get back to you soon.</p>
-                <div
-                    class="flex items-center justify-center gap-2 mt-8 text-[10px] font-bold text-primary-600 uppercase tracking-widest">
-                    <span class="w-1.5 h-1.5 rounded-full bg-primary-600 animate-ping"></span> Review in Progress
+                <div class="pt-8">
+                    <a href="{% url 'hotels:hotelregister' %}"
+                        class="inline-flex items-center gap-2 text-[10px] font-bold text-primary-600 uppercase tracking-[0.2em] group hover:translate-x-1 transition-all">
+                        CONTINUE SETUP <i class="fas fa-arrow-right"></i>
+                    </a>
                 </div>
             </div>
             {% endif %}
         </div>
     </div>
 
-    <!-- ─── Edit Interface Modal ─── -->
-    <div id="editModalOverlay"
-        class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden opacity-0 transition-opacity duration-300 pointer-events-none"
-        onclick="handleOverlayClick(event)">
-        <div id="editModalBox"
-            class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl bg-white rounded-panel-lg shadow-2xl shadow-slate-950/20 overflow-hidden transform scale-95 transition-all duration-300">
-            <div class="p-8 border-b border-slate-100 flex items-center justify-between bg-white/50">
-                <div>
-                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1 block">Helpful Tip:
-                        Complete all sections</span>
-                    <h3 id="modalTitle" class="text-xl font-display font-bold text-slate-900 tracking-tight">Update
-                        Information</h3>
-                </div>
-                <button onclick="closeModal()"
-                    class="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-500 hover:text-red-500 hover:border-red-500 transition-all">
-                    <i class="fas fa-times text-lg"></i>
-                </button>
+    <!-- ══ Hotel Details Panel ══ -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+
+        <!-- Left: Property Identity Card -->
+        <div
+            class="lg:col-span-5 premium-glass rounded-[2.5rem] p-10 border border-white/60 shadow-xl shadow-slate-200/40 relative overflow-hidden">
+            <div
+                class="absolute -top-12 -right-12 w-48 h-48 bg-primary-600/5 rounded-full blur-3xl pointer-events-none">
             </div>
-            <div class="p-10 max-h-[70vh] overflow-y-auto" id="modalBody">
-                <div class="flex flex-col items-center justify-center py-20 text-slate-400">
-                    <i class="fas fa-spinner fa-spin text-4xl mb-6 text-primary-600/50"></i>
-                    <p class="text-[10px] font-bold uppercase tracking-widest">Loading details...</p>
+            <div class="relative z-10">
+                <!-- Header -->
+                <div class="flex items-start justify-between mb-8">
+                    <div>
+                        <span class="text-[9px] font-black text-slate-400 uppercase tracking-[0.3em]">Property
+                            Identity</span>
+                        <h3 class="text-2xl font-display font-bold text-slate-900 tracking-tight mt-1">{{ hotel.name }}
+                        </h3>
+                        <span
+                            class="inline-flex items-center gap-1.5 mt-2 text-[10px] font-bold text-primary-600 uppercase tracking-widest">
+                            <i class="fas fa-tags text-[8px]"></i> {{ hotel.get_hotel_type_display|default:hotel.hotel_type}}
+                        </span>
+                    </div>
+                    <div class="flex items-center gap-1 pt-1">
+                        {% for i in "12345" %}
+                        <i
+                            class="fas fa-star text-xs {% if forloop.counter <= hotel.star_rating %}text-amber-400{% else %}text-slate-200{% endif %}"></i>
+                        {% endfor %}
+                    </div>
                 </div>
-            </div>
-            <div class="p-8 bg-slate-50/50 border-t border-slate-100 flex items-center justify-end gap-4"
-                id="modalFooter">
-                <button onclick="closeModal()"
-                    class="px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-500 hover:text-slate-900 transition-all">
-                    Cancel
-                </button>
-                <button type="button"
-                        onclick="submitEditRequest()"
-                        id="submitBtn"
-                        class="px-8 py-4 bg-primary-600 text-white text-[10px] font-bold uppercase tracking-widest rounded-2xl hover:bg-primary-700 active:scale-95 transition-all shadow-lg shadow-primary-600/20 disabled:opacity-50 disabled:cursor-not-allowed">
-                    Save Changes
-                </button>
+
+                <!-- Info Grid -->
+                <div class="space-y-4">
+                    <div class="flex items-start gap-4 p-4 rounded-2xl bg-slate-50/60">
+                        <div
+                            class="w-8 h-8 rounded-xl bg-primary-100 text-primary-600 flex items-center justify-center shrink-0 text-sm">
+                            <i class="fas fa-location-dot"></i></div>
+                        <div>
+                            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Address</p>
+                            <p class="text-sm font-semibold text-slate-800 leading-relaxed">{{ hotel.address }}, {{hotel.city }}, {{ hotel.state }} — {{ hotel.pincode }}</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="flex items-center gap-3 p-4 rounded-2xl bg-slate-50/60">
+                            <div
+                                class="w-8 h-8 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center shrink-0 text-sm">
+                                <i class="fas fa-phone"></i></div>
+                            <div>
+                                <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Phone
+                                </p>
+                                <p class="text-xs font-bold text-slate-800">{{ hotel.contact_number|default:"—" }}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3 p-4 rounded-2xl bg-slate-50/60">
+                            <div
+                                class="w-8 h-8 rounded-xl bg-cyan-100 text-cyan-600 flex items-center justify-center shrink-0 text-sm">
+                                <i class="fas fa-globe"></i></div>
+                            <div>
+                                <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Website
+                                </p>
+                                <p class="text-xs font-bold text-slate-800 truncate">{{ hotel.website|default:"—" }}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3 p-4 rounded-2xl bg-slate-50/60">
+                            <div
+                                class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 text-sm">
+                                <i class="fas fa-arrow-right-to-bracket"></i></div>
+                            <div>
+                                <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Check-In
+                                </p>
+                                <p class="text-xs font-bold text-slate-800">{{ hotel.check_in_time|default:"—" }}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3 p-4 rounded-2xl bg-slate-50/60">
+                            <div
+                                class="w-8 h-8 rounded-xl bg-rose-100 text-rose-500 flex items-center justify-center shrink-0 text-sm">
+                                <i class="fas fa-arrow-right-from-bracket"></i></div>
+                            <div>
+                                <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">
+                                    Check-Out</p>
+                                <p class="text-xs font-bold text-slate-800">{{ hotel.check_out_time|default:"—" }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CTA -->
+                <a href="{% url 'hotels:edit_hotel' hotel.id %}"
+                    class="mt-8 w-full flex items-center justify-center gap-3 py-4 bg-slate-900 hover:bg-primary-600 text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-2xl transition-all duration-300 shadow-xl shadow-slate-900/10 active:scale-95">
+                    <i class="fas fa-pen-to-square"></i> Edit Property Details
+                </a>
             </div>
         </div>
-    </div>
-    {% endblock %}
 
-    {% block extra_scripts %}
-    <script src="{% static 'hotels/js/dashboard_onboarding.js' %}"></script>
-    <script>
+        <!-- Right: Stats + Rooms + Media -->
+        <div class="lg:col-span-7 space-y-8">
 
-        /* ------------------------------
-           Modal Open / Close Animation
-        --------------------------------*/
-
-        function openModal() {
-            const overlay = document.getElementById('editModalOverlay');
-            const box = document.getElementById('editModalBox');
-
-            overlay.classList.remove('hidden', 'pointer-events-none');
-
-            setTimeout(() => {
-                overlay.classList.add('opacity-100');
-                box.classList.remove('scale-95');
-                box.classList.add('scale-100');
-            }, 10);
-        }
-
-        function closeModal() {
-            const overlay = document.getElementById('editModalOverlay');
-            const box = document.getElementById('editModalBox');
-
-            overlay.classList.remove('opacity-100');
-            box.classList.remove('scale-100');
-            box.classList.add('scale-95');
-
-            setTimeout(() => {
-                overlay.classList.add('hidden', 'pointer-events-none');
-                document.getElementById("modalBody").innerHTML = "";
-            }, 300);
-        }
-
-        function handleOverlayClick(e) {
-            if (e.target === document.getElementById('editModalOverlay')) {
-                closeModal();
-            }
-        }
-
-
-        /* ------------------------------
-           LOAD EDIT FORM (AJAX GET)
-        --------------------------------*/
-
-        function openEditInterface(hotelId, category) {
-
-            openModal();
-
-            const editUrl = `/hotel/edit-detail/${hotelId}/${category}/`;
-
-            const modalBody = document.getElementById("modalBody");
-
-            modalBody.innerHTML = `
-            <div class="flex flex-col items-center justify-center py-20 text-slate-400">
-                <i class="fas fa-spinner fa-spin text-4xl mb-6 text-primary-600/50"></i>
-                <p class="text-[10px] font-bold uppercase tracking-widest">Loading details...</p>
+            <!-- Quick Stats Row -->
+            <div class="grid grid-cols-3 gap-6">
+                <div class="premium-glass rounded-2xl p-6 border border-white/60 text-center shadow-lg">
+                    <span class="text-3xl font-display font-bold text-slate-900">{{ rooms|length }}</span>
+                    <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Room Types</p>
+                </div>
+                <div class="premium-glass rounded-2xl p-6 border border-white/60 text-center shadow-lg">
+                    <span class="text-3xl font-display font-bold text-slate-900">{{ image_count }}</span>
+                    <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Photos</p>
+                </div>
+                <div class="premium-glass rounded-2xl p-6 border border-white/60 text-center shadow-lg">
+                    <span
+                        class="text-[11px] font-black uppercase tracking-wider {% if hotel.status == 'APPROVED' %}text-emerald-600{% elif hotel.status == 'PENDING' %}text-amber-500{% else %}text-rose-500{% endif %}">
+                        {{ hotel.status }}
+                    </span>
+                    <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Status</p>
+                </div>
             </div>
-        `;
 
-            fetch(editUrl)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error("Failed to load form");
-                    }
-                    return response.text();
-                })
-                .then(html => {
-
-                    modalBody.innerHTML = html;
-
-                    // Store URL for submit
-                    modalBody.dataset.editUrl = editUrl;
-
-                })
-                .catch(error => {
-                    console.error(error);
-                    modalBody.innerHTML = `
-                    <div class="text-center py-20 text-red-500">
-                        <p class="font-bold uppercase text-xs">Error Loading Form</p>
+            <!-- Room Categories -->
+            <div class="premium-glass rounded-[2rem] p-8 border border-white/60 shadow-xl shadow-slate-200/40">
+                <div class="flex items-center justify-between mb-6">
+                    <span class="text-[9px] font-black text-slate-400 uppercase tracking-[0.3em]"><i
+                            class="fas fa-bed mr-2"></i>Room Inventory</span>
+                    <a href="{% url 'hotels:edit_hotel' hotel.id %}#inventory"
+                        class="text-[9px] font-bold text-primary-600 uppercase tracking-widest hover:underline">Manage
+                        →</a>
+                </div>
+                {% if rooms %}
+                <div class="space-y-3">
+                    {% for room in rooms %}
+                    <div
+                        class="flex items-center justify-between p-4 rounded-2xl bg-slate-50/60 group hover:bg-slate-100/80 transition-colors">
+                        <div class="flex items-center gap-4">
+                            <div
+                                class="w-9 h-9 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-sm shrink-0">
+                                <i class="fas fa-door-open"></i></div>
+                            <div>
+                                <p class="text-sm font-bold text-slate-800">{{ room.name }}</p>
+                                <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">{{
+                                    room.room_class }} · Max {{ room.max_guests }} guests</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-sm font-bold text-slate-900">₹{{ room.base_price }}</p>
+                            <p class="text-[10px] font-semibold text-slate-400">{{ room.inventory_count }} units</p>
+                        </div>
                     </div>
-                `;
-                });
-        }
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-8 text-slate-400">
+                    <i class="fas fa-bed text-3xl mb-3 opacity-30"></i>
+                    <p class="text-xs font-bold uppercase tracking-widest">No rooms added yet.</p>
+                    <a href="{% url 'hotels:add_room' hotel.id %}" class="btn btn-primary">
+                        <span class="text-[10px] font-bold text-primary-600 mt-2 inline-block uppercase tracking-widest hover:underline">Add
+                            Rooms →</span>
+                    </a>
+                </div>
+                {% endif %}
+            </div>
 
+            <!-- Photo Gallery Strip -->
+            {% if gallery %}
+            <div class="premium-glass rounded-[2rem] p-8 border border-white/60 shadow-xl shadow-slate-200/40">
+                <div class="flex items-center justify-between mb-5">
+                    <span class="text-[9px] font-black text-slate-400 uppercase tracking-[0.3em]"><i
+                            class="fas fa-images mr-2"></i>Property Gallery</span>
+                    <a href="{% url 'hotels:edit_hotel' hotel.id %}#galleryUploadZone"
+                        class="text-[9px] font-bold text-primary-600 uppercase tracking-widest hover:underline">Manage
+                        →</a>
+                </div>
+                <div class="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+                    {% for img in gallery|slice:":8" %}
+                    <img src="{{ img.image_path.url }}" alt="Property photo"
+                        class="w-24 h-20 rounded-2xl object-cover border border-slate-200 shrink-0 hover:scale-105 transition-transform cursor-pointer shadow-sm">
+                    {% endfor %}
+                    {% if image_count > 8 %}
+                    <div
+                        class="w-24 h-20 rounded-2xl bg-slate-100 border border-slate-200 shrink-0 flex items-center justify-center text-slate-400 font-bold text-sm">
+                        +{{ image_count|add:"-8" }}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
 
-        /* ------------------------------
-           SUBMIT EDIT REQUEST (AJAX POST)
-        --------------------------------*/
+{% endblock %}
 
-        function submitEditRequest() {
-
-            const form = document.getElementById("editForm");
-
-            if (!form) {
-                alert("Form not loaded.");
-                return;
-            }
-
-            const submitBtn = document.getElementById("submitBtn");
-            submitBtn.disabled = true;
-            submitBtn.innerText = "Saving...";
-
-            const formData = new FormData(form);
-            const editUrl = document.getElementById("modalBody").dataset.editUrl;
-
-            fetch(editUrl, {
-                method: "POST",
-                body: formData,
-                headers: {
-                    "X-CSRFToken": form.querySelector('[name=csrfmiddlewaretoken]').value
-                }
-            })
-                .then(response => response.json())
-                .then(data => {
-
-                    submitBtn.disabled = false;
-                    submitBtn.innerText = "Save Changes";
-
-                    if (data.success) {
-
-                        closeModal();
-
-                        setTimeout(() => {
-                            location.reload();
-                        }, 400);
-
-                    } else {
-
-                        if (data.message) {
-                            alert(data.message);
-                        }
-
-                        if (data.errors) {
-                            displayFormErrors(data.errors);
-                        }
-                    }
-                })
-                .catch(error => {
-                    console.error(error);
-                    submitBtn.disabled = false;
-                    submitBtn.innerText = "Save Changes";
-                    alert("Something went wrong.");
-                });
-        }
-
-
-        /* ------------------------------
-           SHOW FIELD ERRORS UNDER INPUTS
-        --------------------------------*/
-
-        function displayFormErrors(errors) {
-
-            Object.keys(errors).forEach(field => {
-
-                const input = document.querySelector(`[name="${field}"]`);
-
-                if (input) {
-
-                    // Remove old error if exists
-                    const oldError = input.parentElement.querySelector(".field-error");
-                    if (oldError) oldError.remove();
-
-                    const errorDiv = document.createElement("p");
-                    errorDiv.className = "field-error text-xs text-red-500 mt-1 font-semibold";
-                    errorDiv.innerText = errors[field][0];
-
-                    input.parentElement.appendChild(errorDiv);
-                }
-            });
-        }
-
-    </script>
-    {% endblock %}
+{% block extra_scripts %}
+<script src="{% static 'hotels/js/dashboard.js' %}" defer></script>
+{% endblock %}

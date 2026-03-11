@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 from django.core.validators import MinValueValidator
+import datetime
 
 class Hotel(models.Model):
     STATUS_CHOICES = [
@@ -51,10 +52,11 @@ class Hotel(models.Model):
     services = models.JSONField(default=list, blank=True)
     description = models.TextField(blank=True)
     total_rooms = models.PositiveIntegerField(help_text="Total unit count of the property", default=0, blank=True)
-
+    onboarding_step = models.IntegerField(default=1)
+    
     # --- Operational Information (Step 2C) ---
-    check_in = models.TimeField(default="14:00")
-    check_out = models.TimeField(default="11:00")
+    check_in = models.TimeField(default=datetime.time(14,0))
+    check_out = models.TimeField(default=datetime.time(11,0))
     cancellation_policy = models.TextField(default="Standard Rules Apply")
 
     # --- Compliance Documents (Files & Numbers) ---
@@ -118,6 +120,13 @@ class Hotel(models.Model):
             return first.image_path
         return None
 
+    @property
+    def can_delete_directly(self):
+        """
+        Unverified properties can be deleted instantly.
+        """
+        return self.status in ["INCOMPLETE", "PENDING", "REJECTED"]
+    
     def __str__(self):
         return f"{self.hotel_name} ({self.city})"
 
@@ -141,23 +150,28 @@ class RoomType(models.Model):
     ]
 
     hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE, related_name='rooms')
-    room_category_name = models.CharField(max_length=100, help_text="e.g. Deluxe Garden View", null=True, blank=True)
-    room_type = models.CharField(max_length=20, choices=ROOM_CATEGORIES)
+    name = models.CharField(max_length=150, help_text="Example: Deluxe Garden View")
+    room_type = models.CharField(max_length=20, choices=ROOM_CATEGORIES )
+    description = models.TextField(blank=True)
     price_per_night = models.PositiveIntegerField(default=0, verbose_name="Price per Night")
     max_guest = models.PositiveIntegerField(default=2, verbose_name="Max Guests")
     total_rooms = models.PositiveIntegerField(help_text="Inventory count for this specific type")
-    room_image = models.ImageField(upload_to='room_categories/', null=True, blank=True)
-    amenities = models.JSONField(default=list, blank=True)
+    amenities = models.JSONField( default=list, blank=True )
+    room_image = models.ImageField(upload_to='room_categories/', null=True, blank=True )
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.room_type} at {self.hotel.hotel_name}"
-
+        return f"{self.name} - {self.hotel.hotel_name}"
+    
 class HotelImage(models.Model):
     hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE, related_name='images')
     image_path = models.ImageField(upload_to='property_gallery/')
     is_primary = models.BooleanField(default=False)
     uploaded_at = models.DateTimeField(auto_now_add=True)
-
+    
+    class Meta:
+        verbose_name = "Hotel Image"
+        verbose_name_plural = "Hotel Images"
 
 class Offer(models.Model):
     OFFER_TYPES = [
@@ -188,7 +202,7 @@ class Offer(models.Model):
         ('ROOM', 'Specific Rooms'),
     ]
 
-    hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE, related_name='offers')
+    hotel = models.ForeignKey(Hotel,on_delete=models.CASCADE,related_name='offers')
     name = models.CharField(max_length=100, verbose_name="Offer Title")
     offer_type = models.CharField(max_length=20, choices=OFFER_TYPES, default='PERCENTAGE')
     
@@ -304,3 +318,12 @@ class LocationHistory(models.Model):
 
     def __str__(self):
         return f"{self.location_name or self.city or 'Unknown Area'} - {self.user.email}"
+
+class RoomPhoto(models.Model):
+    room = models.ForeignKey(
+        RoomType,
+        on_delete=models.CASCADE,
+        related_name='photos'
+    )
+    media_file = models.FileField(upload_to='gallery/rooms/')
+    created_at = models.DateTimeField(auto_now_add=True)

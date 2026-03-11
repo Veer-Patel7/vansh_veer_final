@@ -1,0 +1,506 @@
+/* 
+ * edit_hotel.css - Master Property Editor Styles
+ * Concept: Dashboard-integrated Professional Luxury
+ */
+
+.tab-btn {
+    padding: 14px 28px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: #64748b;
+    background: white;
+    border: 1px solid #e2e8f0;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    white-space: nowrap;
+}
+
+.tab-btn i {
+    font-size: 14px;
+    opacity: 0.6;
+}
+
+.tab-btn:hover {
+    border-color: #2563eb;
+    color: #2563eb;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.05);
+}
+
+.tab-btn.active {
+    background: #020617;
+    color: white;
+    border-color: #020617;
+    box-shadow: 0 15px 30px -5px rgba(2, 6, 23, 0.2);
+}
+
+.tab-btn.active i {
+    opacity: 1;
+    color: #00cef5;
+}
+
+.tab-content {
+    display: none;
+    animation: fadeIn 0.6s var(--luxury-ease) forwards;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.editor-card {
+    background: white;
+    border-radius: 40px;
+    padding: 60px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 30px 60px -12px rgba(2, 6, 23, 0.05);
+}
+
+.section-title {
+    font-size: 24px;
+    font-weight: 800;
+    color: #020617;
+    margin-bottom: 12px;
+    letter-spacing: -0.03em;
+}
+
+.section-subtitle {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: #94a3b8;
+    margin-bottom: 40px;
+    display: block;
+}
+
+/* Form Styles */
+.input-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 32px;
+}
+
+.input-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.input-wrap label {
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #334155;
+    padding-left: 4px;
+}
+
+
+/* Custom Select Architecture */
+.elite-select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 24px center;
+    background-size: 16px;
+}
+
+/* Map Preview */
+#edit-map {
+    height: 450px;
+    border-radius: 32px;
+    border: 1px solid #e2e8f0;
+    z-index: 10;
+}
+
+/* Room Category Elite Cards */
+.room-editor-card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 32px;
+    padding: 40px;
+    position: relative;
+    transition: all 0.4s ease;
+}
+
+.room-editor-card:hover {
+    border-color: #cbd5e1;
+    background: white;
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.05);
+}
+
+.remove-room-btn {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    background: white;
+    border: 1px solid #fee2e2;
+    color: #ef4444;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.remove-room-btn:hover {
+    background: #ef4444;
+    color: white;
+    border-color: #ef4444;
+    transform: rotate(90deg);
+}
+
+/* Gallery and Upload Styles */
+.upload-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.media-card {
+    aspect-ratio: 4/3;
+    border-radius: 24px;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid #e2e8f0;
+    background: #f1f5f9;
+}
+
+.media-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.media-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(2, 6, 23, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.media-card:hover .media-overlay {
+    opacity: 1;
+}
+
+.media-delete-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #ef4444;
+    color: white;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: scale(0.8);
+    transition: transform 0.3s;
+}
+
+.media-card:hover .media-delete-btn {
+    transform: scale(1);
+}
+
+.upload-trigger {
+    aspect-ratio: 4/3;
+    border-radius: 24px;
+    border: 2px dashed #cbd5e1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #94a3b8;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.upload-trigger:hover {
+    border-color: #2563eb;
+    color: #2563eb;
+    background: rgba(37, 99, 235, 0.02);
+}
+
+/* Custom Scrollbar for Dashboard View */
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+
+/* ------------------- */
+/* Premium Single Page Architecture */
+.master-editor-container {
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        gap: 40px;
+        align-items: start;
+        padding-bottom: 150px;
+    }
+
+    /* Fixed Side Navigation */
+    .editor-sidebar {
+        position: sticky;
+        top: 40px;
+        background: white;
+        border-radius: 32px;
+        border: 1px solid #e2e8f0;
+        padding: 30px;
+        box-shadow: 0 20px 40px -10px rgba(2, 6, 23, 0.05);
+    }
+
+    .sidebar-nav-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 20px;
+        border-radius: 16px;
+        color: #64748b;
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        cursor: pointer;
+        border: 1px solid transparent;
+    }
+
+    .sidebar-nav-item i {
+        font-size: 14px;
+        width: 20px;
+        text-align: center;
+    }
+
+    .sidebar-nav-item:hover {
+        background: #f8fafc;
+        color: #020617;
+    }
+
+    .sidebar-nav-item.active {
+        background: #020617;
+        color: white;
+        box-shadow: 0 10px 20px rgba(2, 6, 23, 0.15);
+    }
+
+    /* Form Section Architecture */
+    .editor-section {
+        background: white;
+        border-radius: 40px;
+        padding: 60px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 20px 40px -10px rgba(2, 6, 23, 0.04);
+        margin-bottom: 40px;
+        scroll-margin-top: 40px;
+    }
+
+    .section-header {
+        margin-bottom: 40px;
+        border-left: 4px solid #00cef5;
+        padding-left: 24px;
+    }
+
+    .section-desc {
+        font-size: 13px;
+        color: #64748b;
+        font-weight: 500;
+    }
+
+    .input-group {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-bottom: 30px;
+    }
+
+    .input-group label {
+        font-size: 11px;
+        font-weight: 800;
+        color: #334155;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .input-group label i {
+        color: #00cef5;
+    }
+
+    .input-field {
+        width: 100%;
+        padding: 18px 24px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #020617;
+        transition: all 0.3s;
+    }
+
+    .input-field:focus {
+        outline: none;
+        border-color: #020617;
+        background: white;
+        box-shadow: 0 0 0 4px rgba(2, 6, 23, 0.05);
+    }
+
+    .textarea-field {
+        min-height: 140px;
+        resize: vertical;
+    }
+    /* Grid Layouts */
+    .grid-12 {
+        display: grid;
+        grid-template-columns: repeat(12, 1fr);
+        gap: 30px;
+    }
+
+    /* Room Category Elite Cards */
+    .room-card {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 32px;
+        padding: 40px;
+        margin-bottom: 30px;
+        position: relative;
+    }
+
+    .room-badge {
+        position: absolute;
+        top: -12px;
+        left: 40px;
+        background: #020617;
+        color: white;
+        padding: 6px 20px;
+        border-radius: 100px;
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+    }
+
+    /* Sticky Sync Bar */
+    .sync-bar {
+        position: fixed;
+        bottom: 30px;
+        left: calc(50% + 140px);
+        transform: translateX(-50%);
+        background: rgba(2, 6, 23, 0.95);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 16px 50px;
+        border-radius: 100px;
+        display: flex;
+        align-items: center;
+        gap: 40px;
+        box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+    }
+
+    /* Gallery */
+    .gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 20px;
+    }
+
+    .media-item {
+        aspect-ratio: 4/3;
+        border-radius: 20px;
+        overflow: hidden;
+        position: relative;
+        border: 1px solid #e2e8f0;
+    }
+
+    .media-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .media-del {
+        position: absolute;
+        inset: 0;
+        background: rgba(2, 6, 23, 0.6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: 0.3s;
+        cursor: pointer;
+    }
+
+    .media-item:hover .media-del {
+        opacity: 1;
+    }
+
+    .pill-box {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .pill-item {
+        padding: 10px 20px;
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 100px;
+        font-size: 11px;
+        font-weight: 700;
+        color: #64748b;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .pill-item.active {
+        background: #020617;
+        color: white;
+        border-color: #020617;
+    }
+
+    /* Utilities */
+    .col-12 {
+        grid-column: span 12;
+    }
+
+    .col-8 {
+        grid-column: span 8;
+    }
+
+    .col-6 {
+        grid-column: span 6;
+    }
+
+    .col-4 {
+        grid-column: span 4;
+    }

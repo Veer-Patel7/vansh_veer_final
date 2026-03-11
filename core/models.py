@@ -39,7 +39,7 @@ class Booking(models.Model):
     hotel = models.ForeignKey('hotels.Hotel', on_delete=models.CASCADE, related_name='hotel_bookings', null=True, blank=True)
     
     # Offer Integration
-    applied_offer = models.ForeignKey('hotels.Offer', on_delete=models.SET_NULL, null=True, blank=True)
+    applied_offer = models.ForeignKey('hotels.Offer',on_delete=models.SET_NULL,null=True, blank=True,related_name="core_bookings_with_offer")
     discount_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     base_price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0)

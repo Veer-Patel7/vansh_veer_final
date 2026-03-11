@@ -4,7 +4,8 @@ from . import views
 app_name = "core"
 
 urlpatterns=[
-    path('hotelpro/',views.landing,name='landing'),
+    
+    path('',views.landing,name='landing'),
     path('features/', views.features, name='features'),
     path('how-it-works/', views.how_it_works, name='how_it_works'),
     path('reviews/', views.reviews_view, name='reviews'),

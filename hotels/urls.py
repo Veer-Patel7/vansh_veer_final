@@ -13,15 +13,30 @@ app_name = 'hotels'
 urlpatterns = [
     # REST API endpoints
     path('api/', include(router.urls)),
+    
+    path('',include("core.urls")),
 
     # Template-based views
     path('register/', views.add_hotel, name='hotelregister'),
     path('dashboard/<int:hotel_id>/', views.hotel_dashboard, name='hotel_dashboard'),
+    path('dashboard/<int:hotel_id>/', views.hotel_dashboard, name='dashboard_specific'),
     path('rooms/add/<int:hotel_id>/', views.create_room_type, name='create_room_type'),
     path('policy/setup/<int:hotel_id>/', views.setup_policy, name='setup_policy'),
     path('gallery/upload/<int:hotel_id>/', views.upload_images, name='upload_images'),
     path('owner/dashboard/', views.admin_dashboard_pro, name='admin_dashboard_pro'),
     path('owner/my-hotels/', views.my_hotels, name='my_hotels'),
+    path('hotels/delete/<int:hotel_id>/', views.delete_hotel, name='delete_hotel'),
+    path('hotels/edit/<int:hotel_id>/', views.edit_hotel, name='edit_hotel'),
+    
+    #rooms
+    path('rooms/add', views.add_room, name='new_add_room'),
+    path('rooms/<int:hotel_id>/add/', views.add_room, name='add_room'),
+    path('rooms/<int:hotel_id>/edit/', views.add_room, name='edit_room'),
+    path('rooms/', views.manage_rooms, name='manage_rooms'),
+    path('rooms/<int:hotel_id>/', views.manage_rooms, name='manage_rooms_hotel'),
+    path('rooms/delete/<int:room_id>/', views.delete_room, name='delete_room'),
+    
+    
     # Offers Workflow
     path('owner/offers/', views.offers_view, name='offers'),
     path('offers/create/', views.create_offer, name='create_offer'),
@@ -38,15 +53,19 @@ urlpatterns = [
     # Property Edit Workflow
     path('edit-detail/<int:hotel_id>/<str:category>/', views.property_edit_detail, name='property_edit_detail'),
     path('edit-submit/<int:hotel_id>/<str:category>/', views.submit_edit_request, name='submit_edit_request'),
+    
 
     # Sidebar Views
     path('owner/bookings/', views.bookings_view, name='bookings'),
     path('owner/insights/', views.insights_view, name='insights'),
     path('owner/reviews/', views.reviews_view, name='reviews'),
     path('owner/settings/', views.settings_view, name='settings'),
+    path('api/bookings/latest/', views.api_latest_booking, name='api_latest_booking'),
     
     # Location History APIs
     path('api/location-history/', views.get_location_history, name='get_location_history'),
     path('api/location-history/add/', views.add_location_history, name='add_location_history'),
     path('api/location-history/bulk/', views.bulk_action_location_history, name='bulk_action_location_history'),
+    
+    
 ]

@@ -516,3 +516,19 @@ align-items:center;
 justify-content:center;
 font-weight:700;
 }
+
+.user-card-link{
+text-decoration:none;
+display:block;
+}
+
+.user-card{
+background:var(--surface);
+border:1px solid var(--border);
+transition:all 0.2s ease;
+cursor:pointer;
+}
+
+.user-card:hover{
+background:rgba(255,255,255,0.05);
+}

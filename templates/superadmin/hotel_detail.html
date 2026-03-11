@@ -6,20 +6,35 @@
 
     <!-- ===== Page Header ===== -->
     <div class="page-header"
-        style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 1.5rem;">
+        style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:2rem;border-bottom:1px solid var(--border);padding-bottom:1.5rem;">
+
         <div>
-            <a href="/super/hotels/" class="btn btn-sm btn-outline-secondary mb-3">
-                <i class="fas fa-arrow-left mr-1"></i> Back to Hotels
-            </a>
+
+            <!-- Smart Back Button -->
+            <button onclick="smartBack()" class="btn btn-sm btn-outline-secondary mb-3">
+                <i class="fas fa-arrow-left mr-1"></i> Back
+            </button>
+
             <h1 class="sa-page-title m-0">{{ hotel.hotel_name }}</h1>
-            <p class="mt-1 text-muted">{{ hotel.city }}, {{ hotel.state }} &nbsp;·&nbsp; ID #{{ hotel.id }}</p>
+
+            <p class="mt-1 text-muted">
+                {{ hotel.city }}, {{ hotel.state }} &nbsp;·&nbsp; ID #{{ hotel.id }}
+            </p>
+
         </div>
+
         <div class="text-right">
+
             <span class="status-badge status-{{ hotel.status }} mb-2 d-inline-block">
                 {{ hotel.get_status_display }}
             </span>
-            <div class="text-low small">Submitted: {{ hotel.submitted_at|date:"M d, Y H:i"|default:"Recently" }}</div>
+
+            <div class="text-low small">
+                Submitted: {{ hotel.submitted_at|date:"M d, Y H:i"|default:"Recently" }}
+            </div>
+
         </div>
+
     </div>
 
     <!-- ===== Previous Remarks (If any) ===== -->
@@ -365,6 +380,24 @@
     window.addEventListener('click', (e) => {
         if (e.target === modal) modal.style.display = 'none';
     });
+</script>
+
+<script>
+function smartBack(){
+
+    const ref = document.referrer;
+
+    if(ref.includes("/super/dashboard")){
+        window.location.href = "/super/dashboard/";
+    }
+    else if(ref.includes("/super/hotels")){
+        window.location.href = "/super/hotels/";
+    }
+    else{
+        window.history.back();
+    }
+
+}
 </script>
 
 {% endblock %}

@@ -1,0 +1,174 @@
+{% extends 'hotels/dashboard_base.html' %}
+{% load static %}
+
+{% block title %}Manage Rooms | {{ hotel.name }} | HotelPro{% endblock %}
+
+{% block page_title %}Room Inventory{% endblock %}
+{% block page_subtitle %}Add, edit, or remove room categories and set pricing.{% endblock %}
+
+{% block dashboard_content %}
+<div class="space-y-12 animate-in fade-in slide-in-from-bottom-8 duration-1000">
+
+    <!-- Premium Analytics Header -->
+    <div
+        class="flex justify-between items-center bg-white/40 p-10 rounded-[2.5rem] border border-white/60 shadow-xl shadow-slate-200/30">
+        <div class="flex items-center gap-12">
+            <div class="flex flex-col">
+                <div class="flex items-baseline gap-2">
+                    <span class="text-5xl font-display font-black text-slate-900 tracking-tighter">{{rooms.count}}</span>
+                    <div class="w-2 h-2 rounded-full bg-primary-600 animate-pulse"></div>
+                </div>
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2">Total
+                    Categories</span>
+            </div>
+            <div class="h-14 w-px bg-slate-200"></div>
+            <div class="flex flex-col">
+                <span
+                    class="text-5xl font-display font-black text-primary-600 tracking-tighter">{{hotel.rooms.all|length|default:"0"}}</span>
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2">Live Inventory</span>
+            </div>
+        </div>
+
+        <a href="{% url 'hotels:new_add_room' %}"
+            class="btn-premium px-10 py-5 rounded-2xl text-[11px] font-black tracking-[0.25em] flex items-center gap-4 shadow-2xl shadow-primary-600/20 hover:scale-105 active:scale-95 transition-all">
+            <i class="fas fa-plus-circle text-lg"></i> ADD NEW ROOM
+        </a>
+    </div>
+
+    <!-- Inventory Matrix -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+        {% for room in rooms %}
+        <div class="group relative">
+            <!-- Strategic Glow -->
+            <div
+                class="absolute inset-0 bg-gradient-to-br from-primary-600/5 to-emerald-500/5 rounded-[3rem] blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-700">
+            </div>
+
+            <div
+                class="premium-glass rounded-[3rem] p-10 border border-white/60 shadow-xl shadow-slate-200/40 relative z-10 transition-all duration-700 hover:-translate-y-2 hover:shadow-2xl">
+                <div class="flex gap-10">
+                    <!-- High-Resolution Visual Holder -->
+                    <div
+                        class="w-40 h-40 rounded-[2.5rem] overflow-hidden bg-slate-100 flex-shrink-0 relative shadow-inner">
+                        {% with primary=room.photos.first %}
+                        {% if primary %}
+                        <img src="{{ primary.media_file.url }}"
+                            class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000">
+                        {% else %}
+                        <div class="w-full h-full flex flex-col items-center justify-center text-slate-200 gap-3">
+                            <i class="fas fa-camera-retro text-4xl"></i>
+                            <span class="text-[8px] font-bold uppercase tracking-[0.2em]">Add Media</span>
+                        </div>
+                        {% endif %}
+                        {% endwith %}
+                        <div
+                            class="absolute inset-x-0 bottom-0 p-4 flex justify-between items-end bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <span class="text-[8px] font-black text-white uppercase tracking-widest">{{ room.room_class}}</span>
+                            <div class="flex gap-2">
+                                <div
+                                    class="w-6 h-6 rounded-lg bg-white/20 backdrop-blur-md flex items-center justify-center text-white">
+                                    <i class="fas fa-images text-[10px]"></i>
+                                </div>
+                                <div
+                                    class="w-6 h-6 rounded-lg bg-white/20 backdrop-blur-md flex items-center justify-center text-white">
+                                    <i class="fas fa-play text-[8px]"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Room Meta Intelligence -->
+                    <div class="flex-grow flex flex-col">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h3
+                                    class="text-2xl font-display font-black text-slate-900 group-hover:text-primary-600 transition-colors tracking-tight">
+                                    {{ room.name }}</h3>
+                                <div class="flex items-center gap-3 mt-2">
+                                    <span
+                                        class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{{room.room_class
+                                        }}</span>
+                                    <div class="w-1.5 h-1.5 rounded-full bg-slate-200"></div>
+                                    <span
+                                        class="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-1.5">
+                                        <i class="fas fa-users text-[8px]"></i> {{room.max_guests }} Guests
+                                    </span>
+                                    <div class="w-1.5 h-1.5 rounded-full bg-slate-200"></div>
+                                    <span
+                                        class="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-1.5">
+                                        <i class="fas fa-door-open text-[8px]"></i> {{room.inventory_count }} Units
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-3">
+                                <a href="{% url 'hotels:edit_room' room.id %}"
+                                    class="w-10 h-10 rounded-2xl bg-white shadow-sm flex items-center justify-center text-slate-400 hover:text-primary-600 hover:shadow-xl hover:scale-110 transition-all border border-slate-50">
+                                    <i class="fas fa-pencil-alt text-xs"></i>
+                                </a>
+                                <form action="{% url 'hotels:delete_room' room.id %}" method="POST"
+                                    class="inline delete-confirm">
+                                    {% csrf_token %}
+                                    <button type="submit"
+                                        class="w-10 h-10 rounded-2xl bg-white shadow-sm flex items-center justify-center text-slate-400 hover:text-rose-600 hover:shadow-xl hover:scale-110 transition-all border border-slate-50">
+                                        <i class="fas fa-trash-can text-xs"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <div class="mt-auto pt-6 border-t border-slate-50 flex items-center justify-between">
+                            <div class="flex flex-col">
+                                <span class="text-[9px] font-bold text-slate-300 uppercase tracking-widest mb-1">Nightly
+                                    Basis</span>
+                                <span class="text-3xl font-display font-black text-emerald-600">₹{{room.base_price}}</span>
+                            </div>
+
+                            <div class="flex -space-x-2">
+                                {% for amenity in room.amenities|slice:":4" %}
+                                <div class="w-8 h-8 rounded-full bg-white border-2 border-slate-50 flex items-center justify-center shadow-sm tooltip"
+                                    title="{{ amenity }}">
+                                    <i
+                                        class="fas fa-{% if 'Wi-Fi' in amenity %}wifi{% elif 'AC' in amenity %}snowflake{% elif 'TV' in amenity %}tv{% else %}star{% endif %} text-[10px] text-slate-400"></i>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <!-- Elite Empty State: Matching Screenshot -->
+        <div class="lg:col-span-2 relative">
+            <div class="absolute inset-0 bg-gradient-to-br from-slate-100/50 to-white/50 rounded-[4rem] -z-10 blur-3xl">
+            </div>
+            <div
+                class="py-32 flex flex-col items-center justify-center text-center bg-white/40 rounded-[4rem] border-2 border-dashed border-slate-200/60 shadow-inner group">
+                <div
+                    class="w-32 h-32 rounded-full bg-white shadow-2xl shadow-slate-200/50 flex items-center justify-center text-slate-200 mb-10 group-hover:scale-110 transition-transform duration-1000 hover:text-primary-600">
+                    <i class="fas fa-bed text-5xl"></i>
+                </div>
+                <h4 class="text-4xl font-display font-black text-slate-900 mb-4 tracking-tighter">No Room Categories
+                </h4>
+                <p class="text-slate-400 font-semibold mb-12 max-w-sm leading-relaxed">Your inventory is currently
+                    empty. Add your first room type to begin receiving high-end bookings.</p>
+                <a href="{% url 'hotels:new_add_room' %}" class="btn btn-primary">
+                    <span class="btn-premium px-12 py-5 rounded-2xl text-[11px] font-black tracking-[0.3em] shadow-2xl shadow-primary-600/20 active:scale-95 transition-all">
+                        ADD ROOM
+                    </span>
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+</div>
+
+<style>
+    .tooltip {
+        position: relative;
+        cursor: help;
+    }
+</style>
+{% endblock %}

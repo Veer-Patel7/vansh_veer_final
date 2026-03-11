@@ -7,145 +7,176 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Dashboard | HotelPro Admin{% endblock %}</title>
 
-    <!-- Tailwind CSS -->
+    <!-- Tailwind CSS Configuration -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        primary: {
-                            50: '#eff6ff',
-                            100: '#dbeafe',
-                            500: '#3b82f6',
-                            600: '#2563eb',
-                            700: '#1d4ed8',
-                            800: '#1e40af',
-                            900: '#1e3a8a',
-                            950: '#0f172a',
-                        }
-                    },
-                    fontFamily: {
-                        display: ['Outfit', 'sans-serif'],
-                        sans: ['Inter', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
+    <script src="{% static 'hotels/js/dashboard_base.js' %}" defer></script>
 
-    <!-- Google Fonts -->
+    <!-- Google Fonts Hierarchy -->
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap"
         rel="stylesheet">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Font Awesome Pro-grade Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <style>
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            box-shadow: 0 8px 32px 0 rgba(15, 23, 42, 0.04);
-        }
-
-        .sidebar-item-active {
-            background: linear-gradient(to right, rgba(59, 130, 246, 0.1), transparent);
-            border-left: 4px solid #3b82f6;
-            color: white !important;
-        }
-
-        .sidebar-item-active i {
-            color: #3b82f6;
-        }
-
-        ::-webkit-scrollbar {
-            width: 5px;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: rgba(15, 23, 42, 0.1);
-            border-radius: 10px;
-        }
-
-        .status-pending-filter {
-            filter: grayscale(0.4) opacity(0.8);
-            transition: all 0.5s ease;
-        }
-
-        .rounded-executive {
-            border-radius: 3rem;
-        }
-
-        .rounded-panel {
-            border-radius: 2rem;
-        }
-
-        .rounded-panel-lg {
-            border-radius: 2.5rem;
-        }
-    </style>
+    <!-- Global Styles -->
+    <link rel="stylesheet" href="{% static 'hotels/css/dashboard_base.css' %}">
     {% block extra_head %}{% endblock %}
 </head>
 
-<body class="h-full bg-slate-50 font-sans text-slate-900 antialiased">
+<body class="h-full bg-[#f8fafc] font-sans text-slate-900 antialiased"
+      data-api-latest-booking="{% url 'hotels:api_latest_booking' %}">
+
     <div class="flex h-full">
-        <!-- Sidebar -->
-        <nav class="hidden lg:flex flex-col w-72 bg-primary-950 border-r border-white/5 shrink-0">
-            <div class="p-8">
-                <a href="/" class="flex items-center gap-3">
+
+        <nav class="hidden lg:flex flex-col w-80 bg-[#020617] border-r border-white/5 shrink-0 relative overflow-hidden">
+            <!-- Background Radial Glow -->
+            <div
+                class="absolute -top-48 -left-48 w-96 h-96 bg-primary-600/10 rounded-full blur-[120px] pointer-events-none animate-pulse">
+            </div>
+            <div
+                class="absolute -bottom-48 -right-48 w-96 h-96 bg-cyan-500/10 rounded-full blur-[120px] pointer-events-none animate-pulse delay-1000">
+            </div>
+
+            <!-- Brand Identity -->
+            <div class="p-10 relative z-10 border-b border-white/5">
+                <a href="{% url 'core:landing' %}" class="flex items-center gap-4 group">
                     <div
-                        class="w-10 h-10 bg-primary-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-primary-600/20">
-                        <i class="fas fa-hotel text-xl"></i>
+                        class="w-12 h-12 bg-gradient-to-br from-primary-600 to-indigo-700 rounded-2xl flex items-center justify-center text-white shadow-[0_0_25px_rgba(37,99,235,0.4)] group-hover:rotate-[360deg] transition-transform duration-1000">
+                        <i class="fas fa-hotel text-2xl"></i>
                     </div>
-                    <span class="text-2xl font-display font-bold text-white tracking-tight">HotelPro</span>
+                    <div class="flex flex-col">
+                        <span class="text-2xl font-display font-bold text-white tracking-tighter">Hotel<span
+                                class="text-primary-500 italic">PRO</span></span>
+                        <span class="text-[9px] font-bold text-slate-500 uppercase tracking-[0.4em]">ADMIN PANEL</span>
+                    </div>
                 </a>
             </div>
 
-            <div class="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
-                <a href="{% url 'hotels:admin_dashboard_pro' %}"
-                    class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 {% if request.resolver_match.url_name == 'admin_dashboard_pro' %}sidebar-item-active{% else %}text-slate-400 hover:text-white hover:bg-white/5{% endif %}">
-                    <i class="fas fa-th-large w-5 text-center"></i>
-                    <span class="text-sm font-semibold tracking-wide">Dashboard</span>
+            <!-- Navigation Menu -->
+            <div class="flex-1 px-6 pt-10 pb-6 space-y-2 overflow-y-auto relative z-10 scrollbar-hide">
+                <div class="pb-4 px-4">
+                    <span class="text-[10px] font-bold text-slate-600 uppercase tracking-widest">MENU</span>
+                </div>
+                
+                <a href="{% if hotel and hotel.id %}{% url 'hotels:hotel_dashboard' hotel.id %}{% else %}{% url 'hotels:my_hotels' %}{% endif %}"
+                   class="group flex items-center gap-4 px-5 py-4.5 rounded-2xl transition-all duration-500 
+                   {% if request.resolver_match.url_name in 'hotel_dashboard admin_dashboard_pro' %}
+                   sidebar-item-active
+                   {% else %}
+                   text-slate-500 hover:text-white hover:bg-white/5
+                   {% endif %}">
+                        
+                    <div class="w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center group-hover:bg-primary-600/20 group-hover:text-primary-400 transition-all duration-500 shadow-inner">
+                        <i class="fas fa-compass text-sm"></i>
+                    </div>
+
+                    <span class="text-[13px] font-bold tracking-[0.1em] uppercase">Dashboard</span>
+
                 </a>
+
                 <a href="{% url 'hotels:my_hotels' %}"
-                    class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 {% if request.resolver_match.url_name == 'my_hotels' %}sidebar-item-active{% else %}text-slate-400 hover:text-white hover:bg-white/5{% endif %}">
-                    <i class="fas fa-building w-5 text-center"></i>
-                    <span class="text-sm font-semibold tracking-wide">My Hotels</span>
+                    class="group flex items-center gap-4 px-5 py-4.5 rounded-2xl transition-all duration-500 {% if request.resolver_match.url_name == 'my_hotels' %}sidebar-item-active{% else %}text-slate-500 hover:text-white hover:bg-white/5{% endif %}">
+                    <div
+                        class="w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center group-hover:bg-primary-600/20 group-hover:text-primary-400 transition-all duration-500 shadow-inner">
+                        <i class="fas fa-building text-sm"></i>
+                    </div>
+                    <span class="text-[13px] font-bold tracking-[0.1em] uppercase">Hotels</span>
                 </a>
-                <a href="{% url 'hotels:offers' %}"
-                    class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 {% if request.resolver_match.url_name == 'offers' %}sidebar-item-active{% else %}text-slate-400 hover:text-white hover:bg-white/5{% endif %}">
-                    <i class="fas fa-tags w-5 text-center"></i>
-                    <span class="text-sm font-semibold tracking-wide">Offers & Deals</span>
+
+                <a href="{% url 'hotels:manage_rooms' %}"
+                    class="group flex items-center gap-4 px-5 py-4.5 rounded-2xl transition-all duration-500 {% if request.resolver_match.url_name == 'hotels:manage_rooms' or request.resolver_match.url_name == 'hotels:add_room' or request.resolver_match.url_name == 'hotels:edit_room' %}sidebar-item-active{% else %}text-slate-500 hover:text-white hover:bg-white/5{% endif %}">
+                    <div
+                        class="w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center group-hover:bg-primary-600/20 group-hover:text-primary-400 transition-all duration-500 shadow-inner">
+                        <i class="fas fa-bed text-sm"></i>
+                    </div>
+                    <span class="text-[13px] font-bold tracking-[0.1em] uppercase">Rooms</span>
                 </a>
+
                 <a href="{% url 'hotels:bookings' %}"
-                    class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 {% if request.resolver_match.url_name == 'bookings' %}sidebar-item-active{% else %}text-slate-400 hover:text-white hover:bg-white/5{% endif %}">
-                    <i class="fas fa-calendar-check w-5 text-center"></i>
-                    <span class="text-sm font-semibold tracking-wide">Bookings</span>
+                    class="group flex items-center gap-4 px-5 py-4.5 rounded-2xl transition-all duration-500 {% if request.resolver_match.url_name == 'bookings' %}sidebar-item-active{% else %}text-slate-500 hover:text-white hover:bg-white/5{% endif %}">
+                    <div
+                        class="w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center group-hover:bg-primary-600/20 group-hover:text-primary-400 transition-all duration-500 shadow-inner">
+                        <i class="fas fa-calendar-check text-sm"></i>
+                    </div>
+                    <span class="text-[13px] font-bold tracking-[0.1em] uppercase">Bookings</span>
                 </a>
+
+                <div class="pt-12 pb-4 px-4">
+                    <span class="text-[10px] font-bold text-slate-600 uppercase tracking-widest">OFFERS</span>
+                </div>
+
+                <a href="{% url 'hotels:offers' %}"
+                    class="group flex items-center gap-4 px-5 py-4.5 rounded-2xl transition-all duration-500 {% if request.resolver_match.url_name == 'offers' or request.resolver_match.url_name == 'add_offer' or request.resolver_match.url_name == 'edit_offer' %}sidebar-item-active{% else %}text-slate-500 hover:text-white hover:bg-white/5{% endif %}">
+                    <div
+                        class="w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center group-hover:bg-primary-600/20 group-hover:text-primary-400 transition-all duration-500 shadow-inner">
+                        <i class="fas fa-bolt-lightning text-sm"></i>
+                    </div>
+                    <span class="text-[13px] font-bold tracking-[0.1em] uppercase">Offers</span>
+                </a>
+
                 <a href="{% url 'hotels:insights' %}"
-                    class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 {% if request.resolver_match.url_name == 'insights' %}sidebar-item-active{% else %}text-slate-400 hover:text-white hover:bg-white/5{% endif %}">
-                    <i class="fas fa-chart-line w-5 text-center"></i>
-                    <span class="text-sm font-semibold tracking-wide">Insights</span>
+                    class="group flex items-center gap-4 px-5 py-4.5 rounded-2xl transition-all duration-500 {% if request.resolver_match.url_name == 'insights' %}sidebar-item-active{% else %}text-slate-500 hover:text-white hover:bg-white/5{% endif %}">
+                    <div
+                        class="w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center group-hover:bg-primary-600/20 group-hover:text-primary-400 transition-all duration-500 shadow-inner">
+                        <i class="fas fa-chart-pie text-sm"></i>
+                    </div>
+                    <span class="text-[13px] font-bold tracking-[0.1em] uppercase">Insights</span>
                 </a>
+
                 <a href="{% url 'hotels:reviews' %}"
-                    class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 {% if request.resolver_match.url_name == 'reviews' %}sidebar-item-active{% else %}text-slate-400 hover:text-white hover:bg-white/5{% endif %}">
-                    <i class="fas fa-star w-5 text-center"></i>
-                    <span class="text-sm font-semibold tracking-wide">Reviews</span>
+                    class="group flex items-center gap-4 px-5 py-4.5 rounded-2xl transition-all duration-500 {% if request.resolver_match.url_name == 'reviews' %}sidebar-item-active{% else %}text-slate-500 hover:text-white hover:bg-white/5{% endif %}">
+                    <div
+                        class="w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center group-hover:bg-primary-600/20 group-hover:text-primary-400 transition-all duration-500 shadow-inner">
+                        <i class="fas fa-star text-sm"></i>
+                    </div>
+                    <span class="text-[13px] font-bold tracking-[0.1em] uppercase">Reviews</span>
                 </a>
-                <a href="{% url 'hotels:settings' %}"
-                    class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 {% if request.resolver_match.url_name == 'settings' %}sidebar-item-active{% else %}text-slate-400 hover:text-white hover:bg-white/5{% endif %}">
-                    <i class="fas fa-cog w-5 text-center"></i>
-                    <span class="text-sm font-semibold tracking-wide">Settings</span>
+
+                {% if user.is_staff or user.is_superuser %}
+                <div class="pt-12 pb-4 px-4">
+                    <span class="text-[10px] font-bold text-slate-600 uppercase tracking-widest">ADMIN</span>
+                </div>
+
+                <a href="{% url 'hotels:admin_verify_list' %}"
+                    class="group flex items-center gap-4 px-5 py-4.5 rounded-2xl transition-all duration-500 {% if request.resolver_match.url_name == 'admin_verify_list' %}sidebar-item-active{% else %}text-slate-500 hover:text-white hover:bg-white/5{% endif %}">
+                    <div
+                        class="w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center group-hover:bg-indigo-600/20 group-hover:text-indigo-400 transition-all duration-500 shadow-inner">
+                        <i class="fas fa-file-shield text-sm"></i>
+                    </div>
+                    <span class="text-[13px] font-bold tracking-[0.1em] uppercase">Pending Verification</span>
                 </a>
+
+                <a href="{% url 'hotels:admin_offer_list' %}"
+                    class="group flex items-center gap-4 px-5 py-4.5 rounded-2xl transition-all duration-500 {% if request.resolver_match.url_name == 'admin_offer_list' or request.resolver_match.url_name == 'admin_review_offer' %}sidebar-item-active{% else %}text-slate-500 hover:text-white hover:bg-white/5{% endif %}">
+                    <div
+                        class="w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center group-hover:bg-cyan-600/20 group-hover:text-cyan-400 transition-all duration-500 shadow-inner">
+                        <i class="fas fa-microchip text-sm"></i>
+                    </div>
+                    <span class="text-[13px] font-bold tracking-[0.1em] uppercase">Review Offers</span>
+                </a>
+                {% endif %}
             </div>
 
-            <div class="p-4 mt-auto border-t border-white/5">
-                <a href="{% url 'accounts:hotel_login' %}"
-                    class="flex items-center gap-3 px-4 py-3 rounded-xl text-red-400 hover:text-red-300 hover:bg-red-400/10 transition-all duration-300">
-                    <i class="fas fa-sign-out-alt w-5 text-center"></i>
-                    <span class="text-sm font-semibold tracking-wide">Logout</span>
+            <!-- Logout & Support -->
+            <div class="p-8 relative z-10 border-t border-white/5 flex flex-col gap-6">
+                <!-- Support Module -->
+                <div
+                    class="p-5 rounded-3xl bg-white/5 border border-white/10 group cursor-pointer hover:bg-white/10 transition-all">
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="w-2 h-2 rounded-full bg-emerald-500 status-pulse"></div>
+                        <span class="text-[10px] font-bold text-white uppercase tracking-widest">SUPPORT</span>
+                    </div>
+                    <p class="text-[9px] text-slate-500 font-bold leading-relaxed px-1">We are here to help you 24/7.
+                    </p>
+                </div>
+
+                <a href="{% url 'accounts:logout' %}"
+                    class="flex items-center gap-4 px-2 py-2 text-slate-500 hover:text-rose-500 transition-all group">
+                    <div
+                        class="w-10 h-10 rounded-2xl bg-white/5 flex items-center justify-center group-hover:bg-rose-600/20 transition-all">
+                        <i class="fas fa-power-off text-sm"></i>
+                    </div>
+                    <span class="text-[11px] font-bold tracking-widest uppercase">Logout</span>
                 </a>
             </div>
         </nav>
@@ -154,51 +185,51 @@
         <main class="flex-1 flex flex-col overflow-hidden">
             <!-- Header -->
             <header
-                class="h-20 bg-white/70 backdrop-blur-md border-b border-slate-200 flex items-center justify-between px-8 shrink-0">
+                class="h-24 bg-white/80 backdrop-blur-xl border-b border-slate-200/60 flex items-center justify-between px-10 shrink-0 relative z-20">
                 <div class="flex flex-col">
-                    <h1 class="text-xl font-display font-bold text-slate-900 tracking-tight">{% block page_title %}Dashboard{% endblock %}</h1>
-                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-widest mt-0.5">
-                        {% block page_subtitle %}Property Overview{% endblock %}</p>
+                    <h1 class="text-2xl font-display font-bold text-slate-900 tracking-tight">{% block page_title%}Dashboard{% endblock %}</h1>
+                    <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest mt-1">{% block page_subtitle %}Manage your hotels and bookings.{% endblock %}</p>
                 </div>
 
-                <div class="flex items-center gap-6">
+                <div class="flex items-center gap-8">
+                    <!-- Real-time Status -->
                     <div
-                        class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-100 text-[10px] font-bold text-emerald-600 uppercase tracking-widest">
-                        <span class="relative flex h-2 w-2">
-                            <span
-                                class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                        </span>
-                        System Live
+                        class="hidden xl:flex items-center gap-3 px-5 py-2.5 rounded-full bg-emerald-50/50 border border-emerald-100 text-[10px] font-bold text-emerald-600 uppercase tracking-[0.2em] shadow-sm">
+                        <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full status-pulse"></span>
+                        Online
                     </div>
 
+                    <!-- Alerts Console -->
                     <button
-                        class="relative w-10 h-10 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-white hover:border-primary-500 hover:text-primary-600 transition-all duration-300 shadow-sm">
-                        <i class="far fa-bell text-lg"></i>
+                        class="w-12 h-12 rounded-2xl bg-white border border-slate-200 text-slate-400 flex items-center justify-center hover:border-primary-500 hover:text-primary-600 transition-all shadow-sm relative group">
+                        <i class="far fa-bell text-lg group-hover:rotate-[15deg] transition-transform"></i>
                         <span
-                            class="absolute top-2 right-2 w-2 h-2 bg-primary-600 rounded-full border-2 border-white"></span>
+                            class="absolute top-3.5 right-3.5 w-2 h-2 bg-rose-500 rounded-full border-2 border-white"></span>
                     </button>
 
-                    <div class="flex items-center gap-3 pl-6 border-l border-slate-200">
+                    <!-- Profile Module -->
+                    <div class="flex items-center gap-4 pl-8 border-l border-slate-200">
                         <div
-                            class="w-10 h-10 rounded-xl bg-primary-900 flex items-center justify-center text-white font-bold shadow-lg shadow-primary-900/10">
-                            {{ user.email|first|upper }}
+                            class="w-12 h-12 rounded-2xl bg-slate-900 border-2 border-slate-100 flex items-center justify-center text-white font-bold text-lg shadow-xl shadow-slate-900/10">
+                            {{ user.username|first|upper }}
                         </div>
-                        <div class="flex flex-col ml-3 hidden md:flex">
-                            <span class="text-sm font-bold text-slate-900">{{user.first_name|default:user.email}}</span>
-                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Executive
-                                Partner</span>
+                        <div class="flex flex-col hidden sm:flex">
+                            <span class="text-sm font-bold text-slate-900 tracking-tight">{{ user.username }}</span>
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Owner</span>
                         </div>
                     </div>
                 </div>
             </header>
 
-            <!-- Scrollable Content -->
-            <div class="flex-1 overflow-y-auto p-8 bg-slate-50/50">
-                {% block dashboard_content %}{% endblock %}
+            <!-- Scrollable Viewport -->
+            <div class="flex-1 overflow-y-auto p-12 bg-[#f8fafc]">
+                <div class="max-w-[1600px] mx-auto">
+                    {% block dashboard_content %}{% endblock %}
+                </div>
             </div>
         </main>
     </div>
+
 
     {% block extra_scripts %}{% endblock %}
 </body>

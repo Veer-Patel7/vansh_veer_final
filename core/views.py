@@ -85,7 +85,7 @@ def apply_coupon_api(request):
 # Create your views here.
 
 def landing(request):
-    return render(request, 'core/landing.html')
+    return render(request,'core/landing.html')
 
 def features(request):
     return render(request, 'core/features.html')

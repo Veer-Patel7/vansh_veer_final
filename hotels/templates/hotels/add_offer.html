@@ -1,335 +1,247 @@
 {% extends 'hotels/dashboard_base.html' %}
 {% load static %}
 
-{% block title %}
-{% if mode == 'edit' %}Refine Strategy{% else %}New Growth Strategy{% endif %} | HotelPro Enterprise
-{% endblock %}
+{% block title %}{% if offer %}Edit{% else %}Create{% endif %} Offer | {{ hotel.name }} | HotelPro{% endblock %}
+
+{% block page_title %}{% if offer %}Edit Offer: {{ offer.name }}{% else %}Create New Offer{% endif%}{% endblock %}
+{% block page_subtitle %}Setup your offer details and discount to attract more guests.{% endblock %}
 
 {% block extra_head %}
+<!-- Flatpickr (Premium Date Management) -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <link rel="stylesheet" href="{% static 'hotels/css/add_offer.css' %}">
 {% endblock %}
 
 {% block dashboard_content %}
-<div class="strategy-container animate-in fade-in slide-in-from-bottom-4 duration-1000">
-    <a href="{% url 'hotels:offers' %}"
-        class="flex items-center gap-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest hover:text-primary-600 transition-all mb-8">
-        <i class="fas fa-chevron-left"></i> BACK TO STRATEGIES
-    </a>
+<div class="max-w-5xl mx-auto space-y-12 animate-in fade-in slide-in-from-bottom-10 duration-1200 pb-24">
 
-    <form method="POST" id="strategyForm">
-        {% csrf_token %}
-        <div class="grid grid-cols-1 xl:grid-cols-3 gap-10">
-            <div class="xl:col-span-2 space-y-10">
-                <div class="glass-panel rounded-panel-lg p-10 lg:p-14 border border-white/60 relative overflow-hidden">
-                    <div class="absolute top-0 right-0 p-12 opacity-[0.03] pointer-events-none">
-                        <i class="fas fa-microchip text-9xl"></i>
-                    </div>
+    <div class="relative group">
+        <!-- Background Glow -->
+        <div class="absolute inset-x-0 -bottom-10 h-32 bg-primary-600/5 blur-[100px] pointer-events-none"></div>
 
-                    <div class="mb-14">
-                        <span
-                            class="text-[10px] font-bold text-primary-600 uppercase tracking-[0.3em] mb-3 block">Redefine
-                            Growth</span>
-                        <h1 class="text-3xl font-display font-bold text-slate-900 tracking-tight">
-                            {% if mode == 'edit' %}REDEFINE STRATEGY{% else %}DEPLOY NEW OFFER{% endif %}
-                        </h1>
-                    </div>
+        <div
+            class="premium-glass rounded-[4rem] p-16 shadow-2xl shadow-slate-200/40 border border-white/60 relative z-10 overflow-hidden">
+            <form method="POST" id="strategyForm" class="space-y-16">
+                {% csrf_token %}
 
-                    <!-- Block 1: Identity -->
-                    <div class="space-y-8 mb-16">
-                        <div class="flex items-center gap-4 mb-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-16">
+                    <!-- Strategy Identity Section -->
+                    <div class="space-y-12">
+                        <div class="flex items-center gap-6 mb-12">
                             <div
-                                class="w-10 h-10 rounded-xl bg-primary-50 text-primary-600 flex items-center justify-center text-sm shadow-inner">
+                                class="w-16 h-16 rounded-[1.5rem] bg-primary-50 text-primary-600 flex items-center justify-center text-2xl shadow-inner group-hover:rotate-[15deg] transition-all">
                                 <i class="fas fa-fingerprint"></i>
                             </div>
-                            <div>
-                                <h3 class="text-sm font-bold text-slate-900 uppercase tracking-tight">Identity Pillars
+                            <div class="space-y-1">
+                                <h3 class="text-2xl font-display font-bold text-slate-900 tracking-tight">Offer
+                                    Name</h3>
+                                <p
+                                    class="text-[9px] font-bold text-slate-400 uppercase tracking-widest italic leading-none">
+                                    Name your offer for your guests</p>
+                            </div>
+                        </div>
+
+                        <div class="space-y-4">
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-2"
+                                for="name">Offer Title</label>
+                            <input type="text" id="name" name="name" value="{{ offer.name|default:'' }}"
+                                class="w-full bg-white border border-slate-100 rounded-2xl px-8 py-5 text-sm font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-primary-600/10 focus:border-primary-600 transition-all shadow-sm"
+                                placeholder="e.g. Summer Special 2024">
+                        </div>
+
+                        <div class="space-y-6">
+                            <label
+                                class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-2">Offer
+                                Type</label>
+                            <div class="grid grid-cols-2 gap-6">
+                                <label class="cursor-pointer group/archetype">
+                                    <input type="radio" name="strategy" value="GROWTH" class="sr-only peer" {% if not offer or offer.strategy == 'GROWTH' or offer.strategy == 'DIRECT' %}checked{% endif%}>
+                                    <div
+                                        class="p-8 rounded-[2rem] border border-slate-100 bg-slate-50 peer-checked:bg-slate-900 peer-checked:border-slate-900 peer-checked:text-white transition-all shadow-sm">
+                                        <div
+                                            class="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center mb-6 text-slate-400 peer-checked:text-white">
+                                            <i class="fas fa-chart-line text-xl"></i>
+                                        </div>
+                                        <h5 class="text-[11px] font-bold uppercase tracking-[0.3em] mb-2">Growth</h5>
+                                        <p class="text-[9px] font-bold opacity-40 uppercase tracking-widest">Expansion
+                                        </p>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer group/archetype">
+                                    <input type="radio" name="strategy" value="URGENT" class="sr-only peer" {% if offer and offer.strategy == 'URGENT' %}checked{% endif %}>
+                                    <div
+                                        class="p-8 rounded-[2rem] border border-slate-100 bg-slate-50 peer-checked:bg-rose-600 peer-checked:border-rose-600 peer-checked:text-white transition-all shadow-sm">
+                                        <div
+                                            class="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center mb-6 text-slate-400 peer-checked:text-white">
+                                            <i class="fas fa-fire-alt text-xl"></i>
+                                        </div>
+                                        <h5 class="text-[11px] font-bold uppercase tracking-[0.3em] mb-2">Urgency</h5>
+                                        <p class="text-[9px] font-bold opacity-40 uppercase tracking-widest">Flash Sale
+                                        </p>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer group/archetype">
+                                    <input type="radio" name="strategy" value="LOYALTY" class="sr-only peer" {% if offer and offer.strategy == 'LOYALTY' %}checked{% endif %}>
+                                    <div
+                                        class="p-8 rounded-[2rem] border border-slate-100 bg-slate-50 peer-checked:bg-primary-600 peer-checked:border-primary-600 peer-checked:text-white transition-all shadow-sm">
+                                        <div
+                                            class="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center mb-6 text-slate-400 peer-checked:text-white">
+                                            <i class="fas fa-crown text-xl"></i>
+                                        </div>
+                                        <h5 class="text-[11px] font-bold uppercase tracking-[0.3em] mb-2">Loyalty</h5>
+                                        <p class="text-[9px] font-bold opacity-40 uppercase tracking-widest">Elite Only
+                                        </p>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer group/archetype">
+                                    <input type="radio" name="strategy" value="SEASONAL" class="sr-only peer" {% if offer and offer.strategy == 'SEASONAL' %}checked{% endif %}>
+                                    <div
+                                        class="p-8 rounded-[2rem] border border-slate-100 bg-slate-50 peer-checked:bg-indigo-600 peer-checked:border-indigo-600 peer-checked:text-white transition-all shadow-sm">
+                                        <div
+                                            class="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center mb-6 text-slate-400 peer-checked:text-white">
+                                            <i class="fas fa-snowflake text-xl"></i>
+                                        </div>
+                                        <h5 class="text-[11px] font-bold uppercase tracking-[0.3em] mb-2">Seasonal</h5>
+                                        <p class="text-[9px] font-bold opacity-40 uppercase tracking-widest">Holiday</p>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Yield Vectors Section -->
+                    <div class="p-12 bg-slate-50/50 rounded-[3rem] border border-slate-100 space-y-12">
+                        <div class="flex items-center gap-6 mb-12">
+                            <div
+                                class="w-16 h-16 rounded-[1.5rem] bg-emerald-50 text-emerald-600 flex items-center justify-center text-2xl shadow-inner group-hover:rotate-[-15deg] transition-all">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="space-y-1">
+                                <h3 class="text-2xl font-display font-bold text-slate-900 tracking-tight">Economics &
+                                    Control
                                 </h3>
-                                <p class="text-[10px] font-semibold text-slate-500 uppercase tracking-widest mt-0.5">
-                                    Core characteristics & strategy tags</p>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 gap-8">
-                            <div class="group">
-                                <label
-                                    class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3 block group-focus-within:text-primary-600 transition-colors">Strategy
-                                    Designation</label>
-                                <input type="text" name="name"
-                                    class="w-full bg-white/50 backdrop-blur-sm border border-slate-200 rounded-2xl px-6 py-4 text-sm font-semibold text-slate-900 focus:outline-none focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 transition-all placeholder:text-slate-300"
-                                    placeholder="e.g., Q1 Revenue Accelerator" value="{{ offer.name }}" required>
-                            </div>
-
-                            <div class="group">
-                                <label
-                                    class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4 block group-focus-within:text-primary-600 transition-colors">Promotion
-                                    Archetype</label>
-                                <div class="flex flex-wrap gap-3">
-                                    <input type="hidden" name="offer_type" id="offer_type_input"
-                                        value="{{ offer.offer_type|default:'STANDARD' }}">
-                                    <button type="button"
-                                        class="archetype-pill glass-panel px-5 py-3 rounded-xl border border-slate-100 flex items-center gap-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest hover:border-primary-500 transition-all {% if offer.offer_type == 'STANDARD' or not offer.offer_type %}active-archetype{% endif %}"
-                                        data-value="STANDARD">
-                                        <i class="fas fa-tag"></i> Standard
-                                    </button>
-                                    <button type="button"
-                                        class="archetype-pill glass-panel px-5 py-3 rounded-xl border border-slate-100 flex items-center gap-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest hover:border-primary-500 transition-all {% if offer.offer_type == 'EARLY_BIRD' %}active-archetype{% endif %}"
-                                        data-value="EARLY_BIRD">
-                                        <i class="fas fa-bolt"></i> Early Bird
-                                    </button>
-                                    <button type="button"
-                                        class="archetype-pill glass-panel px-5 py-3 rounded-xl border border-slate-100 flex items-center gap-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest hover:border-primary-500 transition-all {% if offer.offer_type == 'LAST_MINUTE' %}active-archetype{% endif %}"
-                                        data-value="LAST_MINUTE">
-                                        <i class="fas fa-clock"></i> Last Minute
-                                    </button>
-                                    <button type="button"
-                                        class="archetype-pill glass-panel px-5 py-3 rounded-xl border border-slate-100 flex items-center gap-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest hover:border-primary-500 transition-all {% if offer.offer_type == 'FLASH_SALE' %}active-archetype{% endif %}"
-                                        data-value="FLASH_SALE">
-                                        <i class="fas fa-fire"></i> Flash Sale
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Block 2: Benefit Structure -->
-                    <div class="space-y-8 mb-16">
-                        <div class="flex items-center gap-4 mb-6">
-                            <div
-                                class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-sm shadow-inner">
-                                <i class="fas fa-calculator"></i>
-                            </div>
-                            <div>
-                                <h3 class="text-sm font-bold text-slate-900 uppercase tracking-tight">Benefit
-                                    Architecture</h3>
-                                <p class="text-[10px] font-semibold text-slate-500 uppercase tracking-widest mt-0.5">
-                                    Value metrics & discount framework</p>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            <div class="group">
-                                <label
-                                    class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3 block group-focus-within:text-emerald-600 transition-colors">Value
-                                    Metric</label>
-                                <select name="discount_type" id="discount_type"
-                                    class="w-full bg-white/50 backdrop-blur-sm border border-slate-200 rounded-2xl px-6 py-4 text-sm font-semibold text-slate-900 focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all">
-                                    <option value="PERCENT" {% if offer.discount_type == 'PERCENT' %}selected{% endif %}>
-                                        Percentage Yield</option>
-                                    <option value="FLAT" {% if offer.discount_type == 'FLAT' %}selected{% endif %}>Flat
-                                        Capital</option>
-                                </select>
-                            </div>
-                            <div class="group">
-                                <label
-                                    class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3 block group-focus-within:text-emerald-600 transition-colors">Magnitude</label>
-                                <input type="number" name="discount_value" id="discount_value"
-                                    class="w-full bg-white/50 backdrop-blur-sm border border-slate-200 rounded-2xl px-6 py-4 text-sm font-semibold text-slate-900 focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all placeholder:text-slate-300"
-                                    placeholder="Value" value="{{ offer.discount_value|floatformat:0 }}" required>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Block 3: Target Architecture -->
-                    <div class="space-y-8 mb-16">
-                        <div class="flex items-center gap-4 mb-6">
-                            <div
-                                class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-sm shadow-inner">
-                                <i class="fas fa-bullseye"></i>
-                            </div>
-                            <div>
-                                <h3 class="text-sm font-bold text-slate-900 uppercase tracking-tight">Target
-                                    Architecture</h3>
-                                <p class="text-[10px] font-semibold text-slate-500 uppercase tracking-widest mt-0.5">
-                                    Inventory scope & requirements</p>
+                                <p
+                                    class="text-[9px] font-bold text-slate-400 uppercase tracking-widest italic leading-none">
+                                    Set your discount and validity dates</p>
                             </div>
                         </div>
 
                         <div class="space-y-8">
-                            <div class="group">
-                                <label
-                                    class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3 block group-focus-within:text-blue-600 transition-colors">Asset
-                                    Target (Property)</label>
-                                <select name="hotel" id="hotel_select"
-                                    class="w-full bg-white/50 backdrop-blur-sm border border-slate-200 rounded-2xl px-6 py-4 text-sm font-semibold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all"
-                                    required>
-                                    {% for hotel in owned_hotels %}
-                                    <option value="{{ hotel.id }}" {% if offer.hotel_id == hotel.id %}selected{% endif %}>
-                                        {{ hotel.hotel_name }}</option>
-                                    {% endfor %}
-                                </select>
+                            <div>
+                                <div class="flex items-center justify-between mb-6">
+                                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest"
+                                        for="discount">Discount Percentage (%)</label>
+                                    <span id="discountValue"
+                                        class="text-4xl font-display font-bold text-primary-600 tracking-tighter">{{offer.discount_percent|default:10 }}%</span>
+                                </div>
+                                <input type="range" id="discount" name="discount_percent" min="5" max="100" step="5"
+                                    value="{{ offer.discount_percent|default:10 }}"
+                                    class="w-full h-2.5 bg-slate-200 rounded-full appearance-none cursor-pointer accent-primary-600 shadow-inner">
                             </div>
 
-                            <div class="group">
-                                <label
-                                    class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4 block group-focus-within:text-blue-600 transition-colors">In-Scope
-                                    Categories</label>
-                                <div id="roomCheckboxes" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    {% for r in room_types %}
+                            <div class="grid grid-cols-2 gap-8">
+                                <div class="space-y-4">
                                     <label
-                                        class="selection-row flex items-center gap-4 p-5 rounded-2xl border border-slate-100 hover:border-blue-500 hover:bg-white transition-all cursor-pointer group/row"
-                                        data-hotel="{{ r.hotel.id }}" data-price="{{ r.price_per_night }}">
-                                        <div
-                                            class="w-6 h-6 rounded-lg border-2 border-slate-200 flex items-center justify-center group-hover/row:border-blue-500 transition-all">
-                                            <input type="checkbox" name="room_categories" value="{{ r.id }}"
-                                                class="hidden peer" {% if r.id|stringformat:"s" in offer.room_categories%}checked{% endif %}>
-                                            <i
-                                                class="fas fa-check text-[10px] text-blue-600 opacity-0 peer-checked:opacity-100 transition-all"></i>
-                                        </div>
-                                        <div class="flex flex-col">
-                                            <span class="text-xs font-bold text-slate-700">{{ r.room_category_name}}</span>
-                                            <span
-                                                class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">?{{r.price_per_night }} / Night</span>
-                                        </div>
-                                    </label>
-                                    {% endfor %}
+                                        class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-2">Min.
+                                        Spend required</label>
+                                    <input type="number" name="min_booking_amount"
+                                        value="{{ offer.min_booking_amount|default:0 }}"
+                                        class="w-full bg-white border border-slate-100 rounded-2xl px-6 py-4 text-sm font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-primary-600/10 transition-all shadow-sm">
+                                </div>
+                                <div class="space-y-4">
+                                    <label
+                                        class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-2">Max.
+                                        Discount Cap</label>
+                                    <input type="number" name="max_discount_amount"
+                                        value="{{ offer.max_discount_amount|default:'' }}" placeholder="Optional"
+                                        class="w-full bg-white border border-slate-100 rounded-2xl px-6 py-4 text-sm font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-primary-600/10 transition-all shadow-sm">
                                 </div>
                             </div>
-                        </div>
-                    </div>
 
-                    <!-- Block 4: Deployment Window -->
-                    <div class="space-y-8">
-                        <div class="flex items-center gap-4 mb-6">
-                            <div
-                                class="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-sm shadow-inner">
-                                <i class="fas fa-calendar-alt"></i>
-                            </div>
-                            <div>
-                                <h3 class="text-sm font-bold text-slate-900 uppercase tracking-tight">Deployment Window
-                                </h3>
-                                <p class="text-[10px] font-semibold text-slate-500 uppercase tracking-widest mt-0.5">
-                                    Execution & termination timeline</p>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            <div class="group">
-                                <label
-                                    class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3 block group-focus-within:text-purple-600 transition-colors">Activation
-                                    Start</label>
-                                <input type="date" name="valid_from"
-                                    class="w-full bg-white/50 backdrop-blur-sm border border-slate-200 rounded-2xl px-6 py-4 text-sm font-semibold text-slate-900 focus:outline-none focus:ring-4 focus:ring-purple-500/10 focus:border-purple-500 transition-all"
-                                    value="{{ offer.valid_from|date:'Y-m-d' }}" required>
-                            </div>
-                            <div class="group">
-                                <label
-                                    class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3 block group-focus-within:text-purple-600 transition-colors">Termination
-                                    Date</label>
-                                <input type="date" name="valid_to"
-                                    class="w-full bg-white/50 backdrop-blur-sm border border-slate-200 rounded-2xl px-6 py-4 text-sm font-semibold text-slate-900 focus:outline-none focus:ring-4 focus:ring-purple-500/10 focus:border-purple-500 transition-all"
-                                    value="{{ offer.valid_to|date:'Y-m-d' }}" required>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Strategy Simulator -->
-            <div class="xl:col-span-1">
-                <div class="sticky top-8 space-y-6">
-                    <div class="glass-panel rounded-panel-lg p-8 border border-white/60 shadow-2xl shadow-slate-200/50">
-                        <div
-                            class="flex items-center gap-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-10">
-                            <i class="fas fa-robot text-primary-600"></i> Strategy Simulator
-                        </div>
-
-                        <div class="space-y-8 mb-10">
-                            <div>
-                                <span
-                                    class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-2">Estimated
-                                    Yield Price</span>
-                                <div class="flex flex-col">
-                                    <span id="prev-old"
-                                        class="text-sm font-bold text-slate-300 line-through tracking-tight">?0</span>
-                                    <span id="prev-new"
-                                        class="text-5xl font-display font-bold text-slate-900 tracking-tighter mt-1">?0</span>
-                                    <div id="prev-savings"
-                                        class="mt-4 inline-flex px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-600 text-[10px] font-bold uppercase tracking-widest border border-emerald-100 self-start">
-                                        0% REDUCTION
+                            <div class="grid grid-cols-1 gap-8 pt-8 border-t border-slate-200/50">
+                                <div class="grid grid-cols-2 gap-8">
+                                    <div class="space-y-4">
+                                        <label
+                                            class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-2">Start
+                                            Date</label>
+                                        <div class="relative group/input">
+                                            <i
+                                                class="far fa-calendar-alt absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within/input:text-primary-600 transition-colors"></i>
+                                            <input type="text" id="activationDate" name="activation_date"
+                                                value="{{ offer.activation_date|date:'Y-m-d' }}"
+                                                class="w-full bg-white border border-slate-100 rounded-2xl pl-16 pr-8 py-4 text-sm font-bold text-slate-900 focus:outline-none transition-all shadow-sm"
+                                                placeholder="Select Start Date">
+                                        </div>
+                                    </div>
+                                    <div class="space-y-4">
+                                        <label
+                                            class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-2">End
+                                            Date</label>
+                                        <div class="relative group/input">
+                                            <i
+                                                class="far fa-calendar-check absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within/input:text-primary-600 transition-colors"></i>
+                                            <input type="text" id="expirationDate" name="expiration_date"
+                                                value="{{ offer.expiration_date|date:'Y-m-d' }}"
+                                                class="w-full bg-white border border-slate-100 rounded-2xl pl-16 pr-8 py-4 text-sm font-bold text-slate-900 focus:outline-none transition-all shadow-sm"
+                                                placeholder="Select End Date">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-
-                            <div class="h-px bg-slate-100"></div>
-
-                            <div class="space-y-4">
-                                <div class="flex items-center justify-between">
-                                    <span
-                                        class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Baseline
-                                        Revenue</span>
-                                    <span id="prev-base" class="text-xs font-bold text-slate-900">?0</span>
-                                </div>
-                                <div class="flex items-center justify-between">
-                                    <span
-                                        class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Strategic
-                                        Burn</span>
-                                    <span id="prev-burn" class="text-xs font-bold text-rose-600">-?0</span>
-                                </div>
-                                <div class="flex items-center justify-between pt-4 border-t border-slate-50">
-                                    <span class="text-[10px] font-bold text-slate-900 uppercase tracking-widest">Net
-                                        Realization</span>
-                                    <span id="prev-net"
-                                        class="text-base font-display font-bold text-emerald-600">?0</span>
-                                </div>
-                            </div>
                         </div>
-
-                        <div class="p-6 rounded-2xl bg-primary-50 border border-primary-100/50">
-                            <div class="flex gap-4">
-                                <i class="fas fa-lightbulb text-primary-600 mt-1"></i>
-                                <div>
-                                    <h4 class="text-[10px] font-bold text-primary-600 uppercase tracking-widest">
-                                        Optimization Intel</h4>
-                                    <p class="text-[10px] font-semibold text-slate-500 leading-relaxed mt-1">
-                                        Recommendation: Thresholds between 15-22% maximize conversion while preserving
-                                        RevPAR baseline.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="glass-panel p-6 rounded-2xl flex flex-col gap-4">
-                        <button type="submit"
-                            class="w-full py-5 bg-primary-600 text-white text-[11px] font-bold uppercase tracking-widest rounded-2xl hover:bg-primary-700 active:scale-95 transition-all shadow-xl shadow-primary-600/20">
-                            {% if mode == 'edit' %}INITIALIZE SYNC{% else %}EXECUTE DEPLOY{% endif %}
-                        </button>
-                        <a href="{% url 'hotels:offers' %}"
-                            class="w-full py-4 bg-white border border-slate-200 text-center text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-rose-600 hover:border-rose-500 rounded-2xl transition-all">
-                            Discard Changes
-                        </a>
                     </div>
                 </div>
-            </div>
+
+                <!-- Strategic Constraints -->
+                <div class="p-12 bg-slate-900 rounded-[3rem] text-white space-y-12">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+                        <div class="space-y-4">
+                            <label
+                                class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-2">Coupon
+                                Code</label>
+                            <input type="text" name="code" value="{{ offer.code|default:'' }}"
+                                class="w-full bg-white/5 border border-white/10 rounded-2xl px-8 py-5 text-sm font-bold text-white focus:outline-none focus:bg-white/10 transition-all shadow-lg"
+                                placeholder="SUMMER25" style="text-transform: uppercase;">
+                        </div>
+                        <div class="space-y-4">
+                            <label
+                                class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-2">Total
+                                Usage Limit</label>
+                            <input type="number" name="usage_limit" value="{{ offer.usage_limit|default:-1 }}"
+                                class="w-full bg-white/5 border border-white/10 rounded-2xl px-8 py-5 text-sm font-bold text-white focus:outline-none focus:bg-white/10 transition-all shadow-lg">
+                        </div>
+                        <div class="flex items-center gap-6 pt-10 px-4">
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" name="is_public" class="sr-only peer" {% if not offer or offer.is_public %}checked{% endif %}>
+                                <div
+                                    class="w-14 h-7 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-1 after:left-1 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600">
+                                </div>
+                                <span class="ml-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Public
+                                    Catalog</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Orchestration Hub -->
+                <div
+                    class="flex flex-col md:flex-row items-center justify-between gap-8 pt-16 border-t border-slate-100/60">
+                    <a href="{% url 'hotels:offers' %}"
+                        class="px-10 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-[0.4em] hover:text-slate-900 transition-all italic underline underline-offset-8 decoration-slate-200">
+                        CANCEL
+                    </a>
+                    <button type="submit"
+                        class="btn-premium px-16 py-6 rounded-2xl text-[11px] font-bold tracking-[0.4em] flex items-center gap-6 transition-all hover:scale-105 active:scale-95 shadow-[0_25px_50px_-12px_rgba(37,99,235,0.4)]">
+                        <i class="fas fa-rocket text-xl animate-pulse"></i>
+                        {% if offer %}SAVE CHANGES{% else %}CREATE OFFER{% endif %}
+                    </button>
+                </div>
+            </form>
         </div>
-    </form>
+    </div>
 </div>
-
-<style>
-    .active-archetype {
-        border-color: #2563eb !important;
-        background: #eff6ff !important;
-        color: #2563eb !important;
-        box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.05);
-    }
-
-    .archetype-pill:hover:not(.active-archetype) {
-        border-color: #cbd5e1 !important;
-        background: #fff !important;
-        color: #1e293b !important;
-    }
-</style>
 {% endblock %}
-
 {% block extra_scripts %}
-<script src="{% static 'hotels/js/add_offer.js' %}"></script>
-<script>
-    // Archetype Selection Logic
-    document.querySelectorAll('.archetype-pill').forEach(pill => {
-        pill.addEventListener('click', () => {
-            document.querySelectorAll('.archetype-pill').forEach(p => p.classList.remove('active-archetype'));
-            pill.classList.add('active-archetype');
-            document.getElementById('offer_type_input').value = pill.dataset.value;
-        });
-    });
-</script>
+<script src="{% static 'hotels/js/add_offer.js' %}" defer></script>
 {% endblock %}
