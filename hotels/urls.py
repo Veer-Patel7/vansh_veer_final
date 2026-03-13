@@ -38,9 +38,12 @@ urlpatterns = [
     
     # Offers Workflow
     path('owner/offers/', views.offers_view, name='offers'),
-    path('offers/create/', views.create_offer, name='create_offer'),
-    path('offers/edit/<int:offer_id>/', views.edit_offer, name='edit_offer'),
+    path('offers/add/', views.add_offer, name='add_offer'),
+    path('offers/edit/<int:offer_id>/', views.add_offer, name='edit_offer'),
+    path('offers/toggle/<int:offer_id>/', views.toggle_offer_status, name='toggle_offer_status'),
     path('offers/delete/<int:offer_id>/', views.delete_offer, name='delete_offer'),
+    path('api/offers/<int:offer_id>/usage/', views.offer_usage_details, name='offer_usage_details'),
+    path('api/offers/<int:offer_id>/rooms/', views.offer_rooms_details, name='offer_rooms_details'),
     path('offers/submit/<int:offer_id>/', views.submit_offer, name='submit_offer'),
 
     # Super Admin Verification & Offer Panel

@@ -162,7 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let customRoomVariants = JSON.parse(localStorage.getItem('hotepro_custom_variants')) || {};
 
     window.updateRoomCategoryOptions = (row) => {
-        const classVal = row.querySelector('input[name^="room_class"], select[name^="room_class"]').value;
+        const classVal = row.querySelector('input[name^="room_type"], select[name^="room_type"]').value;
         const catSelectContainer = row.querySelector('.category-name-select-container');
         if (!catSelectContainer) return;
 
@@ -563,7 +563,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Toggle Room Manager Modal (Step 2)
         if (item && item.classList.contains('custom-cat-trigger')) {
             const row = container.closest('.room-card-elite') || container.closest('.room-row');
-            const classVal = row ? row.querySelector('input[name^="room_class"], select[name^="room_class"]').value : 'STANDARD';
+            const classVal = row ? row.querySelector('input[name^="room_type"], select[name^="room_type"]').value : 'STANDARD';
             window.openRoomManager('category', classVal, container);
             if (container.querySelector('.select-items')) container.querySelector('.select-items').classList.remove('show');
             return;
@@ -618,7 +618,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Trigger dependency updates (like Max Guests)
             const row = container.closest('.room-card-elite') || container.closest('.room-row');
-            if (row && container.dataset.target.includes('room_class')) {
+            if (row && container.dataset.target.includes('room_type')) {
                 window.updateRoomCategoryOptions(row);
             }
         }

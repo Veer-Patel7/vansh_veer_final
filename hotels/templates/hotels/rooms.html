@@ -63,7 +63,7 @@
                         {% endwith %}
                         <div
                             class="absolute inset-x-0 bottom-0 p-4 flex justify-between items-end bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                            <span class="text-[8px] font-black text-white uppercase tracking-widest">{{ room.room_class}}</span>
+                            <span class="text-[8px] font-black text-white uppercase tracking-widest">{{ room.room_type}}</span>
                             <div class="flex gap-2">
                                 <div
                                     class="w-6 h-6 rounded-lg bg-white/20 backdrop-blur-md flex items-center justify-center text-white">
@@ -86,12 +86,12 @@
                                     {{ room.name }}</h3>
                                 <div class="flex items-center gap-3 mt-2">
                                     <span
-                                        class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{{room.room_class
+                                        class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{{room.room_type
                                         }}</span>
                                     <div class="w-1.5 h-1.5 rounded-full bg-slate-200"></div>
                                     <span
                                         class="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-1.5">
-                                        <i class="fas fa-users text-[8px]"></i> {{room.max_guests }} Guests
+                                        <i class="fas fa-users text-[8px]"></i> {{room.max_guest }} Guests
                                     </span>
                                     <div class="w-1.5 h-1.5 rounded-full bg-slate-200"></div>
                                     <span

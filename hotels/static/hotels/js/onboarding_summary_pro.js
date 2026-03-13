@@ -261,7 +261,7 @@ class SummaryEngine {
             const index = row.dataset.roomIndex;
             const name = row.querySelector(`[name="room_name_${index}"]`)?.value || 'Standard Category';
             const price = row.querySelector(`[name="room_price_${index}"]`)?.value || '0';
-            const type = row.querySelector(`[name="room_class_${index}"]`)?.value || 'Room';
+            const type = row.querySelector(`[name="room_type_${index}"]`)?.value || 'Room';
             const amenitiesJson = row.querySelector(`[name="room_amenities_${index}"]`)?.value || '[]';
             let amenities = [];
             try { amenities = JSON.parse(amenitiesJson); } catch (e) { amenities = []; }
