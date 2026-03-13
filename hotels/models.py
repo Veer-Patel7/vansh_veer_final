@@ -160,6 +160,7 @@ class RoomType(models.Model):
     room_image = models.ImageField(upload_to='room_categories/', null=True, blank=True )
     created_at = models.DateTimeField(auto_now_add=True)
 
+    
     def __str__(self):
         return f"{self.name} - {self.hotel.hotel_name}"
     

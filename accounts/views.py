@@ -9,6 +9,7 @@ from django.contrib.auth.decorators import login_required
 from .forms import SuperAdminLoginForm, UserLoginForm, UserRegistrationForm, ForgotPasswordForm, OTPVerificationForm, SetNewPasswordForm
 from .utils import generate_otp
 from hotels.models import Hotel
+from urllib.parse import urlencode
 
 User = get_user_model()
 
@@ -26,17 +27,18 @@ def dashboard_redirect(request):
         return redirect("hotels:hotelregister")
 
     elif request.user.role == "customer":
-        return redirect("customer:home")
+        return redirect("customer:auth")
 
     return redirect("/")
-
+65
 
 # ========================== CUSTOMER LOGIN ==========================
 def customer_login(request):
+    next_url = request.POST.get("next") or request.GET.get("next")
     if request.method == "POST":
         email = request.POST.get("email")
         password = request.POST.get("password")
-
+        
         user = authenticate(request, username=email, password=password)
 
         if user is None:
@@ -51,18 +53,16 @@ def customer_login(request):
             messages.error(request, "Please verify OTP first")
             return redirect("accounts:auth")
 
-        # ✅ LOGIN FIRST
         login(request, user)
 
-        # ✅ THEN HANDLE NEXT
-        next_url = request.GET.get("next") or request.POST.get("next")
+        # ✅ Redirect to booking page if next exists
         if next_url:
             return redirect(next_url)
 
         messages.success(request, "Customer login successful")
         return redirect("customer:home")
-
-    return render(request, "customer/auth.html")
+   
+    return render(request, "customer/auth.html", {"next": next_url})
 
 # ========================== SUPER ADMIN LOGIN ==========================
 def super_login(request):
@@ -127,7 +127,7 @@ def hotel_login(request):
     return render(request, "accounts/hotel_login.html", {"form": form})
 # ========================== CUSTOMER SIGNUP ==========================
 def customer_signup(request):
-
+    next_url = request.POST.get("next") or request.GET.get("next")
     if request.method == "POST":
         first = request.POST.get("first_name")
         last = request.POST.get("last_name")
@@ -163,9 +163,9 @@ def customer_signup(request):
         )
 
         messages.success(request, "OTP sent to your email")
-        return redirect(f"/verify/?email={email}",user="user")
+        return redirect(f"/verify/?email={email}&{urlencode({'next': next_url})}")
         
-    return render(request, "customer_signup")
+    return render(request, "customer/signup.html", {"next": next_url})
 
 # ========================== HOTEL SIGNUP ==========================
 def hotel_signup(request):
@@ -217,6 +217,7 @@ def hotel_signup(request):
 # ========================== VERIFY ACCOUNT OTP ==========================
 def verify(request):
     email = request.GET.get("email")
+    next_url = request.GET.get("next") or request.POST.get("next")
 
     if request.method == "POST":
         otp = request.POST.get("otp")
@@ -233,12 +234,14 @@ def verify(request):
             user.save()
             
             login(request, user)
+            if next_url:
+                return redirect(next_url)
             
             return redirect("accounts:dashboard_redirect")
 
         messages.error(request, "Invalid OTP")
 
-    return render(request, "customer/verify.html", {"email": email})
+    return render(request, "customer/verify.html", {"email": email, "next": next_url})
 
 
 # ========================== FORGOT PASSWORD ==========================

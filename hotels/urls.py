@@ -19,7 +19,6 @@ urlpatterns = [
     # Template-based views
     path('register/', views.add_hotel, name='hotelregister'),
     path('dashboard/<int:hotel_id>/', views.hotel_dashboard, name='hotel_dashboard'),
-    path('dashboard/<int:hotel_id>/', views.hotel_dashboard, name='dashboard_specific'),
     path('rooms/add/<int:hotel_id>/', views.create_room_type, name='create_room_type'),
     path('policy/setup/<int:hotel_id>/', views.setup_policy, name='setup_policy'),
     path('gallery/upload/<int:hotel_id>/', views.upload_images, name='upload_images'),

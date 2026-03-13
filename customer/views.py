@@ -88,29 +88,40 @@ def search_results(request):
     location = request.GET.get("location", "").strip()
     persons = request.GET.get("persons")
 
-    rooms = RoomType.objects.select_related("hotel")
-
     checkin = request.GET.get("checkin")
     checkout = request.GET.get("checkout")
 
-    if location:
-        rooms = rooms.filter(hotel__address__icontains=location)
+    rooms = RoomType.objects.select_related("hotel")
 
+    # Location filter
+    if location:
+        rooms = rooms.filter(hotel__city__icontains=location)
+
+    # Guest filter
     if persons:
         rooms = rooms.filter(max_guest__gte=persons)
 
+    # Availability check
     if checkin and checkout:
         checkin = date.fromisoformat(checkin)
         checkout = date.fromisoformat(checkout)
-        
+
         for room in rooms:
             room.available = room.available_rooms(checkin, checkout)
-            
+
+        # Only show available rooms
+        rooms = [room for room in rooms if room.available > 0]
+
     else:
         for room in rooms:
             room.available = room.total_rooms
 
-    return render(request, "customer/search_results.html", {"rooms": rooms})
+    return render(request, "customer/search_results.html", {
+        "rooms": rooms,
+        "checkin": checkin,
+        "checkout": checkout,
+        "location": location
+    })
 
 
 def hotel_detail(request, pk):

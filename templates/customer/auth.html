@@ -15,6 +15,7 @@
             <h2>Login</h2>
 <br>
             <form method="POST" action="{% url 'accounts:customer_login' %}">
+                <input type="hidden" name="next" value="{{ next }}">
                 {% csrf_token %}
 
                 <input type="hidden" name="next" value="{{ request.GET.next }}">
@@ -39,6 +40,7 @@
 
             <form method="POST"  action="{% url 'accounts:customer_signup' %}">
                 {% csrf_token %}
+                <input type="hidden" name="next" value="{{ next }}">
                 <input type="text" name="username" placeholder="Username" required>
                 <input type="text" name="first_name" placeholder="First Name" required>
                 <input type="text" name="last_name" placeholder="Last Name" required>

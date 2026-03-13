@@ -123,6 +123,13 @@
                     <p><strong>Location:</strong> {{ hotel.address }}</p>
                     <p><strong> ₹ {{ hotel.min_price }}</strong></p>
                     <h5>₹ {{ hotel.max_price }} Totals</h5>
+                    <p><strong>Offer:</strong>
+                        {% if hotel.offers.first %}
+                        {{ hotel.offers.first.get_offer_type_display }}
+                        {% else %}
+                        No Offer
+                        {% endif %}
+                    </p>
                     <a href="{% url 'customer:hotel_detail' hotel.id %}" class="btn-book">View Details</a>
                 </div>
                 {% endfor %}
