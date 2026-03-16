@@ -178,7 +178,7 @@ section {
     display:flex;
     justify-content:space-between;
     align-items:center;
-    box-shadow:0 10px 30px rgba(0, 0, 0, 0);
+    box-shadow:0 10px 30px #3b83f6ae;
     z-index:5;
 }
 
@@ -376,7 +376,7 @@ section {
     padding:40px;
     border-radius:20px;
     text-align:center;
-    box-shadow:0 5px 15px rgba(0,0,0,0.15);
+    box-shadow:0 5px 15px #3b83f6d6;
 }
 
 /* Title */
@@ -430,7 +430,7 @@ section {
     background:white;
     padding:30px;
     border-radius:12px;
-    box-shadow:0 5px 15px rgba(0,0,0,0.15);
+    box-shadow:0 5px 15px #3b83f6d6;
 
     display:flex;
     flex-direction:column;
