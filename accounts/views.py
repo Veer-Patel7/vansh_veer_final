@@ -27,7 +27,7 @@ def dashboard_redirect(request):
         return redirect("hotels:hotelregister")
 
     elif request.user.role == "customer":
-        return redirect("customer:auth")
+        return redirect("customer:home")
 
     return redirect("/")
 65
@@ -43,15 +43,15 @@ def customer_login(request):
 
         if user is None:
             messages.error(request, "Invalid email or password")
-            return redirect("accounts:auth")
+            return render(request, "customer/auth.html", {"next": next_url})
 
         if user.role != "customer":
             messages.error(request, "This is not a customer account")
-            return redirect("accounts:auth")
+            return render(request, "customer/auth.html", {"next": next_url})
 
         if not user.is_verified:
             messages.error(request, "Please verify OTP first")
-            return redirect("accounts:auth")
+            return render(request, "customer/auth.html", {"next": next_url})
 
         login(request, user)
 
@@ -163,7 +163,10 @@ def customer_signup(request):
         )
 
         messages.success(request, "OTP sent to your email")
-        return redirect(f"/verify/?email={email}&{urlencode({'next': next_url})}")
+        data ={"email": email}
+        if next_url:
+            data["next"] = next_url
+        return redirect(f"/verify/?email={email}&{urlencode(data)}")
         
     return render(request, "customer/signup.html", {"next": next_url})
 
@@ -234,7 +237,7 @@ def verify(request):
             user.save()
             
             login(request, user)
-            if next_url:
+            if next_url and next_url != "None":
                 return redirect(next_url)
             
             return redirect("accounts:dashboard_redirect")

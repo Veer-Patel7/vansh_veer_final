@@ -79,6 +79,7 @@ def profile_view(request):
         return redirect("customer:home")   # or show permission page
 
     return render(request, "customer/profile.html")
+
 @login_required
 def my_bookings(request):
     bookings = Booking.objects.filter(user=request.user)
@@ -88,40 +89,38 @@ def search_results(request):
     location = request.GET.get("location", "").strip()
     persons = request.GET.get("persons")
 
-    checkin = request.GET.get("checkin")
-    checkout = request.GET.get("checkout")
+    hotels = Hotel.objects.all()
 
-    rooms = RoomType.objects.select_related("hotel")
-
-    # Location filter
     if location:
-        rooms = rooms.filter(hotel__city__icontains=location)
+        hotels = hotels.filter(address__icontains=location)
 
-    # Guest filter
     if persons:
-        rooms = rooms.filter(max_guest__gte=persons)
+        hotels = hotels.filter(rooms__max_guest__gte=persons)
 
-    # Availability check
-    if checkin and checkout:
-        checkin = date.fromisoformat(checkin)
-        checkout = date.fromisoformat(checkout)
-
-        for room in rooms:
-            room.available = room.available_rooms(checkin, checkout)
-
-        # Only show available rooms
-        rooms = [room for room in rooms if room.available > 0]
-
-    else:
-        for room in rooms:
-            room.available = room.total_rooms
+    hotels = hotels.annotate(
+        min_price=Min("rooms__price_per_night"),
+        max_price=Max("rooms__price_per_night")
+    )
 
     return render(request, "customer/search_results.html", {
-        "rooms": rooms,
-        "checkin": checkin,
-        "checkout": checkout,
-        "location": location
+        "hotels": hotels
     })
+    # Availability check
+    # if checkin and checkout:
+    #     checkin = date.fromisoformat(checkin)
+    #     checkout = date.fromisoformat(checkout)
+
+    #     for room in rooms:
+    #         room.available = room.available_rooms(checkin, checkout)
+
+    #     # Only show available rooms
+    #     rooms = [room for room in rooms if room.available > 0]
+
+    # else:
+    #     for room in rooms:
+    #         room.available = room.total_rooms
+
+    
 
 
 def hotel_detail(request, pk):

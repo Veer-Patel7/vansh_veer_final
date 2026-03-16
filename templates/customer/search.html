@@ -33,16 +33,14 @@
                 <a href="#home">Home</a>
                 <a href="#hotels">Hotels</a> 
                 <a href="#contact">Contact Us</a>
-                <a href="#about">About Us</a>
+                <a href="#about">About Us</a> 
                 
             </nav>
 
-                
-
             <div class="auth-section">
-                <a href="{%url 'accounts:hotel_signup'%}">List Your Property Here</a>
-                {% if user.is_authenticated %}
                 
+                {% if user.is_authenticated %}
+                {% comment %} <a href="{%url 'reviews:add_review' hotel_id=hotel.id%}">Add Your Review Here</a> {% endcomment %}
                 <div class="profile-dropdown">
                     <button class="profile-btn">
                         {{ user.first_name|default:"👤"|slice:":1"|upper }}
@@ -55,6 +53,7 @@
                 </div>
 
                 {% else %}
+                    <a href="{%url 'accounts:hotel_signup'%}">List Your Property Here</a>
                     <a href="{% url 'accounts:auth' %}" class="signin-btn">Sign In</a>
                 {% endif %}
             </div>
@@ -67,13 +66,8 @@
             <h1>WELCOME TO  HOTEL PRO</h1>
             <br>
             <h2>Find the best hotels at unbeatable prices. Book your stay with us today!</h2>
-        </div>
-
-        
-        
-            
-        
-            
+        </div>    
+                    
         <!-- SEARCH FORM -->
         <form method="GET" action="{% url 'customer:search_results' %}" class="search-form">
             {% csrf_token %}
@@ -120,16 +114,25 @@
                 {% for hotel in hotels %}
                 <div class="hotel-card">
                     <h3>{{ hotel.hotel_name }}</h3>
+                    <div class="hotel-image">
+                        {% if hotel.image %}
+                            <img src="{{ hotel.image.url }}">
+                        {% else %}
+                            <img src="{% static 'images/default-hotel.jpg' %}">
+                        {% endif %}
+                     </div>
                     <p><strong>Location:</strong> {{ hotel.address }}</p>
-                    <p><strong> ₹ {{ hotel.min_price }}</strong></p>
-                    <h5>₹ {{ hotel.max_price }} Totals</h5>
-                    <p><strong>Offer:</strong>
+                    <p><strong>Price ₹ {{ hotel.min_price }}</strong></p>
+                    <p> Totals ₹ {{ hotel.max_price }} </p>
+                    <p><strong> Total Rooms:</strong> {{ hotel.total_rooms }}</p>
+                    <p><strong>Available Rooms:</strong> {{ hotel.available_rooms }}</p>
+                    {% comment %} <p><strong>Offer:</strong>
                         {% if hotel.offers.first %}
                         {{ hotel.offers.first.get_offer_type_display }}
                         {% else %}
                         No Offer
                         {% endif %}
-                    </p>
+                    </p> {% endcomment %}
                     <a href="{% url 'customer:hotel_detail' hotel.id %}" class="btn-book">View Details</a>
                 </div>
                 {% endfor %}
@@ -138,9 +141,9 @@
             {% endif %}
         </div>
      </section>
-    </section>
-
-
+     </section>
+{% comment %} 
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br> {% endcomment %}
         <!-- contact  -->
 <section id="contact">
         <h1>Contact Us</h1>
@@ -164,7 +167,8 @@
     </form>
 </div>
 </section>
-
+<secttion>
+    </secttion>
   <!-- about -->
 <section id="about">
         <h1>About Us</h1>

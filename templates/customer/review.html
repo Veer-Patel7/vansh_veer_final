@@ -1,0 +1,36 @@
+<form method="POST">
+    {% csrf_token %}
+
+    <div>
+        <label>Rating</label>
+        <select name="rating" required>
+            <option value="">Select Rating</option>
+            <option value="5">⭐⭐⭐⭐⭐</option>
+            <option value="4">⭐⭐⭐⭐</option>
+            <option value="3">⭐⭐⭐</option>
+            <option value="2">⭐⭐</option>
+            <option value="1">⭐</option>
+        </select>
+    </div>
+
+    <br>
+
+    <div>
+        <label>Comment</label><br>
+        <textarea name="comment" rows="4" required></textarea>
+    </div>
+
+    <br>
+
+    <div>
+        <label>Recommend Hotel?</label>
+        <select name="recommend">
+            <option value="True">Yes</option>
+            <option value="False">No</option>
+        </select>
+    </div>
+
+    <br>
+
+    <button type="submit">Submit Review</button>
+</form>

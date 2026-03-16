@@ -28,6 +28,7 @@
     <!-- VERIFY FORM -->
     <form method="post" id="otpForm">
         {% csrf_token %}
+        
         <input type="hidden" name="email" value="{{ email }}">
         <input type="hidden" name="next" value="{{ next }}">
 
