@@ -44,7 +44,7 @@ class HotelOnboardingTest(TestCase):
             'check_out': '11:00',
             'cancellation_policy': 'No cancellation',
             'room_name_1': 'Deluxe Room',
-            'room_class_1': 'DELUXE',
+            'room_type_1': 'DELUXE',
             'room_price_1': 5000,
             'room_guests_1': 2,
             'room_count_1': 5,

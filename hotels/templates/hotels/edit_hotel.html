@@ -220,18 +220,18 @@
                         </div>
                         <div class="col-4 input-group">
                             <label><i class="fas fa-crown text-amber-500"></i> Class Tier Registry</label>
-                            <select name="room_class_{{ forloop.counter }}" class="input-field font-semibold">
-                                <option value="STANDARD" {% if room.room_class == 'STANDARD' %}selected{% endif %}>
+                            <select name="room_type_{{ forloop.counter }}" class="input-field font-semibold">
+                                <option value="STANDARD" {% if room.room_type == 'STANDARD' %}selected{% endif %}>
                                     Standard Level</option>
-                                <option value="DELUXE" {% if room.room_class == 'DELUXE' %}selected{% endif %}>Deluxe
+                                <option value="DELUXE" {% if room.room_type == 'DELUXE' %}selected{% endif %}>Deluxe
                                     Premier</option>
-                                <option value="SUITE" {% if room.room_class == 'SUITE' %}selected{% endif %}>Luxury Suite
+                                <option value="SUITE" {% if room.room_type == 'SUITE' %}selected{% endif %}>Luxury Suite
                                 </option>
-                                <option value="LUXURY" {% if room.room_class == 'LUXURY' %}selected{% endif %}>Ultra
+                                <option value="LUXURY" {% if room.room_type == 'LUXURY' %}selected{% endif %}>Ultra
                                     Luxury</option>
-                                <option value="VILLA" {% if room.room_class == 'VILLA' %}selected{% endif %}>Private Villa
+                                <option value="VILLA" {% if room.room_type == 'VILLA' %}selected{% endif %}>Private Villa
                                 </option>
-                                <option value="ECONOMY" {% if room.room_class == 'ECONOMY' %}selected{% endif %}>Economy
+                                <option value="ECONOMY" {% if room.room_type == 'ECONOMY' %}selected{% endif %}>Economy
                                     Basic</option>
                             </select>
                         </div>
@@ -239,7 +239,7 @@
                         <!-- Capacity & Economics -->
                         <div class="col-4 input-group">
                             <label><i class="fas fa-users text-slate-400"></i> Max Occupancy</label>
-                            <input type="number" name="room_guests_{{ forloop.counter }}" value="{{ room.max_guests }}"
+                            <input type="number" name="room_guests_{{ forloop.counter }}" value="{{ room.max_guest }}"
                                 class="input-field" min="1">
                         </div>
                         <div class="col-4 input-group">

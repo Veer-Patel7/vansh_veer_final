@@ -16,8 +16,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=150)),
-                ('room_class', models.CharField(choices=[('STANDARD', 'Standard'), ('DELUXE', 'Deluxe'), ('SUITE', 'Suite'), ('VILLA', 'Villa')], default='STANDARD', max_length=50)),
-                ('max_guests', models.PositiveIntegerField(default=2)),
+                ('room_type', models.CharField(choices=[('STANDARD', 'Standard'), ('DELUXE', 'Deluxe'), ('SUITE', 'Suite'), ('VILLA', 'Villa')], default='STANDARD', max_length=50)),
+                ('max_guest', models.PositiveIntegerField(default=2)),
                 ('base_price', models.DecimalField(decimal_places=2, max_digits=12)),
                 ('inventory_count', models.PositiveIntegerField(default=1)),
                 ('amenities', models.JSONField(blank=True, default=list)),

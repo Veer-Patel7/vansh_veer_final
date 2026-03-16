@@ -202,11 +202,49 @@ class Offer(models.Model):
         ('CATEGORY', 'Selected Room Categories'),
         ('ROOM', 'Specific Rooms'),
     ]
+    
+    OFFER_SCOPE = [
+        ('HOTEL', 'Hotel Specific'),
+        ('GLOBAL', 'Platform Wide'),
+    ]
+
+    STRATEGY_CHOICES = [
+        ('GROWTH', 'Growth (New Customers)'),
+        ('URGENCY', 'Urgency (Flash Sale)'),
+        ('LOYALTY', 'Loyalty (Repeat Guests)'),
+        ('SEASONAL', 'Seasonal (Festivals/Holidays)'),
+        ('DIRECT', 'Direct Discount'),
+        ('SKIM', 'Skim (Premium Yield Scheme)'),
+        ('CUSTOM', 'Custom (Bespoke Strategy)'),
+    ]
+
+    CATEGORY_CHOICES = [
+        ('PRICE', 'Price Discount'),
+        ('STAY', 'Stay Duration'),
+        ('FB', 'Dining & F&B'),
+        ('EXPERIENCE', 'Experience/Activity'),
+        ('PERKS', 'Special Perks'),
+    ]
+
+    GUEST_SEGMENT_CHOICES = [
+        ('PUBLIC', 'All Guests'),
+        ('MEMBERS', 'Club Members Only'),
+        ('PRIVATE', 'Private Link/Referral'),
+    ]
+    
+    PROMOTION_TYPE_CHOICES = [
+        ('PERCENT', 'Percentage Discount'),
+        ('FIXED', 'Fixed Amount Discount'),
+        ('BOGO', 'Buy One Get One'),
+        ('UPGRADE', 'Free Room Upgrade'),
+    ]
 
     hotel = models.ForeignKey(Hotel,on_delete=models.CASCADE,related_name='offers')
     name = models.CharField(max_length=100, verbose_name="Offer Title")
     offer_type = models.CharField(max_length=20, choices=OFFER_TYPES, default='PERCENTAGE')
-    
+    targeted_hotels = models.ManyToManyField(Hotel,related_name="targeted_offers",blank=True)
+    targeted_rooms = models.ManyToManyField(RoomType,related_name="targeted_offers",blank=True)
+    combinable_offers = models.ManyToManyField("self",symmetrical=False,blank=True)
     # Discount Details
     discount_type = models.CharField(max_length=20, choices=[('PERCENT', '%'), ('FIXED', '₹')], default='PERCENT')
     discount_value = models.DecimalField(max_digits=10, decimal_places=2)

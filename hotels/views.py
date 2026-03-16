@@ -1,4 +1,5 @@
 import logging
+import json
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponseForbidden, JsonResponse
@@ -6,22 +7,22 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from accounts.decorators import hotel_admin_required, super_admin_required
 from .models import Hotel, RoomPhoto, RoomType, HotelImage, Offer, ChangeRequest, LocationHistory
-import json
 from django.utils import timezone
-from datetime import timedelta
+from datetime import datetime, timedelta
 from .forms import HotelDeploymentForm, RoomTypeForm, HotelPolicyForm, OfferForm
-from reviews.models import Review
 from rest_framework import viewsets, permissions, status, parsers
 from rest_framework.response import Response
 from bookings.models import Booking
-from rest_framework.decorators import action
-from .serializers import (
-    HotelSerializer, RoomTypeSerializer, 
-    HotelImageSerializer
-) 
+from reviews.models import Review
+from rest_framework.decorators import action 
 from django.views.decorators.http import require_POST
 from django.db import transaction, models
 from django.db.models import Avg, Count, Sum
+from decimal import Decimal
+from .serializers import (
+    HotelSerializer, RoomTypeSerializer, 
+    HotelImageSerializer
+)
 
 
 logger = logging.getLogger('hotelpro')
@@ -104,7 +105,7 @@ def add_hotel(request):
                     while f'room_name_{room_idx}' in request.POST:
 
                         room_name = request.POST.get(f'room_name_{room_idx}')
-                        room_class = request.POST.get(f'room_class_{room_idx}', 'STANDARD')
+                        room_type = request.POST.get(f'room_type_{room_idx}', 'STANDARD')
 
                         try:
                             price_str = request.POST.get(f'room_price_{room_idx}', '0').replace(',', '')
@@ -123,7 +124,7 @@ def add_hotel(request):
                         room = RoomType.objects.create(
                             hotel=hotel,
                             name=room_name,
-                            room_type=room_class.upper(),
+                            room_type=room_type.upper(),
                             price_per_night=price,
                             max_guest=guests,
                             total_rooms=inventory,
@@ -213,11 +214,34 @@ def edit_hotel(request, hotel_id):
             hotel.cancellation_policy = request.POST.get('cancellation_policy', hotel.cancellation_policy)
             
             # Handle services list
-            services_data = request.POST.get("services", "[]")
+            services_raw = request.POST.get('services', '[]')
+            if services_raw:
+                # Fix for Python-style single quotes in rendered templates
+                if "'" in services_raw and '"' not in services_raw:
+                    services_raw = services_raw.replace("'", '"')
+                try:
+                    hotel.services = json.loads(services_raw)
+                    if not isinstance(hotel.services, list): hotel.services = []
+                except:
+                    hotel.services = request.POST.getlist('services')
+            
+            hotel.name = request.POST.get('hotel_name', hotel.name)
+            hotel.category = request.POST.get('hotel_type', hotel.category)
+            hotel.address = request.POST.get('address', hotel.address)
+            hotel.city = request.POST.get('city', hotel.city)
+            hotel.state = request.POST.get('state', hotel.state)
+            hotel.pincode = request.POST.get('pincode', hotel.pincode)
+            hotel.contact_number = request.POST.get('contact_number', hotel.contact_number)
+            hotel.website = request.POST.get('website', hotel.website)
+            hotel.narrative = request.POST.get('hotel_narrative', hotel.narrative)
+            
             try:
-                hotel.services = json.loads(services_data)
-            except:
-                hotel.services = []
+                hotel.star_rating = Decimal(str(request.POST.get('star_rating') or hotel.star_rating))
+            except: pass
+            
+            hotel.check_in_time = request.POST.get('check_in', hotel.check_in_time)
+            hotel.check_out_time = request.POST.get('check_out', hotel.check_out_time)
+            hotel.cancellation_policy = request.POST.get('cancellation_policy', hotel.cancellation_policy)
                 
             # 3. Compliance Data (Step 3 Fields)
             hotel.id_type = request.POST.get('id_type', hotel.id_type)
@@ -231,6 +255,7 @@ def edit_hotel(request, hotel_id):
             if request.FILES.get('doc_gst'): hotel.doc_gst = request.FILES.get('doc_gst')
             
             hotel.save()
+            logger.info(f"[Edit Hotel] Identity & Compliance saved for '{hotel.name}'")
 
             # 4. Inventory Matrix Sync (Dynamic Rooms)
             # Find all room indices from the post data (matches room_name_X)
@@ -244,60 +269,85 @@ def edit_hotel(request, hotel_id):
             
             # Tracking existing room IDs to detect deletions
             processed_room_ids = []
-            
+            logger.info(f"[Edit Hotel] Detected {len(new_room_indices)} room node(s) for sync: {new_room_indices}")
+            logger.info(f"[Edit Hotel] All POST keys: {list(request.POST.keys())}")
             for idx in new_room_indices:
-                room_id = request.POST.get(f'room_id_{idx}') # If it exists, it's an edit
-                name = request.POST.get(f'room_name_{idx}')
-                r_class = request.POST.get(f'room_class_{idx}', 'STANDARD')
                 try:
-                    guests = int(request.POST.get(f'room_guests_{idx}', 2))
-                    price = float(request.POST.get(f'room_price_{idx}', 0))
-                    count = int(request.POST.get(f'room_count_{idx}', 1))
-                except:
-                    guests, price, count = 2, 0, 1
-                
-                amenities_data = request.POST.get(f'room_amenities_{idx}', '[]')
-                try: 
-                    amenities_list = json.loads(amenities_data)
-                    if not isinstance(amenities_list, list): amenities_list = []
-                except: 
-                    amenities_list = []
+                    room_id = request.POST.get(f'room_id_{idx}') # If it exists, it's an edit
+                    name = request.POST.get(f'room_name_{idx}')
+                    if not name: continue # Safety skip for ghost nodes
 
-                if room_id: # Edit Existing
-                    room = get_object_or_404(RoomType, id=room_id, hotel=hotel)
-                    room.name = name
-                    room.room_type = r_class
-                    room.max_guest = guests
-                    room.price_per_night = price
-                    room.total_rooms = count
-                    room.amenities = amenities_list
-                    room.save()
-                    processed_room_ids.append(room.id)
-                else: # Create New
-                    room = RoomType.objects.create(
-                        hotel=hotel,
-                        name=name,
-                        room_type=r_class,
-                        max_guest=guests,
-                        price_per_night=price,
-                        total_rooms=count,
-                        amenities=amenities_list
-                    )
-                    processed_room_ids.append(room.id)
-                
-                # Room Media Logic
-                # 1. Process Deletions
-                deleted_photos_data = request.POST.get(f'deleted_room_photos_{idx}', '[]')
-                try:
-                    deleted_photos_ids = json.loads(deleted_photos_data)
-                    if deleted_photos_ids:
-                        RoomPhoto.objects.filter(id__in=deleted_photos_ids, room=room).delete() 
-                except: pass
+                    try:
+                        p_price = request.POST.get(f'room_price_{idx}')
+                        p_raw = "".join(c for c in str(p_price) if c.isdigit() or c == '.') if p_price else "0"
+                        price = Decimal(p_raw or "0")
+                        
+                        p_guests = request.POST.get(f'room_guests_{idx}')
+                        guests = int("".join(c for c in str(p_guests) if c.isdigit()) or "2") if p_guests else 2
+                        
+                        p_count = request.POST.get(f'room_count_{idx}')
+                        count = int("".join(c for c in str(p_count) if c.isdigit()) or "1") if p_count else 1
+                    except Exception as num_err:
+                        price, guests, count = Decimal('0.0'), 2, 1
+                        logger.warning(f"[Edit Hotel] Numeric fallback used for node {idx}: {str(num_err)}")
 
-                # 2. Add New Media
-                room_media = request.FILES.getlist(f'room_photos_{idx}')
-                for f in room_media:
-                    RoomPhoto.objects.create(room=room, media_file=f)
+                    r_class = request.POST.get(f'room_type_{idx}', 'STANDARD') or 'STANDARD'
+                    
+                    amenities_data = request.POST.get(f'room_amenities_{idx}', '[]')
+                    if "'" in amenities_data and '"' not in amenities_data:
+                        amenities_data = amenities_data.replace("'", '"')
+                    try: 
+                        amenities_list = json.loads(amenities_data)
+                        if not isinstance(amenities_list, list): amenities_list = []
+                    except: 
+                        amenities_list = []
+
+                    if room_id:
+                        try:# Edit Existing
+                            room = get_object_or_404(RoomType, id=room_id, hotel=hotel)
+                            room.name = name
+                            room.room_type = r_class
+                            room.max_guest = guests
+                            room.price_per_night = price
+                            room.total_rooms = count
+                            room.amenities = amenities_list
+                            room.save()
+                            processed_room_ids.append(room.id) 
+                        except:  # If ID specified but not found in this hotel context, create new
+                            room = RoomType.objects.create(
+                                hotel=hotel, name=name, room_type=r_class,
+                                max_guest=guests, base_price=price,
+                                inventory_count=count, amenities=amenities_list
+                            )
+                    else: # Create New
+                        room = RoomType.objects.create(
+                            hotel=hotel,
+                            name=name,
+                            room_type=r_class,
+                            max_guest=guests,
+                            price_per_night=price,
+                            total_rooms=count,
+                            amenities=amenities_list
+                        )
+                    processed_room_ids.append(room.id)
+                    logger.info(f"[Edit Hotel] Category '{name}' synced successfully.")
+                        
+                    # Room Media Logic
+                    # 1. Process Deletions
+                    deleted_photos_data = request.POST.get(f'deleted_room_photos_{idx}', '[]')
+                    try:
+                        deleted_photos_ids = json.loads(deleted_photos_data)
+                        if deleted_photos_ids:
+                            RoomPhoto.objects.filter(id__in=deleted_photos_ids, room=room).delete() 
+                    except: pass
+
+                    # 2. Add New Media
+                    room_media = request.FILES.getlist(f'room_photos_{idx}')
+                    for f in room_media:
+                        RoomPhoto.objects.create(room=room, media_file=f)
+                        
+                except Exception as room_err:
+                        logger.error(f"[Edit Hotel] Failure in room loop {idx}: {str(room_err)}")
 
             # Cleanup: Remove rooms not present in the update
             if processed_room_ids:
@@ -318,7 +368,7 @@ def edit_hotel(request, hotel_id):
                 HotelImage.objects.create(hotel=hotel, image_path=f)
 
             messages.success(request, f"Global Property Dossier for '{hotel.name}' has been securely updated.")
-            return redirect('my_hotels')
+            return redirect('hotels:my_hotels')
 
         except Exception as e:
             logger.error(f"[Edit Hotel Error] {str(e)}")
@@ -419,8 +469,8 @@ def add_room(request, hotel_id=None, room_id=None):
     if request.method == "POST":
         try:
             name = request.POST.get("name")
-            room_class = request.POST.get("room_class", "STANDARD")
-            max_guests = int(request.POST.get("max_guests", 2))
+            room_type = request.POST.get("room_type", "STANDARD")
+            max_guest = int(request.POST.get("max_guest", 2))
             base_price = float(request.POST.get("base_price", 0))
             inventory = int(request.POST.get("inventory_count", 1))
 
@@ -439,10 +489,10 @@ def add_room(request, hotel_id=None, room_id=None):
             # EDIT
             if room:
                 room.name = name
-                room.room_class = room_class
-                room.max_guests = max_guests
-                room.base_price = base_price
-                room.inventory_count = inventory
+                room.room_type = room_type
+                room.max_guest = max_guest
+                room.price_per_night = base_price
+                room.total_rooms = inventory
                 room.amenities = amenities_list
                 room.save()
 
@@ -453,8 +503,8 @@ def add_room(request, hotel_id=None, room_id=None):
                 room = RoomType.objects.create(
                     hotel=hotel,
                     name=name,
-                    room_class=room_class,
-                    max_guests=max_guests,
+                    room_type=room_type,
+                    max_guest=max_guest,
                     base_price=base_price,
                     inventory_count=inventory,
                     amenities=amenities_list
@@ -467,7 +517,7 @@ def add_room(request, hotel_id=None, room_id=None):
 
             for photo in room_photos:
                 RoomPhoto.objects.create(
-                    room_category=room,
+                    room=room,
                     media_file=photo
                 )
 
@@ -664,81 +714,257 @@ def admin_dashboard_pro(request):
 # --- Offers Management ---
 @hotel_admin_required
 def offers_view(request):
-    owned_hotels = Hotel.objects.filter(owner=request.user)
-    offers = Offer.objects.filter(hotel__in=owned_hotels)
+    """
+    Manage Hotel Offers and Discounts Portfolio.
+    """
+    user_hotels = Hotel.objects.filter(owner=request.user)
+    if not user_hotels.exists():
+        return redirect('hotels:hotelregister')
+        
+    # Dynamic portfolio filtering
+    offers_list = Offer.objects.filter(hotel__in=user_hotels).distinct().order_by('-created_at')
     
-    # Filtering
-    status_filter = request.GET.get('status')
-    if status_filter:
-        offers = offers.filter(status=status_filter.upper())
+    # Professional Analytics (Aggregated)
+    total_count = offers_list.count()
+    active_count = offers_list.filter(status="LIVE").count()
+    
+    avg_redemption = 0
 
-    # Real Stats
-    from django.db.models import Sum
-    total_redemptions = offers.aggregate(total=Sum('redemption_count'))['total'] or 0
-    offer_revenue = Booking.objects.filter(applied_offer__in=offers).aggregate(total=Sum('total_price'))['total'] or 0
-    active_campaigns = offers.filter(status='LIVE').count()
+    if total_count > 0:
+        total_redemptions = offers_list.aggregate(Sum('redemption_count'))['redemption_count__sum'] or 0
+        avg_redemption = total_redemptions / total_count
+
+    total_revenue = Booking.objects.filter(applied_offer__in=offers_list).aggregate(total=Sum('total_price'))['total'] or 0
 
     stats = {
-        'total_redemptions': total_redemptions,
-        'offer_revenue': offer_revenue,
-        'conversion_lift': 12.5,
-        'active_campaigns': active_campaigns
+        'active_offers': active_count,
+        'draft_offers': total_count - active_count,
+        'total_offers': total_count,
+        'avg_discount': offers_list.aggregate(Avg('discount_value'))['discount_value__avg'] or 0,
+        'avg_redemption': avg_redemption,
+        'total_revenue': total_revenue,
     }
 
-    return render(request, 'hotels/offers.html', {'offers': offers, 'stats': stats})
+    # Templates Gallery Data
+    templates = [
+        {'id': 'early_bird', 'name': 'Early Bird Special', 'discount': 25, 'icon': 'fa-clock', 'category': 'PRICE', 'label': 'Advance Booking'},
+        {'id': 'last_minute', 'name': 'Last Minute Deal', 'discount': 40, 'icon': 'fa-bolt', 'category': 'PRICE', 'label': 'Inventory Clearance'},
+        {'id': 'fb_experience', 'name': 'Gourmet Stay', 'discount': 15, 'icon': 'fa-utensils', 'category': 'FB', 'label': 'F&B Bundle'},
+        {'id': 'wellness', 'name': 'Wellness Retreat', 'discount': 20, 'icon': 'fa-spa', 'category': 'EXPERIENCE', 'label': 'Experience'},
+    ]
+    
+    # Prepare JSON data for the calendar engine
+    offers_json = []
+    for o in offers_list:
+        offers_json.append({
+            'name': o.name,
+            'activation_date': o.activation_date.strftime('%Y-%m-%d') if o.activation_date else None,
+            'expiration_date': o.expiration_date.strftime('%Y-%m-%d') if o.expiration_date else None,
+            'is_live': o.status == "LIVE"
+        })
 
+    return render(request, 'hotels/offers.html', {
+        'offers': offers_list, 
+        'offers_json': offers_json,
+        'user_hotels': user_hotels,
+        'hotel': user_hotels.first(),
+        'stats': stats,
+        'templates': templates
+    })
+    
 @hotel_admin_required
-def create_offer(request):
-    owned_hotels = Hotel.objects.filter(owner=request.user)
-    room_types = RoomType.objects.filter(hotel__in=owned_hotels)
-    
+def add_offer(request, offer_id=None):
+    """
+    Create or Edit Hotel Offers.
+    Handles precise targeting across multiple properties and specific room categories.
+    """
+    user_hotels = Hotel.objects.filter(owner=request.user)
+    if not user_hotels.exists(): 
+        return redirect('hotels:hotelregister')
+        
+    offer = None
+    if offer_id:
+        # Secure retrieval: must be owned by user through at least one targeted hotel
+        offer = get_object_or_404(Offer, id=offer_id, hotel__owner=request.user)
+        
     if request.method == 'POST':
-        form = OfferForm(request.POST)
-        if form.is_valid():
-            offer = form.save()
-            messages.success(request, "Offer created successfully!")
-            return redirect('hotels:offers')
-    else:
-        form = OfferForm()
-    
-    context = {
-        'form': form,
-        'owned_hotels': owned_hotels,
-        'room_types': room_types,
-        'mode': 'create'
-    }
-    return render(request, 'hotels/add_offer.html', context)
+        try:
+            name = request.POST.get('name')
+            if offer:
+                code = offer.code
+            else:
+                import uuid
+                code = uuid.uuid4().hex[:8].upper()
+            
+            # Elite field mapping
+            category = request.POST.get('category', 'PRICE')
+            promotion_type = request.POST.get('promo_type', 'PERCENT')
+            discount = request.POST.get('discount_value', 0)
+            min_nights = request.POST.get('min_nights_stay', 1)
+            
+            # Window mapping
+            start_date_str = request.POST.get('start_date')
+            end_date_str = request.POST.get('end_date')
+            
+            # Professional date parsing
+            activation_date = None
+            expiration_date = None
+            if start_date_str:
+                activation_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
+            if end_date_str:
+                expiration_date = datetime.strptime(end_date_str, '%Y-%m-%d').date()
 
-@hotel_admin_required
-def edit_offer(request, offer_id):
-    owned_hotels = Hotel.objects.filter(owner=request.user)
-    room_types = RoomType.objects.filter(hotel__in=owned_hotels)
-    offer = get_object_or_404(Offer, id=offer_id, hotel__owner=request.user)
-    
-    if request.method == 'POST':
-        form = OfferForm(request.POST, instance=offer)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Offer updated!")
+            strategy = request.POST.get('strategy', 'DIRECT')
+            limit = request.POST.get('usage_limit', -1)
+            min_spend = request.POST.get('min_booking_amount', 0)
+            max_disc = request.POST.get('max_discount_amount')
+            description = request.POST.get('description', '')
+            is_public = request.POST.get('is_public') == 'on'
+            is_live = request.POST.get('is_live') == 'true'
+            is_stackable = request.POST.get('is_stackable') == 'true'
+
+            # Asset Orchestration
+            hotel_ids = [hid for hid in request.POST.getlist('targeted_hotels') if hid.isdigit()]
+            room_selection_mode = request.POST.get('room_selection_mode', 'ALL')
+            
+            if room_selection_mode == 'ALL':
+                room_ids = list(RoomType.objects.filter(hotel_id__in=hotel_ids).values_list('id', flat=True))
+            else:
+                room_ids = [rid for rid in request.POST.getlist('targeted_rooms') if rid.isdigit()]
+
+            if not hotel_ids:
+                messages.warning(request, "Portfolio Alert: At least one property must be selected for activation.")
+                return redirect('hotels:add_offer')
+
+            perks = request.POST.get('perks', '')
+
+            if offer:
+                offer.name = name
+                offer.code = code
+                offer.strategy = strategy
+                offer.category = category
+                offer.promotion_type = promotion_type
+                offer.min_nights_stay = min_nights
+                offer.perks = perks
+                offer.is_stackable = is_stackable
+                offer.discount_percent = discount
+                offer.activation_date = activation_date
+                offer.expiration_date = expiration_date
+                offer.usage_limit = limit
+                offer.min_booking_amount = min_spend
+                offer.max_discount_amount = max_disc if max_disc else None
+                offer.description = description
+                offer.is_public = is_public
+                offer.is_live = is_live
+                offer.status = 'ACTIVE' if is_live else 'DRAFT'
+                offer.save()
+            else:
+                offer = Offer.objects.create(
+                    name=name,
+                    code=code,
+                    strategy=strategy,
+                    category=category,
+                    promotion_type=promotion_type,
+                    min_nights_stay=min_nights,
+                    perks=perks,
+                    is_stackable=is_stackable,
+                    discount_percent=discount,
+                    activation_date=activation_date,
+                    expiration_date=expiration_date,
+                    usage_limit=limit,
+                    min_booking_amount=min_spend,
+                    max_discount_amount=max_disc if max_disc else None,
+                    description=description,
+                    is_public=is_public,
+                    is_live=is_live,
+                    status='ACTIVE' if is_live else 'DRAFT',
+                    scope='HOTEL'
+                )
+
+            # Sync M2M Relationships
+            offer.targeted_hotels.set(Hotel.objects.filter(id__in=hotel_ids, owner=request.user))
+            offer.targeted_rooms.set(RoomType.objects.filter(id__in=room_ids, hotel__owner=request.user))
+
+            if is_stackable:
+                combinable_ids = [cid for cid in request.POST.getlist('combinable_offers') if cid.isdigit()]
+                offer.combinable_offers.set(Offer.objects.filter(id__in=combinable_ids, targeted_hotels__owner=request.user))
+            else:
+                offer.combinable_offers.clear()
+            
+            # Bonded Legacy Link (Unified Indexing)
+            offer.hotel = offer.targeted_hotels.first()
+            offer.save()
+
+            status_msg = "Campaign activated across dossier." if is_live else "Strategic draft saved for future deployment."
+            messages.success(request, f"Strategic Update: {status_msg}")
             return redirect('hotels:offers')
-    else:
-        form = OfferForm(instance=offer)
+            
+        except Exception as e:
+            import traceback
+            logger.error(f"[Strategic Failure] Offer Persistence Error: {str(e)}\n{traceback.format_exc()}")
+            messages.error(request, f"Strategic Failure: {str(e)}")
+
+    # Data for the "Elite" Selection Matrix
+    all_rooms = RoomType.objects.filter(hotel__owner=request.user).select_related('hotel').prefetch_related('photos')
     
-    context = {
-        'form': form,
+    # Pre-compute JSON for dynamic room rendering on frontend
+    rooms_by_hotel = {}
+    for room in all_rooms:
+        hotel_id = str(room.hotel.id)
+        if hotel_id not in rooms_by_hotel:
+            rooms_by_hotel[hotel_id] = []
+            
+        photo = room.photos.first()
+        photo_url = photo.media_file.url if photo else ""
+        
+        rooms_by_hotel[hotel_id].append({
+            'id': str(room.id),
+            'name': room.name,
+            'room_type': room.room_type,
+            'max_guest': room.max_guest,
+            'price_per_night': float(room.price_per_night),
+            'image': photo_url,
+            'hotel_name': room.hotel.hotel_name
+        })
+        
+    rooms_by_hotel_json = json.dumps(rooms_by_hotel)
+    
+    # Strategy Metadata for the refined Elite UI
+    # Structure: (CODE, NAME, ICON, THEME, SUBTITLE, CATEGORY, PROMO_TYPE, DISCOUNT, MIN_NIGHTS)
+    strategy_data = [
+        ('SEASONAL', 'Summer Cycle', 'fa-sun', 'seasonal', '15% MAGNITUDE', 'PRICE', 'PERCENT', 15, 1),
+        ('RETENTION', 'Extended Stay', 'fa-moon', 'stay', 'STAY 3+, PAY 2', 'STAY', 'BOGO', 0, 3),
+        ('PREMIUM', 'Elite Retreat', 'fa-crown', 'experience', 'INCLUSION BUNDLE', 'EXPERIENCE', 'UPGRADE', 0, 1),
+        ('GROWTH', 'Strategic Expansion', 'fa-chart-line', 'growth', 'VOLUME BOOST', 'PRICE', 'PERCENT', 20, 1),
+        ('URGENCY', 'Flash Velocity', 'fa-fire-alt', 'urgency', 'LIMITED WINDOW', 'PRICE', 'FIXED', 1000, 1),
+        ('LOYALTY', 'Elite Member', 'fa-award', 'loyalty', 'RETENTION MAGNET', 'PERKS', 'UPGRADE', 0, 1),
+        ('ARCHITECT', 'Bespoke Offer', 'fa-pen-nib', 'custom', 'BUILD FROM ZERO', 'PRICE', 'PERCENT', 10, 1),
+    ]
+    
+    # Professional Wizard Metadata
+    default_perks = [
+        'Complimentary Breakfast', 'Airport Transfer', 'Late Check-out', 
+        'Early Check-in', 'Free High-Speed Wi-Fi', 'Spa Voucher', 
+        'Dinner Credit', 'Room Upgrade', 'Welcome Drink'
+    ]
+    
+    # Fetch existing offers for combinable options
+    existing_offers = Offer.objects.filter(targeted_hotels__owner=request.user).distinct()
+    if offer:
+        existing_offers = existing_offers.exclude(id=offer.id)
+    
+    return render(request, 'hotels/add_offer.html', {
         'offer': offer,
-        'owned_hotels': owned_hotels,
-        'room_types': room_types,
-        'mode': 'edit'
-    }
-    return render(request, 'hotels/add_offer.html', context)
-
-@hotel_admin_required
-def delete_offer(request, offer_id):
-    offer = get_object_or_404(Offer, id=offer_id, hotel__owner=request.user)
-    offer.delete()
-    messages.success(request, "Offer terminated.")
-    return redirect('hotels:offers')
+        'user_hotels': user_hotels,
+        'all_rooms': all_rooms,
+        'rooms_by_hotel_json': rooms_by_hotel_json,
+        'strategy_data': strategy_data,
+        'default_perks': default_perks,
+        'categories': Offer.CATEGORY_CHOICES,
+        'promotion_types': Offer.PROMOTION_TYPE_CHOICES,
+        'guest_segments': Offer.GUEST_SEGMENT_CHOICES,
+        'existing_offers': existing_offers,
+    })
 
 @hotel_admin_required
 def submit_offer(request, offer_id):
@@ -748,6 +974,137 @@ def submit_offer(request, offer_id):
     messages.success(request, "Offer submitted for approval.")
     return redirect('hotels:offers')
 
+@login_required
+def toggle_offer_status(request, offer_id):
+    """
+    Strategic Status Orchestration: Toggles an offer between LIVE and DRAFT.
+    """
+    offer = get_object_or_404(Offer, id=offer_id)
+    
+    # Security: Ensure user owns either the bound hotel or at least one of the targeted hotels
+    user_hotels = Hotel.objects.filter(owner=request.user)
+    has_bound_access = offer.hotel and offer.hotel.owner == request.user
+    has_targeted_access = offer.targeted_hotels.filter(owner=request.user).exists()
+    
+    if not (has_bound_access or has_targeted_access):
+        return JsonResponse({'status': 'error', 'message': 'Unauthorized Architecture Access'}, status=403)
+    
+    offer.is_live = not offer.is_live
+    offer.save()
+    
+    status_label = "LIVE" if offer.is_live else "DRAFT"
+    return JsonResponse({
+        'status': 'success',
+        'is_live': offer.is_live,
+        'message': f'Offer is now {status_label}'
+    })
+
+@login_required
+def delete_offer(request, offer_id):
+    """
+    Secure Decommissioning: Removes an offer from the portfolio archive.
+    """
+    offer = get_object_or_404(Offer, id=offer_id)
+    
+    # Security: Ensure user owns either the bound hotel or at least one of the targeted hotels
+    user_hotels = Hotel.objects.filter(owner=request.user)
+    has_bound_access = offer.hotel and offer.hotel.owner == request.user
+    has_targeted_access = offer.targeted_hotels.filter(owner=request.user).exists()
+
+    if not (has_bound_access or has_targeted_access):
+        return JsonResponse({'status': 'error', 'message': 'Unauthorized Decommissioning Request'}, status=403)
+    
+    offer.delete()
+    return JsonResponse({
+        'status': 'success',
+        'message': 'Strategy successfully removed from portfolio'
+    })
+    
+def offer_usage_details(request, offer_id):
+
+    try:
+        offer = get_object_or_404(
+            Offer,
+            id=offer_id,
+            hotel__owner=request.user
+        )
+
+        bookings = (
+            Booking.objects
+            .filter(applied_offer=offer)
+            .select_related("room_category")
+            .order_by("-created_at")
+        )
+
+        usage_data = []
+
+        for b in bookings:
+            usage_data.append({
+                "guest_name": b.guest_name,
+                "guest_email": b.guest_email,
+                "guest_phone": b.guest_phone,
+                "room_type": b.room_category.name if b.room_category else "Standard",
+                "check_in": b.check_in.strftime("%b %d, %Y"),
+                "check_out": b.check_out.strftime("%b %d, %Y"),
+                "revenue": float(b.total_price),
+                "reference": b.reference
+            })
+
+        return JsonResponse({
+            "status": "success",
+            "offer_name": offer.name,
+            "usage_data": usage_data
+        })
+
+    except Exception as e:
+        return JsonResponse({
+            "status": "error",
+            "message": str(e)
+        }, status=500)
+
+@hotel_admin_required
+def offer_rooms_details(request, offer_id):
+
+    try:
+        offer = get_object_or_404(
+            Offer,
+            id=offer_id,
+            hotel__owner=request.user
+        )
+
+        rooms = RoomType.objects.filter(
+            hotel=offer.hotel,
+            id__in=offer.room_categories
+        ).prefetch_related("photos")
+
+        rooms_data = []
+
+        for room in rooms:
+
+            first_photo = room.photos.first()
+            photo_url = first_photo.media_file.url if first_photo else ""
+
+            rooms_data.append({
+                "name": room.name,
+                "room_type": room.get_room_type_display(),
+                "max_guests": room.max_guest,
+                "price": float(room.price_per_night),
+                "image": photo_url,
+                "hotel_name": room.hotel.hotel_name
+            })
+
+        return JsonResponse({
+            "status": "success",
+            "offer_name": offer.name,
+            "rooms": rooms_data
+        })
+
+    except Exception as e:
+        return JsonResponse({
+            "status": "error",
+            "message": str(e)
+        }, status=500)
+        
 # --- Admin Verifications ---
 
 @super_admin_required

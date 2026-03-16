@@ -145,7 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 <div class="col-4 input-group">
                     <label>Room Class</label>
-                    <select name="room_class_${index}" class="input-field">
+                    <select name="room_type_${index}" class="input-field">
                         <option value="STANDARD">Standard</option>
                         <option value="DELUXE">Deluxe</option>
                         <option value="SUITE">Suite</option>

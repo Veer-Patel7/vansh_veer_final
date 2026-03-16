@@ -100,16 +100,16 @@
                         <div class="space-y-3">
                             <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-2">Class
                                 Tier *</label>
-                            <select name="room_class"
+                            <select name="room_type"
                                 class="w-full h-14 bg-white/60 border border-slate-200 rounded-2xl px-6 text-sm font-medium focus:outline-none focus:ring-4 focus:ring-primary-600/10 focus:border-primary-600 transition-all shadow-sm cursor-pointer"
                                 required>
-                                <option value="STANDARD" {% if room.room_class == 'STANDARD' %}selected{% endif %}>
+                                <option value="STANDARD" {% if room.room_type == 'STANDARD' %}selected{% endif %}>
                                     STANDARD</option>
-                                <option value="DELUXE" {% if room.room_class == 'DELUXE' %}selected{% endif %}>DELUXE
+                                <option value="DELUXE" {% if room.room_type == 'DELUXE' %}selected{% endif %}>DELUXE
                                 </option>
-                                <option value="SUITE" {% if room.room_class == 'SUITE' %}selected{% endif %}>SUITE
+                                <option value="SUITE" {% if room.room_type == 'SUITE' %}selected{% endif %}>SUITE
                                 </option>
-                                <option value="VILLA" {% if room.room_class == 'VILLA' %}selected{% endif %}>VILLA
+                                <option value="VILLA" {% if room.room_type == 'VILLA' %}selected{% endif %}>VILLA
                                 </option>
                             </select>
                         </div>
@@ -122,7 +122,7 @@
                             <div class="relative group">
                                 <i
                                     class="fas fa-users absolute left-6 top-1/2 -translate-y-1/2 text-slate-300 transition-colors group-focus-within:text-primary-600"></i>
-                                <input type="number" name="max_guests" value="{{ room.max_guests|default:'2' }}" min="1"
+                                <input type="number" name="max_guest" value="{{ room.max_guest|default:'2' }}" min="1"
                                     class="w-full h-14 pl-14 bg-white/60 border border-slate-200 rounded-2xl px-6 text-sm font-medium focus:outline-none focus:ring-4 focus:ring-primary-600/10 focus:border-primary-600 transition-all shadow-sm"
                                     required>
                             </div>
