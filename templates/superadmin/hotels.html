@@ -82,39 +82,76 @@
     <!-- ===== TABS ===== -->
     <div class="section-header border-0 bg-transparent px-4 pt-4 pb-0">
 
-        <ul class="nav nav-pills gap-3" id="hotelTabs" role="tablist">
+        <div class="d-flex justify-content-between align-items-center">
 
-            <li class="nav-item">
-                <a class="nav-link active rounded-xl px-4 py-2 font-weight-bold"
-                   data-toggle="pill" href="#live">
-                   Approved
-                </a>
-            </li>
+            <!-- LEFT SIDE TABS -->
+            <ul class="nav nav-pills gap-3 mb-0 flex-nowrap" id="hotelTabs" role="tablist">
 
-            <li class="nav-item">
-                <a class="nav-link rounded-xl px-4 py-2 font-weight-bold"
-                   data-toggle="pill" href="#rejected">
-                   Rejected
-                </a>
-            </li>
+                <li class="nav-item">
+                    <a class="nav-link active rounded-xl px-4 py-2 font-weight-bold"
+                    data-toggle="pill" data-tab="live" href="#live">
+                    Approved
+                    </a>
+                </li>
 
-            <li class="nav-item">
-                <a class="nav-link rounded-xl px-4 py-2 font-weight-bold"
-                   data-toggle="pill" href="#pending">
-                   Pending
+                <li class="nav-item">
+                    <a class="nav-link rounded-xl px-4 py-2 font-weight-bold"
+                    data-toggle="pill" data-tab="rejected" href="#rejected">
+                    Rejected
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link rounded-xl px-4 py-2 font-weight-bold"
+                    data-toggle="pill" data-tab="pending" href="#pending">
+                    Pending
                     <span class="ml-1 badge badge-pill bg-warning-800/20 text-warning">
-                        {{ pending_count }}
+                            {{ pending_count }}
                     </span>
-                </a>
-            </li>
+                    </a>
+                </li>
 
-            <li class="nav-item">
-                <a class="nav-link rounded-xl px-4 py-2 font-weight-bold"
-                   data-toggle="pill" href="#updates">
-                   Update Requests ({{ pending_requests|length }})
-                </a>
-            </li>
-        </ul>
+                <li class="nav-item">
+                    <a class="nav-link rounded-xl px-4 py-2 font-weight-bold"
+                    data-toggle="pill" href="#updates">
+                    Update Requests ({{ pending_requests|length }})
+                    </a>
+                </li>
+
+            </ul>
+
+            <!-- RIGHT SIDE SEARCH -->
+            <form method="GET"
+                autocomplete="off"
+                style="display:flex;gap:10px;align-items:center;width:320px;">
+
+                <input type="hidden" name="tab" id="activeTabInput" value="live">
+
+                <div style="position:relative;flex:1;">
+
+                    <i class="fas fa-search"
+                    style="position:absolute;left:12px;top:50%;transform:translateY(-50%);
+                    color:var(--text-low);font-size:14px;"></i>
+
+                    <input type="text"
+                        name="search"
+                        value="{{ search|default:'' }}"
+                        placeholder="Search hotel..."
+                        class="sa-input"
+                        style="padding-left:35px;height:38px;">
+
+                </div>
+
+                <button type="submit"
+                        style="height:38px;padding:0 18px;border-radius:8px;
+                        background:var(--primary);color:white;border:none;font-weight:600;">
+                    Search
+                </button>
+
+            </form>
+
+        </div>
+
     </div>
 
     <!-- ================= TAB CONTENT ================= -->
@@ -146,7 +183,7 @@
                             <tr class="hover-bg-target">
 
                                 <td class="text-low font-monospace">
-                                    #HP{{ h.id|stringformat:"04d" }}
+                                    {{ h.id }}
                                 </td>
 
                                 <td class="font-weight-600 text-white">
@@ -221,7 +258,7 @@
                         {% if h.status == "LIVE" %}
 
                         <tr>
-                            <td>#HP{{ h.id|stringformat:"04d" }}</td>
+                            <td>{{ h.id }}</td>
                             <td>{{ h.hotel_name }}</td>
                             <td>{{ h.city }}</td>
                             <td class="text-success">
@@ -259,7 +296,7 @@
                         {% if h.status == "REJECTED" %}
 
                         <tr>
-                            <td>#HP{{ h.id|stringformat:"04d" }}</td>
+                            <td>{{ h.id }}</td>
                             <td>{{ h.hotel_name }}</td>
                             <td>{{ h.verification_remarks }}</td>
                             <td class="text-right">
@@ -269,7 +306,7 @@
                                 </a>
                             </td>
                         </tr>
-
+                        
                         {% endif %}
                         {% endfor %}
 
@@ -391,4 +428,41 @@
 
 </div>
 
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+
+// tab switch ke liye
+document.querySelectorAll("#hotelTabs .nav-link").forEach(tab => {
+
+    tab.addEventListener("click", function(){
+
+        let tabName = this.getAttribute("data-tab");
+
+        if(tabName){
+            document.getElementById("activeTabInput").value = tabName;
+        }
+
+    });
+
+});
+
+
+// PAGE LOAD par correct tab open karo
+const params = new URLSearchParams(window.location.search);
+const activeTab = params.get("tab");
+
+if(activeTab){
+
+    const tabBtn = document.querySelector(`#hotelTabs [data-tab="${activeTab}"]`);
+
+    if(tabBtn){
+        tabBtn.click();
+        document.getElementById("activeTabInput").value = activeTab;
+    }
+
+}
+
+</script>
 {% endblock %}

@@ -12,14 +12,14 @@ from datetime import date, timedelta
 from django.conf import settings
 from reviews.models import Review
 from datetime import date, timedelta, datetime
-from django.db.models import Sum
+from django.db.models import Sum, Q
 from decimal import Decimal
-
+from django.contrib import messages
 
 
 User = get_user_model()
 
-
+# ================= Dashboard =================  
 @login_required(login_url="/super/")
 def dashboard(request):
     if request.user.role != "super_admin":
@@ -44,9 +44,12 @@ def dashboard(request):
     
     # Booking Stats
     total_bookings = Booking.objects.count()
+
+    # Update Requests
+    pending_updates = ChangeRequest.objects.filter(status="PENDING").count()
     
     # Recent Activities
-    recent_hotels = Hotel.objects.all().order_by('-created_at')[:5]
+    recent_hotels = Hotel.objects.all().order_by('created_at')[:5]
     
     context = {
         'hotel_stats': hotel_stats,
@@ -55,50 +58,105 @@ def dashboard(request):
         'total_revenue': total_revenue,
         'pending_revenue': pending_revenue,
         'total_bookings': total_bookings,
+        'pending_updates': pending_updates,
         'recent_hotels': recent_hotels,
     }
     
     return render(request, "superadmin/dashboard.html", context)
 
-
-#------------ profile -----------
+# ================= profile =================
 @login_required
 def profile(request):
 
     if request.method == "POST":
 
-        request.user.username = request.POST.get("username")
-        request.user.email = request.POST.get("email")
+        # PROFILE UPDATE
+        if "username" in request.POST:
 
-        if request.FILES.get("profile_photo"):
-            request.user.profile_photo = request.FILES.get("profile_photo")
+            request.user.username = request.POST.get("username")
+            request.user.email = request.POST.get("email")
 
-        request.user.save()
+            if request.FILES.get("profile_photo"):
+                request.user.profile_photo = request.FILES.get("profile_photo")
 
-        return redirect("/super/profile/")
+            request.user.save()
+
+            messages.success(request, "Profile updated successfully")
+            return redirect("/super/profile/")
+
+
+        # PASSWORD CHANGE
+        if "old_password" in request.POST:
+
+            old = request.POST.get("old_password")
+            new = request.POST.get("new_password")
+            confirm = request.POST.get("confirm_password")
+
+            user = request.user
+
+            if not user.check_password(old):
+                messages.error(request, "Old password incorrect")
+                return redirect("/super/profile/")
+
+            if new != confirm:
+                messages.error(request, "Passwords do not match")
+                return redirect("/super/profile/")
+
+            user.set_password(new)
+            user.save()
+
+            messages.success(request, "Password updated successfully")
+            return redirect("/super/")
+
 
     context = {
-
         "hotels_count": Hotel.objects.count(),
         "bookings_count": Booking.objects.count(),
         "customers_count": User.objects.filter(role="customer").count()
-
     }
 
-    return render(request,"superadmin/profile.html",context)
+    return render(request, "superadmin/profile.html", context)
 
-#--------- hotel owner login req approve ---------
-
+# ================= hotel-owner manage =================
 @login_required(login_url="/super/")
 def owners(request):
     if request.user.role != "super_admin":
         return HttpResponse("Unauthorized")
 
+    search = request.GET.get("search")
+
     owners = User.objects.filter(role="hotel_admin")
-    return render(request, "superadmin/owners.html", {"owners": owners})
 
+    if search:
+        if search.isdigit():
+            owners = owners.filter(id=int(search))
+        else:
+            owners = owners.filter(
+                Q(first_name__icontains=search) |
+                Q(last_name__icontains=search) |
+                Q(email__icontains=search)
+            )
+        
+        # Status search
+        if search.lower() == "active":
+            owners = User.objects.filter(role="hotel_admin", is_active=True)
 
-#  APPROVE OWNER (pending → active)
+        if search.lower() == "pending":
+            owners = User.objects.filter(role="hotel_admin", is_active=False)
+
+        # Action search
+        if search.lower() == "approve":
+            owners = User.objects.filter(role="hotel_admin", is_active=False)
+
+        if search.lower() == "disable":
+            owners = User.objects.filter(role="hotel_admin", is_active=True)
+
+    return render(request, "superadmin/owners.html", {
+        "owners": owners,
+        "search": search
+    })
+    
+# APPROVE OWNER
 @login_required(login_url="/super/")
 def approve_owner(request, user_id):
     owner = get_object_or_404(User, id=user_id)
@@ -106,8 +164,7 @@ def approve_owner(request, user_id):
     owner.save()
     return redirect("/super/owners/")
 
-
-#  DISABLE OWNER
+# DISABLE OWNER
 @login_required(login_url="/super/")
 def disable_owner(request, user_id):
     owner = get_object_or_404(User, id=user_id)
@@ -115,8 +172,7 @@ def disable_owner(request, user_id):
     owner.save()
     return redirect("/super/owners/")
 
-
-#  ENABLE OWNER
+# ENABLE OWNER
 @login_required(login_url="/super/")
 def enable_owner(request, user_id):
     owner = get_object_or_404(request, id=user_id)
@@ -124,36 +180,48 @@ def enable_owner(request, user_id):
     owner.save()
     return redirect("/super/owners/")
 
-
-#-------  hotel registration ----------
-
+# =================  Hotel Management =================
 @login_required(login_url="/super/")
 def hotels_approve(request):
     if request.user.role != "super_admin":
         return HttpResponse("Unauthorized")
+    search = request.GET.get("search", "").strip()
+    tab = request.GET.get("tab", "live")
+    hotels = Hotel.objects.all().order_by("created_at")
 
-    hotels = Hotel.objects.all().order_by("-created_at")
+    # ---------- SEARCH FILTER ----------
+    if search:
+        # direct ID search
+        if search.isdigit():
+            hotels = hotels.filter(id=int(search))
+        else:
+            hotels = hotels.filter(
+                Q(hotel_name__icontains=search) |
+                Q(city__icontains=search) |
+                Q(owner__username__icontains=search) |
+                Q(owner__email__icontains=search)
+            )
 
-    pending_count  = hotels.filter(status="PENDING").count()
-    live_count     = hotels.filter(status="LIVE").count()
-    rejected_count = hotels.filter(status="REJECTED").count()
+    # ---------- GLOBAL COUNTS ----------
+    pending_count  = Hotel.objects.filter(status="PENDING").count()
+    live_count     = Hotel.objects.filter(status="LIVE").count()
+    rejected_count = Hotel.objects.filter(status="REJECTED").count()
 
-    # 🔵 Update requests
-    pending_requests = ChangeRequest.objects.filter(status="PENDING").order_by("-requested_at")
-    approved_requests = ChangeRequest.objects.filter(status="APPROVED").order_by("-requested_at")
-    rejected_requests = ChangeRequest.objects.filter(status="REJECTED").order_by("-requested_at")
+    # ---------- UPDATE REQUESTS ----------
+    pending_requests = ChangeRequest.objects.filter(
+        status="PENDING"
+    ).order_by("-requested_at")
 
     return render(request, "superadmin/hotels.html", {
         "hotels": hotels,
+        "search": search,
+        "tab": tab,
         "pending_count": pending_count,
         "live_count": live_count,
         "rejected_count": rejected_count,
-
-        "pending_requests": pending_requests,
-        "approved_requests": approved_requests,
-        "rejected_requests": rejected_requests,
+        "pending_requests": pending_requests
     })
-
+    
 @login_required(login_url="/super/")
 def hotel_detail_view(request, hotel_id):
     """Full hotel detail for Super Admin review — shows all onboarding data."""
@@ -161,15 +229,20 @@ def hotel_detail_view(request, hotel_id):
         return HttpResponse("Unauthorized")
 
     hotel  = get_object_or_404(Hotel, id=hotel_id)
-    rooms  = RoomType.objects.filter(hotel=hotel)
     images = HotelImage.objects.filter(hotel=hotel)
+    rooms = RoomType.objects.filter(hotel=hotel)
+
+    for r in rooms:
+        if r.amenities:
+            r.amenities_list = r.amenities
+        else:
+            r.amenities_list = []
 
     return render(request, "superadmin/hotel_detail.html", {
         "hotel":  hotel,
         "rooms":  rooms,
         "images": images,
     })
-
 
 @login_required(login_url="/super/")
 def approve_hotel(request, hotel_id):
@@ -198,7 +271,7 @@ def block_hotel(request, hotel_id):
     h.save()
     return redirect("/super/hotels/")
 
-#------reject hotel with reason mail--------
+# Reject hotel with reason mail
 @login_required(login_url="/super/")
 def reject_hotel(request, hotel_id):
 
@@ -227,15 +300,39 @@ def reject_hotel(request, hotel_id):
 
     return render(request, "superadmin/reject_form.html", {"hotel": hotel})
 
-#--------Booking manage---------
-
+#=================Booking manage=================
 @login_required(login_url="/super/")
 def bookings_manage(request):
-
     if request.user.role != "super_admin":
         return HttpResponse("Unauthorized")
+    search = request.GET.get("search", "").replace(",", "").strip()
+    bookings = Booking.objects.all().order_by("id")
 
-    bookings = Booking.objects.all().order_by("-id")
+    if search:
+        if search.isdigit():
+            bookings = bookings.filter(id=int(search))
+        else:
+            q = Q(hotel__hotel_name__icontains=search) | Q(user__email__icontains=search) | Q(booking_status__icontains=search) | Q(id__icontains=search)
+            # Try to detect date formats
+            date_formats = [
+                "%Y-%m-%d",
+                "%d-%m-%Y",
+                "%d/%m/%Y",
+                "%Y/%m/%d",
+                "%B %d %Y",
+                "%b %d %Y",
+                "%d %B %Y",
+                "%d %b %Y",
+            ]
+            for fmt in date_formats:
+                try:
+                    parsed = datetime.strptime(search, fmt).date()
+                    q |= Q(checkin_date=parsed)
+                    q |= Q(checkout_date=parsed)
+                    break
+                except:
+                    pass
+            bookings = bookings.filter(q)
 
     total_revenue = bookings.aggregate(Sum("total_price"))["total_price__sum"] or 0
     total_commission = total_revenue * Decimal("0.10")
@@ -243,7 +340,8 @@ def bookings_manage(request):
     return render(request,"superadmin/bookings.html",{
         "bookings": bookings,
         "total_revenue": total_revenue,
-        "total_commission": total_commission
+        "total_commission": total_commission,
+        "search": search
     })
 
 # ================= PAYMENTS DASHBOARD =================
@@ -251,8 +349,7 @@ def bookings_manage(request):
 def payments_dashboard(request):
     return render(request, "superadmin/payments_dashboard.html")
 
-
-# ================= GENERATE COMMISSION =================
+# GENERATE COMMISSION
 @login_required(login_url="/super/")
 def generate_commission(request):
 
@@ -308,8 +405,7 @@ def generate_commission(request):
         )
     return redirect("/super/payments/invoices/")
 
-
-# ================= VIEW INVOICES =================
+# VIEW INVOICES
 @login_required(login_url="/super/")
 def commissions(request):
 
@@ -324,15 +420,15 @@ def commissions(request):
         invoices = HotelCommission.objects.filter(
             month=month,
             year=year
-        ).order_by("-id")
+        ).order_by("id")
     else:
-        invoices = HotelCommission.objects.all().order_by("-id")
+        invoices = HotelCommission.objects.all().order_by("id")
 
     # penalty update only on shown invoices
     for i in invoices:
         if i.status == "unpaid" and today > i.due_date:
             i.status = "overdue"
-            i.penalty_amount = i.commission_amount * 0.05
+            i.penalty_amount = i.commission_amount * Decimal("0.05")
             i.save()
 
     return render(request, "superadmin/commissions.html", {
@@ -340,7 +436,7 @@ def commissions(request):
         "selected_month": month_input
     })
 
-# ================= MARK PAID =================
+# MARK PAID
 @login_required(login_url="/super/")
 def mark_paid(request, id):
 
@@ -351,8 +447,7 @@ def mark_paid(request, id):
 
     return redirect("/super/payments/invoices/")
 
-
-# ================= SEND PAYMENT REMINDER =================
+# SEND PAYMENT REMINDER
 @login_required(login_url="/super/")
 def send_payment_mail(request, id):
 
@@ -374,27 +469,53 @@ def send_payment_mail(request, id):
 
     return redirect("/super/payments/invoices/")
 
-#===========CUSTOMER MANAGE==============
-
+# ================= CUSTOMER MANAGE =================
 @login_required(login_url="/super/")
 def customers_manage(request):
 
     if request.user.role != "super_admin":
         return HttpResponse("Unauthorized")
 
+    search = request.GET.get("search", "")
+
     customers = User.objects.filter(role="customer")
+
+    if search:
+        if search.isdigit():
+            customers = customers.filter(id=int(search))
+        else:
+            customers = customers.filter(
+                Q(first_name__icontains=search) |
+                Q(last_name__icontains=search) |
+                Q(email__icontains=search)
+            )
+
+        if search.lower() == "active":
+            customers = customers.filter(is_active=True)
+
+        if search.lower() in ["blacklist","blacklisted"]:
+            customers = customers.filter(is_active=False)
 
     data = []
 
     for c in customers:
         total = Booking.objects.filter(user=c).count()
+
+        # total booking search
+        if search.isdigit():
+            if str(total) != search:
+                continue
+
         data.append({
             "obj": c,
             "total": total
         })
 
-    return render(request, "superadmin/customers.html", {"data": data})
-
+    return render(request, "superadmin/customers.html", {
+        "data": data,
+        "search": search
+    })
+    
 #Blacklist customer
 @login_required(login_url="/super/")
 def blacklist_customer(request, user_id):
@@ -415,14 +536,12 @@ def unblock_customer(request, user_id):
 
     return redirect("/super/customers/")
 
-#============ Review Moderate ==============
-
+# ================= Review Moderate =================
 @login_required(login_url="/super/")
 def reviews_moderate(request):
 
     reviews = Review.objects.filter(status="delete_request")
     return render(request, "superadmin/reviews.html", {"reviews": reviews})
-
 
 @login_required(login_url="/super/")
 def approve_delete_review(request, id):
@@ -432,7 +551,6 @@ def approve_delete_review(request, id):
     r.save()
     return redirect("/super/reviews/")
 
-
 @login_required(login_url="/super/")
 def reject_delete_review(request, id):
 
@@ -440,7 +558,6 @@ def reject_delete_review(request, id):
     r.status = "active"
     r.save()
     return redirect("/super/reviews/")
-
 
 @login_required(login_url="/super/")
 def mark_fake_review(request, id):
@@ -451,6 +568,7 @@ def mark_fake_review(request, id):
 
     return redirect("/super/reviews/")
 
+# ================= Change Request =================
 @login_required(login_url="/super/")
 def change_requests_list(request):
 
@@ -500,7 +618,6 @@ def approve_change_request(request, request_id):
 
     return redirect("/super/hotels/")
 
-
 @login_required(login_url="/super/")
 def reject_change_request(request, request_id):
 
@@ -533,3 +650,4 @@ def reject_change_request(request, request_id):
         "superadmin/reject_change_form.html",
         {"change_req": change_req}
     )
+    

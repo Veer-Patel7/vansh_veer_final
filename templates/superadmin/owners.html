@@ -14,8 +14,23 @@
 
     <!-- ===== Owners Table ===== -->
     <div class="section-card">
-        <div class="section-header">
-            <h3>Owner Accounts</h3>
+        <div class="section-header d-flex justify-content-between align-items-center">
+            <h3 class="m-0">Owner Accounts</h3>
+            <form method="GET" style="display:flex;gap:10px;align-items:center;max-width:360px;width:100%;">
+                <div style="position:relative;flex:1;">
+                    <i class="fas fa-search"
+                    style="position:absolute;left:12px;top:50%;transform:translateY(-50%);
+                    color:var(--text-low);font-size:14px;"></i>
+                    <input type="text"
+                        name="search"
+                        value="{{ search|default:'' }}"
+                        placeholder="Search owner..."
+                        class="sa-input"
+                        autocomplete="off"
+                        style="padding-left:35px;height:38px;">
+                </div>
+                <button type="submit" style="height:38px;padding:0 18px;border-radius:8px; background:var(--primary);color:white;border:none;font-weight:600;"> Search </button>
+            </form>
         </div>
 
         <div class="section-body">
@@ -23,6 +38,7 @@
             <table class="sa-table">
                 <thead>
                     <tr>
+                        <th>Id</th>
                         <th>Name</th>
                         <th>Email</th>
                         <th>Status</th>
@@ -33,7 +49,7 @@
                 <tbody>
                     {% for o in owners %}
                     <tr>
-
+                        <td>{{ o.id }}</td>
                         <td>
                             <div style="font-weight:600;color:var(--text-high);">
                                 {{ o.first_name }} {{ o.last_name }}
@@ -95,4 +111,32 @@
 
 </div>
 
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+
+const searchInput = document.getElementById("ownerSearch");
+
+searchInput.addEventListener("keyup", function(){
+
+    let value = this.value.toLowerCase();
+    let rows = document.querySelectorAll(".sa-table tbody tr");
+
+    rows.forEach(row => {
+
+        let name = row.children[0].innerText.toLowerCase();
+        let email = row.children[1].innerText.toLowerCase();
+
+        if(name.includes(value) || email.includes(value)){
+            row.style.display = "";
+        } else {
+            row.style.display = "none";
+        }
+
+    });
+
+});
+
+</script>
 {% endblock %}

@@ -77,12 +77,12 @@
 <div class="section-card">
     <div class="section-header"> <h3>Change Password</h3> </div>
     <div class="section-body">
-        <form method="POST" action="/super/change-password/">
+        <form method="POST" action="/super/profile/">
             {% csrf_token %}
             <div class="info-grid">
                 <div class="info-item">
                     <span class="info-label"> Old Password </span>
-                    <input type="password" name="old_password" class="sa-input">
+                    <input type="password" name="old_password" class="sa-input" autocomplete="off">
                 </div>
 
                 <div class="info-item">
