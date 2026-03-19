@@ -8,19 +8,54 @@
 
 body{
     background:#f4f6f9;
+    padding-top:80px; /* navbar overlap fix */
+}
+
+/* ================= NAVBAR ================= */
+.navbar{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    padding:18px 8%;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:#054ab9;
+    z-index:100;
+}
+
+.logo a {
+    font-size:24px;
+    font-weight:700;
+    color:white;
+    text-decoration: none;
+}
+
+
+.navbar nav a{
+    color:white;
+    text-decoration:none;
+    margin:0 15px;
+    font-weight:500;
+    transition:0.3s;
+}
+
+.navbar nav a:hover{
+    color:#cbd5e1;
 }
 
 /* ================= PAGE TITLE ================= */
 .page-title{
     text-align:center;
-    margin:40px 0 20px;
+    margin:20px 0 30px;
     font-size:32px;
     font-weight:700;
 }
 
-/* ================= RESULTS SECTION ================= */
+/* ================= RESULTS ================= */
 .results-section{
-    padding:30px 8%;
+    padding:20px 8%;
 }
 
 .hotel-container{
@@ -32,28 +67,57 @@ body{
 /* ================= HOTEL CARD ================= */
 .hotel-card{
     background:white;
-    padding:25px;
-    border-radius:15px;
-    box-shadow:0 8px 20px rgba(0,0,0,0.08);
-    transition:0.3s ease;
+    border-radius:12px;
+    overflow:hidden;
+    box-shadow:0 5px 15px rgba(59,130,246,0.25);
+    transition:0.3s;
+    padding:15px;
 }
 
 .hotel-card:hover{
-    transform:translateY(-5px);
-    box-shadow:0 12px 25px rgba(0,0,0,0.15);
+    transform:translateY(-6px);
+    box-shadow:0 12px 30px rgba(0,0,0,0.15);
 }
 
+/* IMAGE */
+.hotel-image{
+    width:100%;
+    height:220px;
+    overflow:hidden;
+    border-radius:10px;
+    margin-bottom:12px;
+}
+
+.hotel-image img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    transition:0.3s;
+}
+
+.hotel-card:hover img{
+    transform:scale(1.05);
+}
+
+/* TEXT */
 .hotel-card h3{
-    margin-bottom:10px;
     font-size:20px;
+    margin-bottom:8px;
 }
 
 .hotel-card p{
-    margin-bottom:8px;
+    margin:4px 0;
+    font-size:14px;
     color:#555;
 }
 
-/* ================= BUTTON ================= */
+/* PRICE */
+.hotel-card h5{
+    color:#16a34a;
+    margin:6px 0;
+}
+
+/* BUTTON */
 .btn-book{
     display:inline-block;
     margin-top:10px;
@@ -75,12 +139,4 @@ body{
     text-align:center;
     font-size:18px;
     color:#888;
-}
-/* ===== NAVBAR ===== */
-.navbar{
-    background:#054ab9;
-    color:white;
-    padding:15px 40px;
-    font-size:20px;
-    font-weight:bold;
 }

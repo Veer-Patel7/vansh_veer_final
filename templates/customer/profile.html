@@ -22,7 +22,7 @@
                 
 
             <div class="auth-section">
-                <a href="{%url 'accounts:hotel_signup'%}">List Your Property Here</a>
+                {% comment %} <a href="{%url 'accounts:hotel_signup'%}">List Your Property Here</a> {% endcomment %}
                 {% if user.is_authenticated %}
                 
                 <div class="profile-dropdown">

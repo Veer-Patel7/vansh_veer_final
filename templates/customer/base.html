@@ -1,0 +1,15 @@
+{% load static%}
+<html>
+    <head>
+        <link rel="stylesheet" href="{% static 'customer/base.css' %}">
+    </head>
+    
+    
+    <body>
+        <div class="navbar">
+            <h2 class="logo"><a href="{% url 'customer:home' %}">HotelPro</a></h2>
+        </div>
+        {% block content %}
+    {% endblock %}
+    </body>
+</html>

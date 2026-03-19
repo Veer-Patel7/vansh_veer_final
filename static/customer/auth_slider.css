@@ -20,15 +20,42 @@ body{
 
 /* ===== NAVBAR ===== */
 .navbar{
-    position:absolute;
+    position:fixed;
     top:0;
+    left:0;
     width:100%;
-    background:rgba(59,131,246,0.75);
-    backdrop-filter:blur(6px);
+    padding:18px 8%;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:#054ab9;
+    z-index:10;
+}
+
+        
+.navbar a {
+    color: white;
+    text-decoration: none;
+    margin: 0 15px;
+}
+
+
+.navbar nav a{
     color:white;
-    padding:15px 40px;
-    font-size:20px;
-    font-weight:600;
+    text-decoration:none;
+    margin:0 15px;
+    font-weight:500;
+    transition:0.3s;
+}
+
+.navbar nav a:hover{
+    color:#cbd5e1;
+}
+
+.logo{
+    font-size:24px;
+    font-weight:700;
+    color:white;
 }
 
 /* ===== CONTAINER ===== */

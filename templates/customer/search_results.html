@@ -1,3 +1,4 @@
+{% comment %} {% extends "customer/base.html" %} {% endcomment %}
 {% load static %}
 <!DOCTYPE html>
 <html>
@@ -6,7 +7,9 @@
     <link rel="stylesheet" href="{% static 'customer/search_results.css' %}">
 </head>
 <body>
-<div class="navbar">HotelPro</div>
+<div class="navbar">
+<h2 class="logo"><a href="{% url 'customer:home' %}">HotelPro</a></h2>
+</div>
 <form method="POST">
     {% csrf_token %}
 
@@ -17,17 +20,31 @@
             {% if hotels %}
                 {% for hotel in hotels %}
                 <div class="hotel-card">
-                    <h3 class="hotel-name">{{ hotel.hotel_name }}</h3>
+                    <h3>{{ hotel.hotel_name }}</h3>
+                    <div class="hotel-image">
+                        {% if hotel.image %}
+                            <img src="{{ hotel.image.url }}">
+                        {% else %}
+                            <img src="{% static 'images/default-hotel.jpg' %}">
+                        {% endif %}
+                     </div>
                     <p><strong>Location:</strong> {{ hotel.address }}</p>
-                    <p><strong>Range upto: ₹ {{ hotel.min_price }}-{{ hotel.max_price }}</strong></p>
-                    {% comment %} <h5>₹ {{ hotel.max_price }} Totals</h5> {% endcomment %}
-                    {% comment %} <p><strong>Room Type:</strong> {{ room.get_room_type_display }}</p> {% endcomment %}
-                    {% comment %} <p><strong>Max Guests:</strong> {{ room.max_guest }}</p> {% endcomment %}
-                    <a href="{% url 'customer:hotel_detail' hotel.id  %}" class="btn-book">View Details</a>
+                    <p><strong>Price ₹ {{ hotel.min_price }}</strong></p>
+                    <p> Totals ₹ {{ hotel.max_price }} </p>
+                    <p><strong> Total Rooms:</strong> {{ hotel.total_rooms }}</p>
+                    <p><strong>Available Rooms:</strong> {{ hotel.available_rooms }}</p>
+                    {% comment %} <p><strong>Offer:</strong>
+                        {% if hotel.offers.first %}
+                        {{ hotel.offers.first.get_offer_type_display }}
+                        {% else %}
+                        No Offer
+                        {% endif %}
+                    </p> {% endcomment %}
+                    <a href="{% url 'customer:hotel_detail' hotel.id %}" class="btn-book">View Details</a>
                 </div>
                 {% endfor %}
             {% else %}
-                <p class="no-result">No hotels found.</p>
+                <p>No hotels found.</p>
             {% endif %}
         </div>
     </section>

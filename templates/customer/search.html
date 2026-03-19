@@ -1,3 +1,4 @@
+
 {% load static %}
 <!DOCTYPE html>
 <html>
@@ -111,14 +112,14 @@
      <section class="results-section">
         <div class="hotel-container">
             {% if hotels %}
-                {% for hotel in hotels %}
+                {% for hotel in hotels|slice:":8" %}
                 <div class="hotel-card">
                     <h3>{{ hotel.hotel_name }}</h3>
                     <div class="hotel-image">
                         {% if hotel.image %}
                             <img src="{{ hotel.image.url }}">
                         {% else %}
-                            <img src="{% static 'images/default-hotel.jpg' %}">
+                            <img src="{% static 'image/Hotel.jpg' %}">
                         {% endif %}
                      </div>
                     <p><strong>Location:</strong> {{ hotel.address }}</p>
@@ -142,6 +143,7 @@
         </div>
      </section>
      </section>
+   
 {% comment %} 
 <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br> {% endcomment %}
         <!-- contact  -->

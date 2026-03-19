@@ -40,7 +40,10 @@ def customer_search(request):
     checkin = request.GET.get("checkin")
     checkout = request.GET.get("checkout")
 
-    hotels = Hotel.objects.all().filter(status="LIVE").prefetch_related("rooms")
+    hotels = Hotel.objects.filter(
+    status="LIVE",
+    owner__is_active=True
+    ).prefetch_related("rooms")
 
     if location:
         hotels = hotels.filter(city__icontains=location)
@@ -86,6 +89,7 @@ def my_bookings(request):
     return render(request, "customer/my_bookings.html", {"bookings": bookings})
 
 def search_results(request):
+    hotels = Hotel.objects.filter(status__iexact="LIVE")
     location = request.GET.get("location", "").strip()
     persons = request.GET.get("persons")
 
