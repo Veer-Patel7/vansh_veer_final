@@ -209,7 +209,7 @@ def confirm_booking(request):
 
             if available <= 0:
                 messages.error(request, "No rooms available for selected dates")
-                return redirect("customer:hotel_detail", id=room.hotel.id)
+                return redirect("customer:home")
 
             # Create booking
             Booking.objects.create(
