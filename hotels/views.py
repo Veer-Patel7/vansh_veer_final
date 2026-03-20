@@ -601,7 +601,7 @@ def hotel_dashboard(request, hotel_id=None):
         'recent_bookings': hotel.app_hotel_bookings.order_by('-created_at')[:5],
 
         'revenue_today': hotel.app_hotel_bookings.filter(
-            booking_status='confirm',
+            booking_status='confirmed',
             created_at__date=today
         ).aggregate(
             Sum('total_price')

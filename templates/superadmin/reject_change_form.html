@@ -1,9 +1,15 @@
 {% extends "superadmin/base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'superadmin/css/forms.css' %}">
+{% endblock %}
+
 {% block content %}
 <div class="container-fluid py-5">
     <div class="row justify-content-center">
         <div class="col-md-6">
-            <div class="section-box border-0 shadow-2xl bg-surface/50 backdrop-blur-md p-5">
+            <div class="section-box border-0 p-5" style="background: rgba(30,41,59,0.5); backdrop-filter: blur(10px); box-shadow: 0 20px 40px rgba(0,0,0,0.3);">
                 <div class="text-center mb-5">
                     <div
                         class="w-20 h-20 rounded-circle bg-danger-500/10 flex items-center justify-center text-danger mx-auto mb-4 border border-danger-500/20">
@@ -39,12 +45,13 @@
 
                     <div class="d-flex gap-3">
                         <button type="submit"
-                            class="btn btn-danger btn-block py-3 font-weight-bold rounded-xl shadow-lg shadow-danger/20">
+                            class="btn-approve w-100 py-3 font-weight-bold rounded-xl"
+                            style="background: var(--danger); box-shadow: 0 10px 20px rgba(239,68,68,0.2);">
                             Confirm Rejection
                         </button>
                         <a href="/super/change-requests/"
-                            class="btn btn-outline-light btn-block py-3 font-weight-bold rounded-xl mt-0">
-                            Cancel
+                            class="btn btn-outline-light w-100 py-3 font-weight-bold rounded-xl">
+                             Cancel
                         </a>
                     </div>
                 </form>
@@ -53,20 +60,4 @@
     </div>
 </div>
 
-<style>
-    .sa-input {
-        background: rgba(2, 6, 23, 0.4);
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        color: white;
-        padding: 12px 16px;
-        transition: all 0.3s ease;
-    }
-
-    .sa-input:focus {
-        border-color: var(--primary);
-        outline: none;
-        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
-    }
-</style>
 {% endblock %}

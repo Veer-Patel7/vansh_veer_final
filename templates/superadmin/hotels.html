@@ -1,4 +1,6 @@
 {% extends "superadmin/base.html" %}
+{% load static %}
+
 {% block content %}
 
 <div class="container-fluid py-4 animate-in fade-in duration-700">
@@ -125,7 +127,7 @@
                 autocomplete="off"
                 style="display:flex;gap:10px;align-items:center;width:320px;">
 
-                <input type="hidden" name="tab" id="activeTabInput" value="live">
+                <input type="hidden" name="tab" id="activeTabInput" value="{{ request.GET.tab|default:'live' }}">
 
                 <div style="position:relative;flex:1;">
 
@@ -431,38 +433,5 @@
 {% endblock %}
 
 {% block extra_scripts %}
-<script>
-
-// tab switch ke liye
-document.querySelectorAll("#hotelTabs .nav-link").forEach(tab => {
-
-    tab.addEventListener("click", function(){
-
-        let tabName = this.getAttribute("data-tab");
-
-        if(tabName){
-            document.getElementById("activeTabInput").value = tabName;
-        }
-
-    });
-
-});
-
-
-// PAGE LOAD par correct tab open karo
-const params = new URLSearchParams(window.location.search);
-const activeTab = params.get("tab");
-
-if(activeTab){
-
-    const tabBtn = document.querySelector(`#hotelTabs [data-tab="${activeTab}"]`);
-
-    if(tabBtn){
-        tabBtn.click();
-        document.getElementById("activeTabInput").value = activeTab;
-    }
-
-}
-
-</script>
+<script src="{% static 'superadmin/js/hotels.js' %}"></script>
 {% endblock %}

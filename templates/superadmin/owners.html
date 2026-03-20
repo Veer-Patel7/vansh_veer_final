@@ -1,4 +1,6 @@
 {% extends "superadmin/base.html" %}
+{% load static %}
+
 {% block content %}
 
 <div class="container-fluid px-0" style="max-width:1200px;margin:0 auto;padding:1rem;">
@@ -114,29 +116,5 @@
 {% endblock %}
 
 {% block extra_scripts %}
-<script>
-
-const searchInput = document.getElementById("ownerSearch");
-
-searchInput.addEventListener("keyup", function(){
-
-    let value = this.value.toLowerCase();
-    let rows = document.querySelectorAll(".sa-table tbody tr");
-
-    rows.forEach(row => {
-
-        let name = row.children[0].innerText.toLowerCase();
-        let email = row.children[1].innerText.toLowerCase();
-
-        if(name.includes(value) || email.includes(value)){
-            row.style.display = "";
-        } else {
-            row.style.display = "none";
-        }
-
-    });
-
-});
-
-</script>
+<script src="{% static 'superadmin/js/owners.js' %}"></script>
 {% endblock %}

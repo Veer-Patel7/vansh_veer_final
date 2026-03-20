@@ -25,7 +25,7 @@ class Booking(models.Model):
     children = models.SmallIntegerField()
 
     payment_method = models.CharField(max_length=20, default="cash")
-    booking_status = models.CharField(max_length=20, default="confirm")
+    booking_status = models.CharField(max_length=20, default="confirmed")
 
     cancel_reason = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)

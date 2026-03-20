@@ -260,12 +260,14 @@
 /* ------------------- */
 /* Premium Single Page Architecture */
 .master-editor-container {
-        display: grid;
-        grid-template-columns: 280px 1fr;
-        gap: 40px;
-        align-items: start;
-        padding-bottom: 150px;
-    }
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 40px;
+    align-items: start;
+    padding-bottom: 150px;
+    height: 100vh;
+    overflow-y: auto;
+}
 
     /* Fixed Side Navigation */
     .editor-sidebar {
