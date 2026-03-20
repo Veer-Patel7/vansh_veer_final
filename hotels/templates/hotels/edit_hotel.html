@@ -1,7 +1,7 @@
 {% extends 'hotels/dashboard_base.html' %}
 {% load static %}
 
-{% block title %}Master Property Editor | {{ hotel.name }}{% endblock %}
+{% block title %}Master Property Editor | {{ hotel.hotel_name }}{% endblock %}
 
 {% block extra_head %}
 <!-- Professional Editor Suite -->
@@ -10,7 +10,7 @@
 {% endblock %}
 
 {% block page_title %}Master Property Editor{% endblock %}
-{% block page_subtitle %}Managing Synchronized Intelligence for {{ hotel.name }}.{% endblock %}
+{% block page_subtitle %}Managing Synchronized Intelligence for {{ hotel.hotel_name }}.{% endblock %}
 
 {% block dashboard_content %}
 <div class="master-editor-container">
@@ -51,18 +51,18 @@
             <div class="grid-12">
                 <div class="col-8 input-group">
                     <label><i class="fas fa-hotel"></i> Hotel Official Name</label>
-                    <input type="text" name="hotel_name" value="{{ hotel.name }}" class="input-field" required>
+                    <input type="text" name="hotel_name" value="{{ hotel.hotel_name }}" class="input-field" required>
                 </div>
                 <div class="col-4 input-group">
                     <label><i class="fas fa-tags"></i> Category</label>
                     <select name="hotel_type" class="input-field">
-                        <option value="HOTEL" {% if hotel.category == 'HOTEL' %}selected{% endif %}>Standard Hotel
+                        <option value="HOTEL" {% if hotel.hotel_type == 'HOTEL' %}selected{% endif %}>Standard Hotel
                         </option>
-                        <option value="RESORT" {% if hotel.category == 'RESORT' %}selected{% endif %}>Resort & Spa
+                        <option value="RESORT" {% if hotel.hotel_type == 'RESORT' %}selected{% endif %}>Resort & Spa
                         </option>
-                        <option value="HOMESTAY" {% if hotel.category == 'HOMESTAY' %}selected{% endif %}>Homestay
+                        <option value="HOMESTAY" {% if hotel.hotel_type == 'HOMESTAY' %}selected{% endif %}>Homestay
                         </option>
-                        <option value="VILLA" {% if hotel.category == 'VILLA' %}selected{% endif %}>Private Villa</option>
+                        <option value="VILLA" {% if hotel.hotel_type == 'VILLA' %}selected{% endif %}>Private Villa</option>
                     </select>
                 </div>
                 <div class="col-12 input-group">
@@ -83,7 +83,7 @@
                 </div>
                 <div class="col-4 input-group">
                     <label><i class="fas fa-star"></i> Star Tier</label>
-                    <input type="number" name="star_rating" value="{{ hotel.star_rating }}" step="1" min="1" max="5"
+                    <input type="number" name="star_rating" value="{{ hotel.star_rating|default:0 }}" step="1" min="1" max="5"
                         class="input-field">
                 </div>
             </div>
@@ -121,12 +121,12 @@
                 <div class="grid-12 gap-6">
                     <div class="col-6">
                         <label class="text-[9px] font-bold text-slate-400 uppercase mb-2 block">Lattitude Node</label>
-                        <input type="text" name="lat" id="lat" value="{{ hotel.latitude|default:'20.5937' }}"
+                        <input type="text" name="lat" id="lat" value="{{ hotel.lat|default:'20.5937' }}"
                             class="input-field bg-slate-50 font-mono text-xs" readonly>
                     </div>
                     <div class="col-6">
                         <label class="text-[9px] font-bold text-slate-400 uppercase mb-2 block">Longitude Node</label>
-                        <input type="text" name="lng" id="lng" value="{{ hotel.longitude|default:'78.9629' }}"
+                        <input type="text" name="lng" id="lng" value="{{ hotel.lng|default:'78.9629' }}"
                             class="input-field bg-slate-50 font-mono text-xs" readonly>
                     </div>
                 </div>
@@ -145,11 +145,11 @@
             <div class="grid-12">
                 <div class="col-6 input-group">
                     <label><i class="fas fa-clock text-cyan-500"></i> Check-in Timeline</label>
-                    <input type="time" name="check_in" value="{{ hotel.check_in_time|time:'H:i' }}" class="input-field">
+                    <input type="time" name="check_in" value="{{ hotel.check_in|time:'H:i' }}" class="input-field">
                 </div>
                 <div class="col-6 input-group">
                     <label><i class="fas fa-clock-rotate-left text-rose-500"></i> Check-out Timeline</label>
-                    <input type="time" name="check_out" value="{{ hotel.check_out_time|time:'H:i' }}"
+                    <input type="time" name="check_out" value="{{ hotel.check_out|time:'H:i' }}"
                         class="input-field">
                 </div>
                 <div class="col-12 input-group mt-6">
@@ -244,13 +244,13 @@
                         </div>
                         <div class="col-4 input-group">
                             <label><i class="fas fa-coins text-emerald-500"></i> Base Price Node (INR)</label>
-                            <input type="number" name="room_price_{{ forloop.counter }}" value="{{ room.base_price }}"
+                            <input type="number" name="room_price_{{ forloop.counter }}" value="{{ room.price_per_night }}"
                                 class="input-field font-mono" step="0.01">
                         </div>
                         <div class="col-4 input-group">
                             <label><i class="fas fa-cubes text-blue-500"></i> Inventory Delta (Units)</label>
                             <input type="number" name="room_count_{{ forloop.counter }}"
-                                value="{{ room.inventory_count }}" class="input-field" min="0">
+                                value="{{ room.total_rooms }}" class="input-field" min="0">
                         </div>
 
                         <!-- Utility Matrix (Amenities) -->
@@ -383,7 +383,7 @@
                         <div class="col-4 input-group">
                             <label>Mandatory ID Proof</label>
                             <input type="file" name="doc_mandatory" class="input-field">
-                            {% if hotel.doc_id_proof %}
+                            {% if hotel.doc_mandatory %}
                             <div
                                 class="text-[9px] font-bold text-emerald-500 mt-2 bg-emerald-50 p-2 rounded-lg border border-emerald-100 flex items-center gap-2">
                                 <i class="fas fa-file-shield text-xs"></i> Existing Dossier File
@@ -393,7 +393,7 @@
                         <div class="col-4 input-group">
                             <label>Govt Registration</label>
                             <input type="file" name="doc_certificate" class="input-field">
-                            {% if hotel.doc_govt_registration %}
+                            {% if hotel.doc_certificate %}
                             <div
                                 class="text-[9px] font-bold text-emerald-500 mt-2 bg-emerald-50 p-2 rounded-lg border border-emerald-100 flex items-center gap-2">
                                 <i class="fas fa-file-shield text-xs"></i> Cert. Registry Confirmed
@@ -403,7 +403,7 @@
                         <div class="col-4 input-group">
                             <label>GST Certificate</label>
                             <input type="file" name="doc_gst" class="input-field">
-                            {% if hotel.doc_gst_certificate %}
+                            {% if hotel.doc_gst %}
                             <div
                                 class="text-[9px] font-bold text-emerald-500 mt-2 bg-emerald-50 p-2 rounded-lg border border-emerald-100 flex items-center gap-2">
                                 <i class="fas fa-file-shield text-xs"></i> Tax Dossier Validated
@@ -428,7 +428,7 @@
             <div class="gallery-grid">
                 {% for img in gallery %}
                 <div class="media-item group/gallery relative overflow-hidden">
-                    <img src="{{ img.media_file.url }}" alt="Property Gallery">
+                    <img src="{{ img.image_path.url }}" alt="Property Gallery">
                     <div class="media-del photo-del-btn" data-type="gallery" data-id="{{ img.id }}">
                         <i class="fas fa-trash-can text-white text-xl"></i>
                     </div>

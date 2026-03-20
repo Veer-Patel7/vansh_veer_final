@@ -173,218 +173,154 @@ def add_hotel(request):
 
 @hotel_admin_required
 def edit_hotel(request, hotel_id):
-    """
-    Master Property Editor: Update Global Dossier.
-    Handles updates for Identity, Inventory (Rooms), and Compliance.
-    """
     hotel = get_object_or_404(Hotel, id=hotel_id, owner=request.user)
-    
+
     if request.method == 'POST':
-        print("POST KEYS:",request.POST.keys())
         try:
-            # 1. Update Core Identity (Step 1 Fields)
-            hotel.hotel_name = request.POST.get('hotel_name', hotel.hotel_name).strip()
-            # hotel_type points to 'category' field in request data
-            hotel_type = request.POST.get('hotel_type', '').strip()
-            if hotel_type:
-                hotel.hotel_type = hotel_type
-                
-            hotel.address = request.POST.get('address', hotel.address).strip()
-            hotel.narrative = request.POST.get('hotel_narrative', hotel.narrative).strip()
-            # Contact & Portfolio Intelligence
-            hotel.contact_number = request.POST.get('contact_number', hotel.contact_number).strip()
-            hotel.website = request.POST.get('website', hotel.website).strip()
-            try:
-                hotel.star_rating = float(request.POST.get('star_rating', hotel.star_rating))
-            except (TypeError, ValueError):
-                pass
-            
-            # Location Intelligence
-            hotel.city = request.POST.get('city', hotel.city).strip()
-            hotel.state = request.POST.get('state', hotel.state).strip()
-            hotel.pincode = request.POST.get('pincode', hotel.pincode).strip()
+            # ==============================
+            # 1. BASIC DETAILS
+            # ==============================
+            hotel.hotel_name = (request.POST.get('hotel_name') or hotel.hotel_name or "").strip()
+            hotel.hotel_type = request.POST.get('hotel_type') or hotel.hotel_type
+
+            hotel.address = (request.POST.get('address') or hotel.address or "").strip()
+            hotel.city = (request.POST.get('city') or hotel.city or "").strip()
+            hotel.state = (request.POST.get('state') or hotel.state or "").strip()
+            hotel.pincode = (request.POST.get('pincode') or hotel.pincode or "").strip()
+
+            hotel.contact_number = (request.POST.get('contact_number') or hotel.contact_number or "").strip()
+            hotel.website = (request.POST.get('website') or hotel.website or "").strip()
+            hotel.narrative = (request.POST.get('hotel_narrative') or hotel.narrative or "").strip()
+
+            # ==============================
+            # 2. LOCATION
+            # ==============================
             lat = request.POST.get('lat')
             lng = request.POST.get('lng')
-            if lat: hotel.latitude = lat
-            if lng: hotel.longitude = lng
 
-            # Operational Rules (Step 2 Fields)
-            hotel.check_in_time = request.POST.get('check_in', hotel.check_in_time)
-            hotel.check_out_time = request.POST.get('check_out', hotel.check_out_time)
-            hotel.cancellation_policy = request.POST.get('cancellation_policy', hotel.cancellation_policy)
-            
-            # Handle services list
-            services_raw = request.POST.get('services', '[]')
-            if services_raw:
-                # Fix for Python-style single quotes in rendered templates
-                if "'" in services_raw and '"' not in services_raw:
-                    services_raw = services_raw.replace("'", '"')
+            if lat:
                 try:
-                    hotel.services = json.loads(services_raw)
-                    if not isinstance(hotel.services, list): hotel.services = []
+                    hotel.lat = float(lat)
                 except:
-                    hotel.services = request.POST.getlist('services')
-            
-            hotel.name = request.POST.get('hotel_name', hotel.name)
-            hotel.category = request.POST.get('hotel_type', hotel.category)
-            hotel.address = request.POST.get('address', hotel.address)
-            hotel.city = request.POST.get('city', hotel.city)
-            hotel.state = request.POST.get('state', hotel.state)
-            hotel.pincode = request.POST.get('pincode', hotel.pincode)
-            hotel.contact_number = request.POST.get('contact_number', hotel.contact_number)
-            hotel.website = request.POST.get('website', hotel.website)
-            hotel.narrative = request.POST.get('hotel_narrative', hotel.narrative)
-            
-            try:
-                hotel.star_rating = Decimal(str(request.POST.get('star_rating') or hotel.star_rating))
-            except: pass
-            
-            hotel.check_in_time = request.POST.get('check_in', hotel.check_in_time)
-            hotel.check_out_time = request.POST.get('check_out', hotel.check_out_time)
-            hotel.cancellation_policy = request.POST.get('cancellation_policy', hotel.cancellation_policy)
-                
-            # 3. Compliance Data (Step 3 Fields)
-            hotel.id_type = request.POST.get('id_type', hotel.id_type)
-            hotel.id_number = request.POST.get('id_number', hotel.id_number).strip()
-            hotel.govt_reg_number = request.POST.get('govt_reg_number', hotel.govt_reg_number).strip()
-            hotel.gst_number = request.POST.get('gst_number', hotel.gst_number).strip()
-            
-            # Handle Document Overwrites
-            if request.FILES.get('doc_mandatory'): hotel.doc_mandatory = request.FILES.get('doc_mandatory')
-            if request.FILES.get('doc_certificate'): hotel.doc_certificate = request.FILES.get('doc_certificate')
-            if request.FILES.get('doc_gst'): hotel.doc_gst = request.FILES.get('doc_gst')
-            
-            hotel.save()
-            logger.info(f"[Edit Hotel] Identity & Compliance saved for '{hotel.name}'")
+                    pass
 
-            # 4. Inventory Matrix Sync (Dynamic Rooms)
-            # Find all room indices from the post data (matches room_name_X)
-            new_room_indices = []
+            if lng:
+                try:
+                    hotel.lng = float(lng)
+                except:
+                    pass
+
+            # ==============================
+            # 3. OPERATIONS
+            # ==============================
+            hotel.check_in = request.POST.get('check_in') or hotel.check_in
+            hotel.check_out = request.POST.get('check_out') or hotel.check_out
+            hotel.cancellation_policy = request.POST.get('cancellation_policy') or hotel.cancellation_policy
+
+            try:
+                hotel.star_rating = float(request.POST.get('star_rating') or hotel.star_rating)
+            except:
+                pass
+
+            # ==============================
+            # 4. SERVICES (JSON)
+            # ==============================
+            try:
+                hotel.services = json.loads(request.POST.get('services', '[]'))
+            except:
+                hotel.services = []
+
+            # ==============================
+            # 5. COMPLIANCE
+            # ==============================
+            hotel.id_type = request.POST.get('id_type') or hotel.id_type
+            hotel.id_number = (request.POST.get('id_number') or hotel.id_number or "").strip()
+            hotel.govt_reg_number = (request.POST.get('govt_reg_number') or hotel.govt_reg_number or "").strip()
+            hotel.gst_number = (request.POST.get('gst_number') or hotel.gst_number or "").strip()
+
+            if request.FILES.get('doc_mandatory'):
+                hotel.doc_mandatory = request.FILES.get('doc_mandatory')
+            if request.FILES.get('doc_certificate'):
+                hotel.doc_certificate = request.FILES.get('doc_certificate')
+            if request.FILES.get('doc_gst'):
+                hotel.doc_gst = request.FILES.get('doc_gst')
+            hotel.save()
+
+            # ==============================
+            # 6. ROOMS UPDATE
+            # ==============================
+            processed_room_ids = []
+
             for key in request.POST.keys():
                 if key.startswith('room_name_'):
-                    # The index might be a number or a timestamp from JS
                     idx = key.replace('room_name_', '')
-                    if idx and idx != "__prefix__":
-                        new_room_indices.append(idx)
-            
-            # Tracking existing room IDs to detect deletions
-            processed_room_ids = []
-            logger.info(f"[Edit Hotel] Detected {len(new_room_indices)} room node(s) for sync: {new_room_indices}")
-            logger.info(f"[Edit Hotel] All POST keys: {list(request.POST.keys())}")
-            for idx in new_room_indices:
-                try:
-                    room_id = request.POST.get(f'room_id_{idx}') # If it exists, it's an edit
                     name = request.POST.get(f'room_name_{idx}')
-                    if not name: continue # Safety skip for ghost nodes
-
+                    if not name:
+                        continue
+                    room_id = request.POST.get(f'room_id_{idx}')
                     try:
-                        p_price = request.POST.get(f'room_price_{idx}')
-                        p_raw = "".join(c for c in str(p_price) if c.isdigit() or c == '.') if p_price else "0"
-                        price = Decimal(p_raw or "0")
-                        
-                        p_guests = request.POST.get(f'room_guests_{idx}')
-                        guests = int("".join(c for c in str(p_guests) if c.isdigit()) or "2") if p_guests else 2
-                        
-                        p_count = request.POST.get(f'room_count_{idx}')
-                        count = int("".join(c for c in str(p_count) if c.isdigit()) or "1") if p_count else 1
-                    except Exception as num_err:
-                        price, guests, count = Decimal('0.0'), 2, 1
-                        logger.warning(f"[Edit Hotel] Numeric fallback used for node {idx}: {str(num_err)}")
+                        price = float(request.POST.get(f'room_price_{idx}', 0))
+                        guests = int(request.POST.get(f'room_guests_{idx}', 2))
+                        count = int(request.POST.get(f'room_count_{idx}', 1))
+                    except:
+                        price, guests, count = 0, 2, 1
+                    room_type = request.POST.get(f'room_type_{idx}', 'STANDARD')
+                    try:
+                        amenities = json.loads(request.POST.get(f'room_amenities_{idx}', '[]'))
+                    except:
+                        amenities = []
 
-                    r_class = request.POST.get(f'room_type_{idx}', 'STANDARD') or 'STANDARD'
-                    
-                    amenities_data = request.POST.get(f'room_amenities_{idx}', '[]')
-                    if "'" in amenities_data and '"' not in amenities_data:
-                        amenities_data = amenities_data.replace("'", '"')
-                    try: 
-                        amenities_list = json.loads(amenities_data)
-                        if not isinstance(amenities_list, list): amenities_list = []
-                    except: 
-                        amenities_list = []
-
+                    # UPDATE
                     if room_id:
-                        try:# Edit Existing
-                            room = get_object_or_404(RoomType, id=room_id, hotel=hotel)
-                            room.name = name
-                            room.room_type = r_class
-                            room.max_guest = guests
-                            room.price_per_night = price
-                            room.total_rooms = count
-                            room.amenities = amenities_list
-                            room.save()
-                            processed_room_ids.append(room.id) 
-                        except:  # If ID specified but not found in this hotel context, create new
-                            room = RoomType.objects.create(
-                                hotel=hotel, name=name, room_type=r_class,
-                                max_guest=guests, base_price=price,
-                                inventory_count=count, amenities=amenities_list
-                            )
-                    else: # Create New
+                        room = get_object_or_404(RoomType, id=room_id, hotel=hotel)
+                        room.name = name
+                        room.room_type = room_type
+                        room.max_guest = guests
+                        room.price_per_night = price
+                        room.total_rooms = count
+                        room.amenities = amenities
+                        room.save()
+
+                    # CREATE
+                    else:
                         room = RoomType.objects.create(
                             hotel=hotel,
                             name=name,
-                            room_type=r_class,
+                            room_type=room_type,
                             max_guest=guests,
                             price_per_night=price,
                             total_rooms=count,
-                            amenities=amenities_list
+                            amenities=amenities
                         )
                     processed_room_ids.append(room.id)
-                    logger.info(f"[Edit Hotel] Category '{name}' synced successfully.")
-                        
-                    # Room Media Logic
-                    # 1. Process Deletions
-                    deleted_photos_data = request.POST.get(f'deleted_room_photos_{idx}', '[]')
-                    try:
-                        deleted_photos_ids = json.loads(deleted_photos_data)
-                        if deleted_photos_ids:
-                            RoomPhoto.objects.filter(id__in=deleted_photos_ids, room=room).delete() 
-                    except: pass
-
-                    # 2. Add New Media
-                    room_media = request.FILES.getlist(f'room_photos_{idx}')
-                    for f in room_media:
+                    # ROOM IMAGES
+                    files = request.FILES.getlist(f'room_photos_{idx}')
+                    for f in files:
                         RoomPhoto.objects.create(room=room, media_file=f)
-                        
-                except Exception as room_err:
-                        logger.error(f"[Edit Hotel] Failure in room loop {idx}: {str(room_err)}")
-
-            # Cleanup: Remove rooms not present in the update
+            # DELETE OLD ROOMS
             if processed_room_ids:
                 hotel.rooms.exclude(id__in=processed_room_ids).delete()
 
-            # 5. Global Gallery Sync
-            # 1. Process Gallery Deletions
-            deleted_gallery_data = request.POST.get('deleted_gallery_photos', '[]')
-            try:
-                deleted_gallery_ids = json.loads(deleted_gallery_data)
-                if deleted_gallery_ids:
-                    HotelImage.objects.filter(id__in=deleted_gallery_ids, hotel=hotel).delete()
-            except: pass
-
-            # 2. Add New Gallery Media
+            # ==============================
+            # 7. GALLERY
+            # ==============================
             gallery_files = request.FILES.getlist('property_images')
             for f in gallery_files:
                 HotelImage.objects.create(hotel=hotel, image_path=f)
-
-            messages.success(request, f"Global Property Dossier for '{hotel.name}' has been securely updated.")
+            messages.success(request, f"{hotel.hotel_name} updated successfully")
             return redirect('hotels:my_hotels')
-
         except Exception as e:
             logger.error(f"[Edit Hotel Error] {str(e)}")
-            messages.error(request, f"Protocol Failure: {str(e)}")
-
-    # Prefetch data for elite rendering
-    # We use .all() to ensure we get all RoomType objects linked to this hotel
+            messages.error(request, f"Error: {str(e)}")
     rooms = hotel.rooms.all().prefetch_related('photos')
     gallery = hotel.images.all()
-    
+
     return render(request, 'hotels/edit_hotel.html', {
         'hotel': hotel,
         'rooms': rooms,
         'gallery': gallery,
         'service_choices': HOTEL_SERVICE_CHOICES,
-        'is_edit': True # Context flag for high-fidelity UI
+        'is_edit': True
     })
 
 @hotel_admin_required
