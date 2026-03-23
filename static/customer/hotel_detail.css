@@ -18,25 +18,41 @@ body{
     position:fixed;
     top:0;
     left:0;
-    right:0;            
     width:100%;
-    padding:18px 8%;  
-    display:flex;   
+    padding:18px 8%;
+    display:flex;
     justify-content:space-between;
     align-items:center;
     background:#054ab9;
-    z-index:9999;
+    z-index:10;
+}
+
+        
+.navbar a {
+    color: white;
+    text-decoration: none;
+    margin: 0 15px;
+}
+
+
+.navbar nav a{
+    color:white;
+    text-decoration:none;
+    margin:10px 50px;
+    font-weight:500;
+    transition:0.3s;
+}
+
+.navbar nav a:hover{
+    color:#cbd5e1;
 }
 
 .logo a{
-    font-size:24px;
+    font-size:26px;
     font-weight:700;
     color:white;
     text-decoration:none;
-}
-
-.logo a:hover{
-    color:#e2e8f0;
+    padding: 100px;  
 }
 
 /* ========== CONTAINER ========== */
