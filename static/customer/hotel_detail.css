@@ -56,40 +56,43 @@ body{
 }
 
 /* ========== CONTAINER ========== */
-.container{
-    width:100%;              /* 🔥 better spacing */
-    max-width:100px;
-    margin:0 auto;
+.main-card{
+    width:600px;             
+    max-width:600px;
+    height:auto;
+    margin:40px auto;
     background:white;
-    padding:40px 0;
+    padding:20px;
     border-radius:20px;
-    box-shadow:0 20px 40px rgba(0,0,0,0.25);
+    box-shadow:0 20px 40px rgb(0, 0, 0);
+    display:block;
 }
+
 
 /* ========== HOTEL HEADER ========== */
 .hotel-header h1{
-    font-size:28px;
+    font-size:35px;
     margin-bottom:8px;
     color:#333;
 }
 
 .hotel-header p{
     color:#555;
-    font-size:14px;
+    font-size:20px;
     margin-bottom:20px;
 }
 
 /* ========== HOTEL IMAGE ========== */
 .hotel-image{
-    margin-bottom:25px;
+    margin-bottom:5px;
     overflow:hidden;
-    border-radius:15px;
+    border-radius:5px;
 }
 
 .hotel-image img{
     width:100%;
     height:350px;
-    object-fit:cover;
+    object-fit:contain;
     transition:0.3s;
 }
 
@@ -108,7 +111,7 @@ body{
 }
 
 .hotel-description p{
-    font-size:15px;
+    font-size:20px;
     color:#444;
     line-height:1.6;
 }
