@@ -57,6 +57,7 @@
                 <th>Guests</th>
                 <th>Total Price</th>
                 <th>Status</th>
+                <th>Actions</th>
             </tr>
         </thead>
 
@@ -71,6 +72,9 @@
                 <td>₹{{ booking.total_price }}</td>
                 <td>
                 <span class="badge bg-success">Confirmed</span>
+                </td>
+                <td>
+                    <a href="{% url 'reviews:add_review' booking.hotel.id %}" class="btn btn-sm btn-outline-primary">Leave Review</a>
                 </td>            
             </tr>
             {% endfor %}

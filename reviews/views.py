@@ -1,8 +1,10 @@
-from django.shortcuts import redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import Review
+from hotels.models import Hotel
 from django.core.mail import send_mail
 from django.conf import settings
+from django.contrib import messages
 
 # HOTEL ADMIN → request delete
 @login_required(login_url="/hotel/login/")
@@ -33,11 +35,9 @@ def reject_delete(request, id):
 
 @login_required
 def add_review(request, hotel_id):
-
     hotel = get_object_or_404(Hotel, id=hotel_id)
 
     if request.method == "POST":
-
         rating = request.POST.get("rating")
         comment = request.POST.get("comment")
         recommend = request.POST.get("recommend")
@@ -75,4 +75,6 @@ def add_review(request, hotel_id):
         )
 
         messages.success(request, "Review submitted successfully")
-        return redirect("hotel_detail", hotel_id=hotel.id)
+        return redirect("customer:my_bookings")
+
+    return render(request, "review/review.html", {"hotel": hotel})

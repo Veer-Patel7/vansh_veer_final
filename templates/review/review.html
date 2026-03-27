@@ -1,0 +1,190 @@
+{% extends "customer/search.html" %}
+{% load static %}
+
+{% block content %}
+<!-- Back Navigation -->
+<div class="review-page-bg py-5">
+    <div class="container container-narrow pt-5">
+        <div class="mb-4">
+            <a href="{% url 'customer:my_bookings' %}" class="text-decoration-none text-muted">
+                <i class="bi bi-arrow-left"></i> Back to My Bookings
+            </a>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="review-card shadow-lg border-0">
+                    <div class="row g-0">
+                        <!-- Left Panel: Hotel Info -->
+                        <div class="col-md-4 bg-primary text-white p-4 p-md-5 d-flex flex-column justify-content-center">
+                            <div class="hotel-info mb-4">
+                                <span class="badge bg-white text-primary mb-2 fw-bold px-3 py-2 rounded-pill shadow-sm">Reviewing</span>
+                                <h1 class="display-6 fw-bold mb-3">{{ hotel.hotel_name }}</h1>
+                                <p class="opacity-75"><i class="bi bi-geo-alt-fill me-2"></i>{{ hotel.city|default:"Premier Destination" }}</p>
+                            </div>
+                            <div class="trust-indicators">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="rounded-circle bg-white bg-opacity-25 p-2 me-3">
+                                        <i class="bi bi-shield-check"></i>
+                                    </div>
+                                    <span class="small">Your feedback helps millions of travelers make better choices.</span>
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <div class="rounded-circle bg-white bg-opacity-25 p-2 me-3">
+                                        <i class="bi bi-chat-heart"></i>
+                                    </div>
+                                    <span class="small">Hotels value your honest feedback to improve their services.</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Panel: Form -->
+                        <div class="col-md-8 bg-white p-4 p-md-5">
+                            <form method="POST" action="{% url 'reviews:add_review' hotel.id %}">
+                                {% csrf_token %}
+                                
+                                <h2 class="h4 fw-bold mb-4 text-dark">How was your stay?</h2>
+
+                                <!-- Premium Rating Selector -->
+                                <div class="rating-container mb-5">
+                                    <label class="form-label fw-semibold text-muted mb-3 d-block">Rate your overall experience</label>
+                                    <div class="star-rating">
+                                        {% for i in "54321"|make_list %}
+                                        <input type="radio" id="star{{ i }}" name="rating" value="{{ i }}" required />
+                                        <label for="star{{ i }}" title="{{ i }} stars">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-star-fill" viewBox="0 0 16 16">
+                                                <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                            </svg>
+                                        </label>
+                                        {% endfor %}
+                                    </div>
+                                    <div class="invalid-feedback">Please select a rating</div>
+                                </div>
+
+                                <!-- Comment Input -->
+                                <div class="mb-4">
+                                    <label for="comment" class="form-label fw-semibold text-muted">A detailed review helps more</label>
+                                    <textarea name="comment" id="comment" class="form-control animated-textarea" rows="4" 
+                                              placeholder="What did you like? What could be better? The staff, the room, the food..." 
+                                              required></textarea>
+                                </div>
+
+                                <!-- Recommendation -->
+                                <div class="mb-5">
+                                    <label class="form-label fw-semibold text-muted mb-3 d-block">Would you recommend {{ hotel.hotel_name }}?</label>
+                                    <div class="recommendation-switch d-flex gap-2">
+                                        <input type="radio" class="btn-check" name="recommend" id="rec_yes" value="True" checked>
+                                        <label class="btn btn-outline-success px-4 py-2 rounded-pill fw-semibold" for="rec_yes">
+                                            <i class="bi bi-hand-thumbs-up-fill me-2"></i> Yes, Highly!
+                                        </label>
+
+                                        <input type="radio" class="btn-check" name="recommend" id="rec_no" value="False">
+                                        <label class="btn btn-outline-danger px-4 py-2 rounded-pill fw-semibold" for="rec_no">
+                                            <i class="bi bi-hand-thumbs-down-fill me-2"></i> Not really
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="d-grid pt-3">
+                                    <button type="submit" class="btn btn-primary btn-lg shadow-sm py-3 fw-bold explore-btn-hover">
+                                        Post My Review <i class="bi bi-send-fill ms-2"></i>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Styles for Review Page -->
+<style>
+    :root {
+        --primary-gradient: linear-gradient(135deg, #4e54c8 0%, #8f94fb 100%);
+    }
+
+    .review-page-bg {
+        background-color: #f8fafc;
+        min-height: 100vh;
+    }
+
+    .container-narrow {
+        max-width: 900px;
+    }
+
+    .review-card {
+        border-radius: 24px;
+        overflow: hidden;
+        transition: transform 0.3s ease;
+    }
+
+    /* Star Rating System */
+    .star-rating {
+        display: flex;
+        flex-direction: row-reverse;
+        justify-content: flex-end;
+        gap: 8px;
+    }
+
+    .star-rating input {
+        display: none;
+    }
+
+    .star-rating label {
+        color: #e2e8f0;
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+    }
+
+    .star-rating label:hover,
+    .star-rating label:hover ~ label,
+    .star-rating input:checked ~ label {
+        color: #ffc107;
+        transform: scale(1.1);
+    }
+
+    .star-rating label:active {
+        transform: scale(0.9);
+    }
+
+    /* Form Styling */
+    .animated-textarea {
+        border: 2px solid #edf2f7;
+        border-radius: 16px;
+        padding: 16px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        resize: none;
+    }
+
+    .animated-textarea:focus {
+        border-color: #4e54c8;
+        box-shadow: 0 0 0 4px rgba(78, 84, 200, 0.1);
+        transform: translateY(-2px);
+    }
+
+    .btn-primary {
+        background: var(--primary-gradient);
+        border: none;
+        border-radius: 16px;
+    }
+
+    .explore-btn-hover:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(78, 84, 200, 0.3) !important;
+    }
+
+    .recommendation-switch label {
+        transition: all 0.2s;
+    }
+
+    /* Hero section adjustment for back nav */
+    .hero {
+        display: none; /* Hide hero on this specific page if search.html shows it */
+    }
+</style>
+
+<!-- Add Bootstrap Icons if not present -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+{% endblock %}
