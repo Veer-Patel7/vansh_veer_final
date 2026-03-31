@@ -29,9 +29,9 @@ urlpatterns = [
     path('hotels/edit/<int:hotel_id>/', views.edit_hotel, name='edit_hotel'),
     
     #rooms
-    path('rooms/add', views.add_room, name='new_add_room'),
+    path('rooms/add/', views.add_room, name='new_add_room'),
     path('rooms/<int:hotel_id>/add/', views.add_room, name='add_room'),
-    path('rooms/<int:hotel_id>/edit/', views.add_room, name='edit_room'),
+    path('rooms/<int:hotel_id>/<int:room_id>/edit/', views.add_room, name='edit_room'),
     path('rooms/', views.manage_rooms, name='manage_rooms'),
     path('rooms/<int:hotel_id>/', views.manage_rooms, name='manage_rooms_hotel'),
     path('rooms/delete/<int:room_id>/', views.delete_room, name='delete_room'),

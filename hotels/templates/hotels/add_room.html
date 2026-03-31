@@ -31,6 +31,8 @@
     <form method="POST" id="room_form" class="grid grid-cols-1 lg:grid-cols-12 gap-12" enctype="multipart/form-data">
         {% csrf_token %}
 
+        <input type="hidden" name="hotel_id" value="{{ hotel.id }}">
+
         <!-- Left Column: Core Data -->
         <div class="lg:col-span-8 space-y-12">
             <div

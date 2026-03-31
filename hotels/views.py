@@ -395,8 +395,17 @@ def add_room(request, hotel_id=None, room_id=None):
     hotels = Hotel.objects.filter(owner=request.user)
 
     hotel = None
+
+    # URL se hotel
     if hotel_id:
         hotel = get_object_or_404(Hotel, id=hotel_id, owner=request.user)
+
+    # POST se hotel override 
+    if request.method == "POST":
+        hotel_id_post = request.POST.get("hotel_id")
+
+        if hotel_id_post:
+            hotel = get_object_or_404(Hotel, id=hotel_id_post, owner=request.user)
 
     room = None
     if room_id and hotel:
@@ -417,12 +426,12 @@ def add_room(request, hotel_id=None, room_id=None):
             except:
                 amenities_list = []
 
-            # If hotel not selected
+            # agar hotel nahi mila
             if not hotel:
                 messages.error(request, "Please select a hotel first.")
                 return redirect("hotels:manage_rooms")
 
-            # EDIT
+            # ===== EDIT =====
             if room:
                 room.name = name
                 room.room_type = room_type
@@ -434,21 +443,21 @@ def add_room(request, hotel_id=None, room_id=None):
 
                 messages.success(request, f"Room '{name}' updated successfully.")
 
-            # CREATE
+            # ===== CREATE =====
             else:
                 room = RoomType.objects.create(
                     hotel=hotel,
                     name=name,
                     room_type=room_type,
                     max_guest=max_guest,
-                    base_price=base_price,
-                    inventory_count=inventory,
+                    price_per_night=base_price,
+                    total_rooms=inventory,
                     amenities=amenities_list
                 )
 
                 messages.success(request, f"New Room '{name}' created successfully.")
 
-            # Upload photos
+            # ===== PHOTOS =====
             room_photos = request.FILES.getlist("room_photos")
 
             for photo in room_photos:
@@ -458,8 +467,9 @@ def add_room(request, hotel_id=None, room_id=None):
                 )
 
             return redirect("hotels:manage_rooms_hotel", hotel_id=hotel.id)
-        
+
         except Exception as e:
+            print("ERROR:", e)  #debug
             messages.error(request, f"Error: {str(e)}")
 
     return render(request, "hotels/add_room.html", {
@@ -467,7 +477,7 @@ def add_room(request, hotel_id=None, room_id=None):
         "hotels": hotels,
         "room": room
     })
-
+    
 @hotel_admin_required
 def manage_rooms(request, hotel_id=None):
 
