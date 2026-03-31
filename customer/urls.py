@@ -21,5 +21,6 @@ urlpatterns = [
     # Review add
     path('add-review/<int:hotel_id>/', views.add_review, name="add_review"),
     path('contact/', views.contact, name='contact'),
+    path('about/', views.about, name='about'),
 ]
 

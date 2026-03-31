@@ -2,47 +2,47 @@
 
 {% block content %}
 
-<section class="hero"id="home">
+<section class="hero" id="home">
 </section>
-    <!-- HERO SECTION -->
-    
+<!-- HERO SECTION -->
 
-        <!-- NAVBAR -->
-        <div class="navbar">
-            <h2 class="logo"><a href="{% url 'customer:home' %}">HotelPro</a></h2>
 
-            <nav>
-                <a href="{% url 'customer:home' %}">Home</a>
-                {% comment %} <a href="#hotels">Hotels</a> 
-                <a href="#contact">Contact Us</a>
-                <a href="#about">About Us</a> {% endcomment %}
-                
-            </nav>
+<!-- NAVBAR -->
+<div class="navbar">
+    <h2 class="logo"><a href="{% url 'customer:home' %}">HotelPro</a></h2>
 
-                
+    <nav>
+        <a href="{% url 'customer:home' %}#home">Home</a>
+        <a href="{% url 'customer:home' %}#hotels">Hotels</a>
+        <a href="{% url 'customer:home' %}#about-hero">About Us</a>
+        <a href="{% url 'customer:home' %}#contact">Contact Us</a>
 
-            <div class="auth-section">
-                {% comment %} <a href="{%url 'accounts:hotel_signup'%}">List Your Property Here</a> {% endcomment %}
-                {% if user.is_authenticated %}
-                
-                <div class="profile-dropdown">
-                    <button class="profile-btn">
-                        {{ user.first_name|default:"👤"|slice:":1"|upper }}
-                        
-                    </button>
-                    <div class="dropdown-content">
-                        <a href="{% url 'customer:profile' %}">Profile</a>
-                        <a href="{% url 'customer:my_bookings' %}">My Bookings</a>
-                        <a href="{% url 'accounts:logout' %}">Logout</a>
-                    </div>
-                </div>
+    </nav>
 
-                {% else %}
-                    <a href="{% url 'accounts:auth' %}" class="signin-btn">Sign In</a>
-                {% endif %}
+
+
+    <div class="auth-section">
+        {% comment %} <a href="{%url 'accounts:hotel_signup'%}">List Your Property Here</a> {% endcomment %}
+        {% if user.is_authenticated %}
+
+        <div class="profile-dropdown">
+            <button class="profile-btn">
+                {{ user.first_name|default:"👤"|slice:":1"|upper }}
+
+            </button>
+            <div class="dropdown-content">
+                <a href="{% url 'customer:profile' %}">Profile</a>
+                <a href="{% url 'customer:my_bookings' %}">My Bookings</a>
+                <a href="{% url 'accounts:logout' %}">Logout</a>
             </div>
         </div>
-        
+
+        {% else %}
+        <a href="{% url 'accounts:auth' %}" class="signin-btn">Sign In</a>
+        {% endif %}
+    </div>
+</div>
+
 <div class="my-bookings">
     <h2>My Bookings</h2>
 
@@ -71,18 +71,19 @@
                 <td>{{ booking.total_guests }}</td>
                 <td>₹{{ booking.total_price }}</td>
                 <td>
-                <span class="badge bg-success">Confirmed</span>
+                    <span class="badge bg-success">Confirmed</span>
                 </td>
                 <td>
-                    <a href="{% url 'reviews:add_review' booking.hotel.id %}" class="btn btn-sm btn-outline-primary">Leave Review</a>
-                </td>            
+                    <a href="{% url 'reviews:add_review' booking.hotel.id %}"
+                        class="btn btn-sm btn-outline-primary">Leave Review</a>
+                </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
 
     {% else %}
-        <p class="no-booking">You have no bookings yet.</p>
+    <p class="no-booking">You have no bookings yet.</p>
     {% endif %}
 </div>
- {% endblock %}
+{% endblock %}

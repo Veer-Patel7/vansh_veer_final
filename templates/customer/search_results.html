@@ -2,54 +2,92 @@
 {% load static %}
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Available Hotels</title>
     <link rel="stylesheet" href="{% static 'customer/search_results.css' %}">
 </head>
+
 <body>
-<div class="navbar">
-<h2 class="logo"><a href="{% url 'customer:home' %}">HotelPro</a></h2>
-</div>
-<form method="POST">
-    {% csrf_token %}
+    <div class="navbar">
+        <h2 class="logo"><a href="{% url 'customer:home' %}">HotelPro</a></h2>
+    </div>
+    <form method="POST">
+        {% csrf_token %}
 
-    <h1 class="page-title">Available Hotels</h1>
+        <h1 class="page-title">Available Hotels</h1>
 
-    <section class="results-section">
-        <div class="hotel-container">
-            {% if hotels %}
-                {% for hotel in hotels %}
-                <div class="hotel-card">
-                    <h3>{{ hotel.hotel_name }}</h3>
-                    <div class="hotel-image">
-                        {% if hotel.image %}
+        <section class="results-section">
+            <div class="hotel-container">
+                {% if hotels %}
+                    {# Initially display only 8 hotels using Django template slice #}
+                    {% for hotel in hotels|slice:":8" %}
+                    <div class="hotel-card">
+                        <h3>{{ hotel.hotel_name }}</h3>
+                        <div class="hotel-image">
+                            {% if hotel.image %}
                             <img src="{{ hotel.image.url }}">
-                        {% else %}
+                            {% else %}
                             <img src="{% static 'images/default-hotel.jpg' %}">
-                        {% endif %}
-                     </div>
-                    <p><strong>Location:</strong> {{ hotel.address }}</p>
-                    <p><strong>Price ₹ {{ hotel.min_price }}</strong></p>
-                    <p> Totals ₹ {{ hotel.max_price }} </p>
-                    <p><strong> Total Rooms:</strong> {{ hotel.total_rooms }}</p>
-                    <p><strong>Available Rooms:</strong> {{ hotel.available_rooms }}</p>
-                    {% comment %} <p><strong>Offer:</strong>
-                        {% if hotel.offers.first %}
-                        {{ hotel.offers.first.get_offer_type_display }}
-                        {% else %}
-                        No Offer
-                        {% endif %}
-                    </p> {% endcomment %}
-                    <a href="{% url 'customer:hotel_detail' hotel.id %}" class="btn-book">View Details</a>
-                </div>
-                {% endfor %}
-            {% else %}
-                <p>No hotels found.</p>
-            {% endif %}
-        </div>
-    </section>
+                            {% endif %}
+                        </div>
+                        <p><strong>Location:</strong> {{ hotel.address }}</p>
+                        <p><strong>Price ₹ {{ hotel.min_price }}</strong></p>
+                        <p> Totals ₹ {{ hotel.max_price }} </p>
+                        <p><strong> Total Rooms:</strong> {{ hotel.total_rooms }}</p>
+                        <p><strong>Available Rooms:</strong> {{ hotel.available_rooms }}</p>
+                        <a href="{% url 'customer:hotel_detail' hotel.id %}" class="btn-book">View Details</a>
+                    </div>
+                    {% endfor %}
 
-</form>
+                    {# Wrap extra hotels in a hidden container #}
+                    <div id="extra-hotels" style="display: none;">
+                    {% for hotel in hotels|slice:"8:" %}
+                    <div class="hotel-card">
+                        <h3>{{ hotel.hotel_name }}</h3>
+                        <div class="hotel-image">
+                            {% if hotel.image %}
+                            <img src="{{ hotel.image.url }}">
+                            {% else %}
+                            <img src="{% static 'images/default-hotel.jpg' %}">
+                            {% endif %}
+                        </div>
+                        <p><strong>Location:</strong> {{ hotel.address }}</p>
+                        <p><strong>Price ₹ {{ hotel.min_price }}</strong></p>
+                        <p> Totals ₹ {{ hotel.max_price }} </p>
+                        <p><strong> Total Rooms:</strong> {{ hotel.total_rooms }}</p>
+                        <p><strong>Available Rooms:</strong> {{ hotel.available_rooms }}</p>
+                        <a href="{% url 'customer:hotel_detail' hotel.id %}" class="btn-book">View Details</a>
+                    </div>
+                    {% endfor %}
+                    </div>
+                {% else %}
+                <p>No hotels found.</p>
+                {% endif %}
+            </div>
+
+            {% if hotels|length > 8 %}
+            <div style="text-align: center; margin-top: 40px;">
+                <button id="show-more-btn" class="btn-book" style="border: none; cursor: pointer; padding: 12px 25px;">+ Show More</button>
+            </div>
+
+            <script>
+                document.getElementById('show-more-btn').addEventListener('click', function () {
+                    const extraHotels = document.getElementById('extra-hotels');
+                    if (extraHotels.style.display === 'none') {
+                        extraHotels.style.display = 'contents';
+                        this.textContent = '- Show Less';
+                    } else {
+                        extraHotels.style.display = 'none';
+                        this.textContent = '+ Show More';
+                    }
+                });
+            </script>
+            {% endif %}
+        </section>
+
+    </form>
 
 </body>
+
 </html>
