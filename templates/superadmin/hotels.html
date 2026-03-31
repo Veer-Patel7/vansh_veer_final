@@ -115,7 +115,7 @@
 
                 <li class="nav-item">
                     <a class="nav-link rounded-xl px-4 py-2 font-weight-bold"
-                    data-toggle="pill" href="#updates">
+                    data-toggle="pill" data-tab="updates" href="#updates">
                     Update Requests ({{ pending_requests|length }})
                     </a>
                 </li>
@@ -127,7 +127,9 @@
                 autocomplete="off"
                 style="display:flex;gap:10px;align-items:center;width:320px;">
 
-                <input type="hidden" name="tab" id="activeTabInput" value="{{ request.GET.tab|default:'live' }}">
+                <input type="hidden" name="tab" id="activeTabInput" value="{{ tab|default:'live' }}">
+                <input type="hidden" name="sort_by" value="{{ sort_by|default:'id' }}">
+                <input type="hidden" name="sort_order" value="{{ sort_order|default:'asc' }}">
 
                 <div style="position:relative;flex:1;">
 
@@ -169,10 +171,62 @@
 
                         <thead>
                             <tr>
-                                <th>ID</th>
-                                <th>Hotel Name</th>
-                                <th>Location</th>
-                                <th>Hotel Owner</th>
+                                <th>
+                                    <div style="display:flex;align-items:center;gap:6px;">
+                                        <span>ID</span>
+                                        <a href="?tab=pending{% if search %}&amp;search={{ search|urlencode }}{% endif %}&amp;sort_by=id&amp;sort_order={% if tab == 'pending' and sort_by == 'id' and sort_order == 'asc' %}desc{% else %}asc{% endif %}"
+                                           title="Sort by ID"
+                                           style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border:1px solid #d6d9df;border-radius:6px;color:var(--text-low);text-decoration:none;">
+                                            {% if tab == 'pending' and sort_by == 'id' and sort_order == 'asc' %}
+                                            <i class="fas fa-arrow-up" style="font-size:11px;"></i>
+                                            {% else %}
+                                            <i class="fas fa-arrow-down" style="font-size:11px;"></i>
+                                            {% endif %}
+                                        </a>
+                                    </div>
+                                </th>
+                                <th>
+                                    <div style="display:flex;align-items:center;gap:6px;">
+                                        <span>Hotel Name</span>
+                                        <a href="?tab=pending{% if search %}&amp;search={{ search|urlencode }}{% endif %}&amp;sort_by=hotel&amp;sort_order={% if tab == 'pending' and sort_by == 'hotel' and sort_order == 'asc' %}desc{% else %}asc{% endif %}"
+                                           title="Sort by Hotel"
+                                           style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border:1px solid #d6d9df;border-radius:6px;color:var(--text-low);text-decoration:none;">
+                                            {% if tab == 'pending' and sort_by == 'hotel' and sort_order == 'asc' %}
+                                            <i class="fas fa-arrow-up" style="font-size:11px;"></i>
+                                            {% else %}
+                                            <i class="fas fa-arrow-down" style="font-size:11px;"></i>
+                                            {% endif %}
+                                        </a>
+                                    </div>
+                                </th>
+                                <th>
+                                    <div style="display:flex;align-items:center;gap:6px;">
+                                        <span>Location</span>
+                                        <a href="?tab=pending{% if search %}&amp;search={{ search|urlencode }}{% endif %}&amp;sort_by=city&amp;sort_order={% if tab == 'pending' and sort_by == 'city' and sort_order == 'asc' %}desc{% else %}asc{% endif %}"
+                                           title="Sort by Location"
+                                           style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border:1px solid #d6d9df;border-radius:6px;color:var(--text-low);text-decoration:none;">
+                                            {% if tab == 'pending' and sort_by == 'city' and sort_order == 'asc' %}
+                                            <i class="fas fa-arrow-up" style="font-size:11px;"></i>
+                                            {% else %}
+                                            <i class="fas fa-arrow-down" style="font-size:11px;"></i>
+                                            {% endif %}
+                                        </a>
+                                    </div>
+                                </th>
+                                <th>
+                                    <div style="display:flex;align-items:center;gap:6px;">
+                                        <span>Hotel Owner</span>
+                                        <a href="?tab=pending{% if search %}&amp;search={{ search|urlencode }}{% endif %}&amp;sort_by=owner&amp;sort_order={% if tab == 'pending' and sort_by == 'owner' and sort_order == 'asc' %}desc{% else %}asc{% endif %}"
+                                           title="Sort by Owner"
+                                           style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border:1px solid #d6d9df;border-radius:6px;color:var(--text-low);text-decoration:none;">
+                                            {% if tab == 'pending' and sort_by == 'owner' and sort_order == 'asc' %}
+                                            <i class="fas fa-arrow-up" style="font-size:11px;"></i>
+                                            {% else %}
+                                            <i class="fas fa-arrow-down" style="font-size:11px;"></i>
+                                            {% endif %}
+                                        </a>
+                                    </div>
+                                </th>
                                 <th class="text-right">Action</th>
                             </tr>
                         </thead>
@@ -247,10 +301,62 @@
                 <table class="sa-table">
                     <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Hotel</th>
-                            <th>City</th>
-                            <th>Status</th>
+                            <th>
+                                <div style="display:flex;align-items:center;gap:6px;">
+                                    <span>ID</span>
+                                    <a href="?tab=live{% if search %}&amp;search={{ search|urlencode }}{% endif %}&amp;sort_by=id&amp;sort_order={% if tab == 'live' and sort_by == 'id' and sort_order == 'asc' %}desc{% else %}asc{% endif %}"
+                                       title="Sort by ID"
+                                       style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border:1px solid #d6d9df;border-radius:6px;color:var(--text-low);text-decoration:none;">
+                                        {% if tab == 'live' and sort_by == 'id' and sort_order == 'asc' %}
+                                        <i class="fas fa-arrow-up" style="font-size:11px;"></i>
+                                        {% else %}
+                                        <i class="fas fa-arrow-down" style="font-size:11px;"></i>
+                                        {% endif %}
+                                    </a>
+                                </div>
+                            </th>
+                            <th>
+                                <div style="display:flex;align-items:center;gap:6px;">
+                                    <span>Hotel</span>
+                                    <a href="?tab=live{% if search %}&amp;search={{ search|urlencode }}{% endif %}&amp;sort_by=hotel&amp;sort_order={% if tab == 'live' and sort_by == 'hotel' and sort_order == 'asc' %}desc{% else %}asc{% endif %}"
+                                       title="Sort by Hotel"
+                                       style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border:1px solid #d6d9df;border-radius:6px;color:var(--text-low);text-decoration:none;">
+                                        {% if tab == 'live' and sort_by == 'hotel' and sort_order == 'asc' %}
+                                        <i class="fas fa-arrow-up" style="font-size:11px;"></i>
+                                        {% else %}
+                                        <i class="fas fa-arrow-down" style="font-size:11px;"></i>
+                                        {% endif %}
+                                    </a>
+                                </div>
+                            </th>
+                            <th>
+                                <div style="display:flex;align-items:center;gap:6px;">
+                                    <span>City</span>
+                                    <a href="?tab=live{% if search %}&amp;search={{ search|urlencode }}{% endif %}&amp;sort_by=city&amp;sort_order={% if tab == 'live' and sort_by == 'city' and sort_order == 'asc' %}desc{% else %}asc{% endif %}"
+                                       title="Sort by City"
+                                       style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border:1px solid #d6d9df;border-radius:6px;color:var(--text-low);text-decoration:none;">
+                                        {% if tab == 'live' and sort_by == 'city' and sort_order == 'asc' %}
+                                        <i class="fas fa-arrow-up" style="font-size:11px;"></i>
+                                        {% else %}
+                                        <i class="fas fa-arrow-down" style="font-size:11px;"></i>
+                                        {% endif %}
+                                    </a>
+                                </div>
+                            </th>
+                            <th>
+                                <div style="display:flex;align-items:center;gap:6px;">
+                                    <span>Status</span>
+                                    <a href="?tab=live{% if search %}&amp;search={{ search|urlencode }}{% endif %}&amp;sort_by=status&amp;sort_order={% if tab == 'live' and sort_by == 'status' and sort_order == 'asc' %}desc{% else %}asc{% endif %}"
+                                       title="Sort by Status"
+                                       style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border:1px solid #d6d9df;border-radius:6px;color:var(--text-low);text-decoration:none;">
+                                        {% if tab == 'live' and sort_by == 'status' and sort_order == 'asc' %}
+                                        <i class="fas fa-arrow-up" style="font-size:11px;"></i>
+                                        {% else %}
+                                        <i class="fas fa-arrow-down" style="font-size:11px;"></i>
+                                        {% endif %}
+                                    </a>
+                                </div>
+                            </th>
                             <th class="text-right">Action</th>
                         </tr>
                     </thead>
@@ -286,9 +392,48 @@
                 <table class="sa-table">
                     <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Hotel</th>
-                            <th>Reason</th>
+                            <th>
+                                <div style="display:flex;align-items:center;gap:6px;">
+                                    <span>ID</span>
+                                    <a href="?tab=rejected{% if search %}&amp;search={{ search|urlencode }}{% endif %}&amp;sort_by=id&amp;sort_order={% if tab == 'rejected' and sort_by == 'id' and sort_order == 'asc' %}desc{% else %}asc{% endif %}"
+                                       title="Sort by ID"
+                                       style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border:1px solid #d6d9df;border-radius:6px;color:var(--text-low);text-decoration:none;">
+                                        {% if tab == 'rejected' and sort_by == 'id' and sort_order == 'asc' %}
+                                        <i class="fas fa-arrow-up" style="font-size:11px;"></i>
+                                        {% else %}
+                                        <i class="fas fa-arrow-down" style="font-size:11px;"></i>
+                                        {% endif %}
+                                    </a>
+                                </div>
+                            </th>
+                            <th>
+                                <div style="display:flex;align-items:center;gap:6px;">
+                                    <span>Hotel</span>
+                                    <a href="?tab=rejected{% if search %}&amp;search={{ search|urlencode }}{% endif %}&amp;sort_by=hotel&amp;sort_order={% if tab == 'rejected' and sort_by == 'hotel' and sort_order == 'asc' %}desc{% else %}asc{% endif %}"
+                                       title="Sort by Hotel"
+                                       style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border:1px solid #d6d9df;border-radius:6px;color:var(--text-low);text-decoration:none;">
+                                        {% if tab == 'rejected' and sort_by == 'hotel' and sort_order == 'asc' %}
+                                        <i class="fas fa-arrow-up" style="font-size:11px;"></i>
+                                        {% else %}
+                                        <i class="fas fa-arrow-down" style="font-size:11px;"></i>
+                                        {% endif %}
+                                    </a>
+                                </div>
+                            </th>
+                            <th>
+                                <div style="display:flex;align-items:center;gap:6px;">
+                                    <span>Reason</span>
+                                    <a href="?tab=rejected{% if search %}&amp;search={{ search|urlencode }}{% endif %}&amp;sort_by=reason&amp;sort_order={% if tab == 'rejected' and sort_by == 'reason' and sort_order == 'asc' %}desc{% else %}asc{% endif %}"
+                                       title="Sort by Reason"
+                                       style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border:1px solid #d6d9df;border-radius:6px;color:var(--text-low);text-decoration:none;">
+                                        {% if tab == 'rejected' and sort_by == 'reason' and sort_order == 'asc' %}
+                                        <i class="fas fa-arrow-up" style="font-size:11px;"></i>
+                                        {% else %}
+                                        <i class="fas fa-arrow-down" style="font-size:11px;"></i>
+                                        {% endif %}
+                                    </a>
+                                </div>
+                            </th>
                             <th class="text-right">Action</th>
                         </tr>
                     </thead>
@@ -322,10 +467,49 @@
                     <table class="sa-table">
                         <thead>
                             <tr>
-                                <th>Hotel</th>
-                                <th>Category</th>
+                                <th>
+                                    <div style="display:flex;align-items:center;gap:6px;">
+                                        <span>Hotel</span>
+                                        <a href="?tab=updates{% if search %}&amp;search={{ search|urlencode }}{% endif %}&amp;sort_by=hotel&amp;sort_order={% if tab == 'updates' and sort_by == 'hotel' and sort_order == 'asc' %}desc{% else %}asc{% endif %}"
+                                           title="Sort by Hotel"
+                                           style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border:1px solid #d6d9df;border-radius:6px;color:var(--text-low);text-decoration:none;">
+                                            {% if tab == 'updates' and sort_by == 'hotel' and sort_order == 'asc' %}
+                                            <i class="fas fa-arrow-up" style="font-size:11px;"></i>
+                                            {% else %}
+                                            <i class="fas fa-arrow-down" style="font-size:11px;"></i>
+                                            {% endif %}
+                                        </a>
+                                    </div>
+                                </th>
+                                <th>
+                                    <div style="display:flex;align-items:center;gap:6px;">
+                                        <span>Category</span>
+                                        <a href="?tab=updates{% if search %}&amp;search={{ search|urlencode }}{% endif %}&amp;sort_by=category&amp;sort_order={% if tab == 'updates' and sort_by == 'category' and sort_order == 'asc' %}desc{% else %}asc{% endif %}"
+                                           title="Sort by Category"
+                                           style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border:1px solid #d6d9df;border-radius:6px;color:var(--text-low);text-decoration:none;">
+                                            {% if tab == 'updates' and sort_by == 'category' and sort_order == 'asc' %}
+                                            <i class="fas fa-arrow-up" style="font-size:11px;"></i>
+                                            {% else %}
+                                            <i class="fas fa-arrow-down" style="font-size:11px;"></i>
+                                            {% endif %}
+                                        </a>
+                                    </div>
+                                </th>
                                 <th>Proposed Changes</th>
-                                <th>Requested At</th>
+                                <th>
+                                    <div style="display:flex;align-items:center;gap:6px;">
+                                        <span>Requested At</span>
+                                        <a href="?tab=updates{% if search %}&amp;search={{ search|urlencode }}{% endif %}&amp;sort_by=requested_at&amp;sort_order={% if tab == 'updates' and sort_by == 'requested_at' and sort_order == 'asc' %}desc{% else %}asc{% endif %}"
+                                           title="Sort by Requested Date"
+                                           style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border:1px solid #d6d9df;border-radius:6px;color:var(--text-low);text-decoration:none;">
+                                            {% if tab == 'updates' and sort_by == 'requested_at' and sort_order == 'asc' %}
+                                            <i class="fas fa-arrow-up" style="font-size:11px;"></i>
+                                            {% else %}
+                                            <i class="fas fa-arrow-down" style="font-size:11px;"></i>
+                                            {% endif %}
+                                        </a>
+                                    </div>
+                                </th>
                                 <th class="text-right">Action</th>
                             </tr>
                         </thead>

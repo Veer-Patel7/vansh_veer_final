@@ -19,6 +19,8 @@
         <div class="section-header d-flex justify-content-between align-items-center">
             <h3 class="m-0">Owner Accounts</h3>
             <form method="GET" style="display:flex;gap:10px;align-items:center;max-width:360px;width:100%;">
+                <input type="hidden" name="sort_by" value="{{ sort_by|default:'id' }}">
+                <input type="hidden" name="sort_order" value="{{ sort_order|default:'asc' }}">
                 <div style="position:relative;flex:1;">
                     <i class="fas fa-search"
                     style="position:absolute;left:12px;top:50%;transform:translateY(-50%);
@@ -40,11 +42,76 @@
             <table class="sa-table">
                 <thead>
                     <tr>
-                        <th>Id</th>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Status</th>
-                        <th style="width:140px;">Action</th>
+                        <th>
+                            <div style="display:flex;align-items:center;gap:6px;">
+                                <span>Id</span>
+                                <a href="?{% if search %}search={{ search|urlencode }}&amp;{% endif %}sort_by=id&amp;sort_order={% if sort_by == 'id' and sort_order == 'asc' %}desc{% else %}asc{% endif %}"
+                                    title="Sort by ID"
+                                    style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border:1px solid #d6d9df;border-radius:6px;color:var(--text-low);text-decoration:none;">
+                                    {% if sort_by == 'id' and sort_order == 'asc' %}
+                                    <i class="fas fa-arrow-up" style="font-size:11px;"></i>
+                                    {% else %}
+                                    <i class="fas fa-arrow-down" style="font-size:11px;"></i>
+                                    {% endif %}
+                                </a>
+                            </div>
+                        </th>
+                        <th>
+                            <div style="display:flex;align-items:center;gap:6px;">
+                                <span>Name</span>
+                                <a href="?{% if search %}search={{ search|urlencode }}&amp;{% endif %}sort_by=name&amp;sort_order={% if sort_by == 'name' and sort_order == 'asc' %}desc{% else %}asc{% endif %}"
+                                    title="Sort by Name"
+                                    style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border:1px solid #d6d9df;border-radius:6px;color:var(--text-low);text-decoration:none;">
+                                    {% if sort_by == 'name' and sort_order == 'asc' %}
+                                    <i class="fas fa-arrow-up" style="font-size:11px;"></i>
+                                    {% else %}
+                                    <i class="fas fa-arrow-down" style="font-size:11px;"></i>
+                                    {% endif %}
+                                </a>
+                            </div>
+                        </th>
+                        <th>
+                            <div style="display:flex;align-items:center;gap:6px;">
+                                <span>Email</span>
+                                <a href="?{% if search %}search={{ search|urlencode }}&amp;{% endif %}sort_by=email&amp;sort_order={% if sort_by == 'email' and sort_order == 'asc' %}desc{% else %}asc{% endif %}"
+                                    title="Sort by Email"
+                                    style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border:1px solid #d6d9df;border-radius:6px;color:var(--text-low);text-decoration:none;">
+                                    {% if sort_by == 'email' and sort_order == 'asc' %}
+                                    <i class="fas fa-arrow-up" style="font-size:11px;"></i>
+                                    {% else %}
+                                    <i class="fas fa-arrow-down" style="font-size:11px;"></i>
+                                    {% endif %}
+                                </a>
+                            </div>
+                        </th>
+                        <th>
+                            <div style="display:flex;align-items:center;gap:6px;">
+                                <span>Status</span>
+                                <a href="?{% if search %}search={{ search|urlencode }}&amp;{% endif %}sort_by=status&amp;sort_order={% if sort_by == 'status' and sort_order == 'asc' %}desc{% else %}asc{% endif %}"
+                                    title="Sort by Status"
+                                    style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border:1px solid #d6d9df;border-radius:6px;color:var(--text-low);text-decoration:none;">
+                                    {% if sort_by == 'status' and sort_order == 'asc' %}
+                                    <i class="fas fa-arrow-up" style="font-size:11px;"></i>
+                                    {% else %}
+                                    <i class="fas fa-arrow-down" style="font-size:11px;"></i>
+                                    {% endif %}
+                                </a>
+                            </div>
+                        </th>
+                        <th style="width:140px;">
+                            <div style="display:flex;align-items:center;gap:6px;">
+                                <span>Action</span>
+                                <a href="?{% if search %}search={{ search|urlencode }}&amp;{% endif %}sort_by=action&amp;sort_order={% if sort_by == 'action' and sort_order == 'asc' %}desc{% else %}asc{% endif %}"
+                                    title="Sort by Action"
+                                    style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border:1px solid #d6d9df;border-radius:6px;color:var(--text-low);text-decoration:none;">
+                                    {% if sort_by == 'action' and sort_order == 'asc' %}
+                                    <i class="fas fa-arrow-up" style="font-size:11px;"></i>
+                                    {% else %}
+                                    <i class="fas fa-arrow-down" style="font-size:11px;"></i>
+                                    {% endif %}
+                                </a>
+                            </div>
+                        </th>
                     </tr>
                 </thead>
 
@@ -95,7 +162,7 @@
                     {% empty %}
 
                     <tr>
-                        <td colspan="4">
+                        <td colspan="5">
                             <div class="empty-state">
                                 <i class="fas fa-user"></i>
                                 <p>No owners found.</p>

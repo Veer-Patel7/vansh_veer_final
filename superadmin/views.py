@@ -12,7 +12,7 @@ from datetime import date, timedelta
 from django.conf import settings
 from reviews.models import Review
 from datetime import date, timedelta, datetime
-from django.db.models import Sum, Q
+from django.db.models import Sum, Q, F, ExpressionWrapper, DecimalField
 from decimal import Decimal
 from django.contrib import messages
 
@@ -124,6 +124,8 @@ def owners(request):
         return HttpResponse("Unauthorized")
 
     search = request.GET.get("search")
+    sort_by = request.GET.get("sort_by", "id")
+    sort_order = request.GET.get("sort_order", "asc")
 
     owners = User.objects.filter(role="hotel_admin")
 
@@ -151,9 +153,32 @@ def owners(request):
         if search.lower() == "disable":
             owners = User.objects.filter(role="hotel_admin", is_active=True)
 
+    allowed_sort_fields = {
+        "id": "id",
+        "name": "first_name",
+        "email": "email",
+        "status": "is_active",
+        "action": "is_active",
+    }
+
+    if sort_by not in allowed_sort_fields:
+        sort_by = "id"
+
+    if sort_order not in ["asc", "desc"]:
+        sort_order = "asc"
+
+    prefix = "-" if sort_order == "desc" else ""
+
+    if sort_by == "name":
+        owners = owners.order_by(f"{prefix}first_name", f"{prefix}last_name")
+    else:
+        owners = owners.order_by(f"{prefix}{allowed_sort_fields[sort_by]}")
+
     return render(request, "superadmin/owners.html", {
         "owners": owners,
-        "search": search
+        "search": search,
+        "sort_by": sort_by,
+        "sort_order": sort_order,
     })
     
 # APPROVE OWNER
@@ -187,7 +212,9 @@ def hotels_approve(request):
         return HttpResponse("Unauthorized")
     search = request.GET.get("search", "").strip()
     tab = request.GET.get("tab", "live")
-    hotels = Hotel.objects.all().order_by("created_at")
+    sort_by = request.GET.get("sort_by", "id")
+    sort_order = request.GET.get("sort_order", "asc")
+    hotels = Hotel.objects.all()
 
     # ---------- SEARCH FILTER ----------
     if search:
@@ -210,12 +237,48 @@ def hotels_approve(request):
     # ---------- UPDATE REQUESTS ----------
     pending_requests = ChangeRequest.objects.filter(
         status="PENDING"
-    ).order_by("-requested_at")
+    )
+
+    hotel_sort_fields = {
+        "id": "id",
+        "hotel": "hotel_name",
+        "city": "city",
+        "owner": "owner__username",
+        "status": "status",
+        "reason": "verification_remarks",
+    }
+    update_sort_fields = {
+        "hotel": "hotel__hotel_name",
+        "category": "category",
+        "requested_at": "requested_at",
+    }
+
+    if sort_order not in ["asc", "desc"]:
+        sort_order = "asc"
+    prefix = "-" if sort_order == "desc" else ""
+
+    if tab == "updates":
+        if sort_by not in update_sort_fields:
+            sort_by = "requested_at"
+            sort_order = "desc"
+            prefix = "-"
+        pending_requests = pending_requests.order_by(
+            f"{prefix}{update_sort_fields[sort_by]}",
+            f"{prefix}id",
+        )
+        hotels = hotels.order_by("id")
+    else:
+        if sort_by not in hotel_sort_fields:
+            sort_by = "id"
+        hotels = hotels.order_by(f"{prefix}{hotel_sort_fields[sort_by]}", f"{prefix}id")
+        pending_requests = pending_requests.order_by("-requested_at")
 
     return render(request, "superadmin/hotels.html", {
         "hotels": hotels,
         "search": search,
         "tab": tab,
+        "sort_by": sort_by,
+        "sort_order": sort_order,
         "pending_count": pending_count,
         "live_count": live_count,
         "rejected_count": rejected_count,
@@ -306,7 +369,10 @@ def bookings_manage(request):
     if request.user.role != "super_admin":
         return HttpResponse("Unauthorized")
     search = request.GET.get("search", "").replace(",", "").strip()
-    bookings = Booking.objects.all().order_by("id")
+    sort_by = request.GET.get("sort_by", "id")
+    sort_order = request.GET.get("sort_order", "asc")
+
+    bookings = Booking.objects.all()
 
     if search:
         if search.isdigit():
@@ -334,6 +400,33 @@ def bookings_manage(request):
                     pass
             bookings = bookings.filter(q)
 
+    allowed_sort_fields = {
+        "id": "id",
+        "hotel": "hotel__hotel_name",
+        "guest": "user__email",
+        "checkin": "checkin_date",
+        "checkout": "checkout_date",
+        "total_price": "total_price",
+        "commission": "commission_amount",
+    }
+
+    if sort_by not in allowed_sort_fields:
+        sort_by = "id"
+
+    if sort_order not in ["asc", "desc"]:
+        sort_order = "asc"
+
+    if sort_by == "commission":
+        bookings = bookings.annotate(
+            commission_amount=ExpressionWrapper(
+                F("total_price") * Decimal("0.10"),
+                output_field=DecimalField(max_digits=12, decimal_places=2),
+            )
+        )
+
+    prefix = "-" if sort_order == "desc" else ""
+    bookings = bookings.order_by(f"{prefix}{allowed_sort_fields[sort_by]}", f"{prefix}id")
+
     total_revenue = bookings.aggregate(Sum("total_price"))["total_price__sum"] or 0
     total_commission = total_revenue * Decimal("0.10")
 
@@ -341,7 +434,9 @@ def bookings_manage(request):
         "bookings": bookings,
         "total_revenue": total_revenue,
         "total_commission": total_commission,
-        "search": search
+        "search": search,
+        "sort_by": sort_by,
+        "sort_order": sort_order,
     })
 
 # ================= PAYMENTS DASHBOARD =================
@@ -410,6 +505,8 @@ def generate_commission(request):
 def commissions(request):
 
     month_input = request.GET.get("month")  # e.g. "2026-02"
+    sort_by = request.GET.get("sort_by", "id")
+    sort_order = request.GET.get("sort_order", "asc")
     today = date.today()
 
     if month_input:
@@ -431,9 +528,44 @@ def commissions(request):
             i.penalty_amount = i.commission_amount * Decimal("0.05")
             i.save()
 
+    allowed_sort_fields = {
+        "id": "id",
+        "hotel": "hotel__hotel_name",
+        "commission": "commission_amount",
+        "penalty": "penalty_amount",
+        "total_revenue": "total_revenue",
+        "status": "status",
+        "due_date": "due_date",
+        "action": "status",
+        "month": "month",
+        "total_pay": "total_payable_calc",
+    }
+
+    if sort_by not in allowed_sort_fields:
+        sort_by = "id"
+
+    if sort_order not in ["asc", "desc"]:
+        sort_order = "asc"
+
+    if sort_by == "total_pay":
+        invoices = invoices.annotate(
+            total_payable_calc=ExpressionWrapper(
+                F("commission_amount") + F("penalty_amount"),
+                output_field=DecimalField(max_digits=12, decimal_places=2),
+            )
+        )
+
+    prefix = "-" if sort_order == "desc" else ""
+    if sort_by == "month":
+        invoices = invoices.order_by(f"{prefix}year", f"{prefix}month", f"{prefix}id")
+    else:
+        invoices = invoices.order_by(f"{prefix}{allowed_sort_fields[sort_by]}", f"{prefix}id")
+
     return render(request, "superadmin/commissions.html", {
         "data": invoices,
-        "selected_month": month_input
+        "selected_month": month_input,
+        "sort_by": sort_by,
+        "sort_order": sort_order,
     })
 
 # MARK PAID
@@ -477,6 +609,8 @@ def customers_manage(request):
         return HttpResponse("Unauthorized")
 
     search = request.GET.get("search", "")
+    sort_by = request.GET.get("sort_by", "id")
+    sort_order = request.GET.get("sort_order", "asc")
 
     customers = User.objects.filter(role="customer")
 
@@ -511,9 +645,38 @@ def customers_manage(request):
             "total": total
         })
 
+    if sort_order not in ["asc", "desc"]:
+        sort_order = "asc"
+
+    reverse = sort_order == "desc"
+
+    if sort_by == "name":
+        data = sorted(
+            data,
+            key=lambda d: ((d["obj"].first_name or "").lower(), (d["obj"].last_name or "").lower()),
+            reverse=reverse,
+        )
+    elif sort_by == "email":
+        data = sorted(data, key=lambda d: (d["obj"].email or "").lower(), reverse=reverse)
+    elif sort_by == "total_bookings":
+        data = sorted(data, key=lambda d: d["total"], reverse=reverse)
+    elif sort_by == "status":
+        data = sorted(data, key=lambda d: d["obj"].is_active, reverse=reverse)
+    elif sort_by == "action":
+        data = sorted(
+            data,
+            key=lambda d: "blacklist" if d["obj"].is_active else "unblock",
+            reverse=reverse,
+        )
+    else:
+        sort_by = "id"
+        data = sorted(data, key=lambda d: d["obj"].id, reverse=reverse)
+
     return render(request, "superadmin/customers.html", {
         "data": data,
-        "search": search
+        "search": search,
+        "sort_by": sort_by,
+        "sort_order": sort_order,
     })
     
 #Blacklist customer

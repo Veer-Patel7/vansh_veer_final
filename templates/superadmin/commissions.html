@@ -22,6 +22,8 @@
   <div class="section-body">
 
     <form method="get" action="/super/payments/invoices/">
+      <input type="hidden" name="sort_by" value="{{ sort_by|default:'id' }}">
+      <input type="hidden" name="sort_order" value="{{ sort_order|default:'asc' }}">
       <div class="info-item">
         <label class="info-label">Select Month</label>
 
@@ -58,15 +60,132 @@
     <table class="sa-table">
       <thead>
         <tr>
-          <th>Hotel</th>
-          <th>Month</th>
-          <th>Total Revenue</th>
-          <th>Commission</th>
-          <th>Penalty</th>
-          <th>Total Pay</th>
-          <th>Status</th>
-          <th>Due Date</th>
-          <th>Action</th>
+          <th>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span>Hotel</span>
+              <a href="?{% if selected_month %}month={{ selected_month|urlencode }}&amp;{% endif %}sort_by=hotel&amp;sort_order={% if sort_by == 'hotel' and sort_order == 'asc' %}desc{% else %}asc{% endif %}"
+                title="Sort by Hotel"
+                style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border:1px solid #d6d9df;border-radius:6px;color:var(--text-low);text-decoration:none;">
+                {% if sort_by == 'hotel' and sort_order == 'asc' %}
+                <i class="fas fa-arrow-up" style="font-size:11px;"></i>
+                {% else %}
+                <i class="fas fa-arrow-down" style="font-size:11px;"></i>
+                {% endif %}
+              </a>
+            </div>
+          </th>
+          <th>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span>Month</span>
+              <a href="?{% if selected_month %}month={{ selected_month|urlencode }}&amp;{% endif %}sort_by=month&amp;sort_order={% if sort_by == 'month' and sort_order == 'asc' %}desc{% else %}asc{% endif %}"
+                title="Sort by Month"
+                style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border:1px solid #d6d9df;border-radius:6px;color:var(--text-low);text-decoration:none;">
+                {% if sort_by == 'month' and sort_order == 'asc' %}
+                <i class="fas fa-arrow-up" style="font-size:11px;"></i>
+                {% else %}
+                <i class="fas fa-arrow-down" style="font-size:11px;"></i>
+                {% endif %}
+              </a>
+            </div>
+          </th>
+          <th>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span>Total Revenue</span>
+              <a href="?{% if selected_month %}month={{ selected_month|urlencode }}&amp;{% endif %}sort_by=total_revenue&amp;sort_order={% if sort_by == 'total_revenue' and sort_order == 'asc' %}desc{% else %}asc{% endif %}"
+                title="Sort by Total Revenue"
+                style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border:1px solid #d6d9df;border-radius:6px;color:var(--text-low);text-decoration:none;">
+                {% if sort_by == 'total_revenue' and sort_order == 'asc' %}
+                <i class="fas fa-arrow-up" style="font-size:11px;"></i>
+                {% else %}
+                <i class="fas fa-arrow-down" style="font-size:11px;"></i>
+                {% endif %}
+              </a>
+            </div>
+          </th>
+          <th>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span>Commission</span>
+              <a href="?{% if selected_month %}month={{ selected_month|urlencode }}&amp;{% endif %}sort_by=commission&amp;sort_order={% if sort_by == 'commission' and sort_order == 'asc' %}desc{% else %}asc{% endif %}"
+                title="Sort by Commission"
+                style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border:1px solid #d6d9df;border-radius:6px;color:var(--text-low);text-decoration:none;">
+                {% if sort_by == 'commission' and sort_order == 'asc' %}
+                <i class="fas fa-arrow-up" style="font-size:11px;"></i>
+                {% else %}
+                <i class="fas fa-arrow-down" style="font-size:11px;"></i>
+                {% endif %}
+              </a>
+            </div>
+          </th>
+          <th>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span>Penalty</span>
+              <a href="?{% if selected_month %}month={{ selected_month|urlencode }}&amp;{% endif %}sort_by=penalty&amp;sort_order={% if sort_by == 'penalty' and sort_order == 'asc' %}desc{% else %}asc{% endif %}"
+                title="Sort by Penalty"
+                style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border:1px solid #d6d9df;border-radius:6px;color:var(--text-low);text-decoration:none;">
+                {% if sort_by == 'penalty' and sort_order == 'asc' %}
+                <i class="fas fa-arrow-up" style="font-size:11px;"></i>
+                {% else %}
+                <i class="fas fa-arrow-down" style="font-size:11px;"></i>
+                {% endif %}
+              </a>
+            </div>
+          </th>
+          <th>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span>Total Pay</span>
+              <a href="?{% if selected_month %}month={{ selected_month|urlencode }}&amp;{% endif %}sort_by=total_pay&amp;sort_order={% if sort_by == 'total_pay' and sort_order == 'asc' %}desc{% else %}asc{% endif %}"
+                title="Sort by Total Pay"
+                style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border:1px solid #d6d9df;border-radius:6px;color:var(--text-low);text-decoration:none;">
+                {% if sort_by == 'total_pay' and sort_order == 'asc' %}
+                <i class="fas fa-arrow-up" style="font-size:11px;"></i>
+                {% else %}
+                <i class="fas fa-arrow-down" style="font-size:11px;"></i>
+                {% endif %}
+              </a>
+            </div>
+          </th>
+          <th>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span>Status</span>
+              <a href="?{% if selected_month %}month={{ selected_month|urlencode }}&amp;{% endif %}sort_by=status&amp;sort_order={% if sort_by == 'status' and sort_order == 'asc' %}desc{% else %}asc{% endif %}"
+                title="Sort by Status"
+                style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border:1px solid #d6d9df;border-radius:6px;color:var(--text-low);text-decoration:none;">
+                {% if sort_by == 'status' and sort_order == 'asc' %}
+                <i class="fas fa-arrow-up" style="font-size:11px;"></i>
+                {% else %}
+                <i class="fas fa-arrow-down" style="font-size:11px;"></i>
+                {% endif %}
+              </a>
+            </div>
+          </th>
+          <th>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span>Due Date</span>
+              <a href="?{% if selected_month %}month={{ selected_month|urlencode }}&amp;{% endif %}sort_by=due_date&amp;sort_order={% if sort_by == 'due_date' and sort_order == 'asc' %}desc{% else %}asc{% endif %}"
+                title="Sort by Due Date"
+                style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border:1px solid #d6d9df;border-radius:6px;color:var(--text-low);text-decoration:none;">
+                {% if sort_by == 'due_date' and sort_order == 'asc' %}
+                <i class="fas fa-arrow-up" style="font-size:11px;"></i>
+                {% else %}
+                <i class="fas fa-arrow-down" style="font-size:11px;"></i>
+                {% endif %}
+              </a>
+            </div>
+          </th>
+          <th>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span>Action</span>
+              <a href="?{% if selected_month %}month={{ selected_month|urlencode }}&amp;{% endif %}sort_by=action&amp;sort_order={% if sort_by == 'action' and sort_order == 'asc' %}desc{% else %}asc{% endif %}"
+                title="Sort by Action"
+                style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border:1px solid #d6d9df;border-radius:6px;color:var(--text-low);text-decoration:none;">
+                {% if sort_by == 'action' and sort_order == 'asc' %}
+                <i class="fas fa-arrow-up" style="font-size:11px;"></i>
+                {% else %}
+                <i class="fas fa-arrow-down" style="font-size:11px;"></i>
+                {% endif %}
+              </a>
+            </div>
+          </th>
         </tr>
       </thead>
 
