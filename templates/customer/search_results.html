@@ -18,49 +18,26 @@
         <h1 class="page-title">Available Hotels</h1>
 
         <section class="results-section">
-            <div class="hotel-container">
+            <div class="hotel-container" id="hotel-grid">
                 {% if hotels %}
-                    {# Initially display only 8 hotels using Django template slice #}
-                    {% for hotel in hotels|slice:":8" %}
-                    <div class="hotel-card">
-                        <h3>{{ hotel.hotel_name }}</h3>
-                        <div class="hotel-image">
-                            {% if hotel.image %}
-                            <img src="{{ hotel.image.url }}">
-                            {% else %}
-                            <img src="{% static 'images/default-hotel.jpg' %}">
-                            {% endif %}
-                        </div>
-                        <p><strong>Location:</strong> {{ hotel.address }}</p>
-                        <p><strong>Price ₹ {{ hotel.min_price }}</strong></p>
-                        <p> Totals ₹ {{ hotel.max_price }} </p>
-                        <p><strong> Total Rooms:</strong> {{ hotel.total_rooms }}</p>
-                        <p><strong>Available Rooms:</strong> {{ hotel.available_rooms }}</p>
-                        <a href="{% url 'customer:hotel_detail' hotel.id %}" class="btn-book">View Details</a>
+                {% for hotel in hotels %}
+                <div class="hotel-card {% if forloop.counter > 8 %}hidden-hotel{% endif %}">
+                    <h3>{{ hotel.hotel_name }}</h3>
+                    <div class="hotel-image">
+                        {% if hotel.image %}
+                        <img src="{{ hotel.image.url }}">
+                        {% else %}
+                        <img src="{% static 'image/Hotel.jpg' %}">
+                        {% endif %}
                     </div>
-                    {% endfor %}
-
-                    {# Wrap extra hotels in a hidden container #}
-                    <div id="extra-hotels" style="display: none;">
-                    {% for hotel in hotels|slice:"8:" %}
-                    <div class="hotel-card">
-                        <h3>{{ hotel.hotel_name }}</h3>
-                        <div class="hotel-image">
-                            {% if hotel.image %}
-                            <img src="{{ hotel.image.url }}">
-                            {% else %}
-                            <img src="{% static 'images/default-hotel.jpg' %}">
-                            {% endif %}
-                        </div>
-                        <p><strong>Location:</strong> {{ hotel.address }}</p>
-                        <p><strong>Price ₹ {{ hotel.min_price }}</strong></p>
-                        <p> Totals ₹ {{ hotel.max_price }} </p>
-                        <p><strong> Total Rooms:</strong> {{ hotel.total_rooms }}</p>
-                        <p><strong>Available Rooms:</strong> {{ hotel.available_rooms }}</p>
-                        <a href="{% url 'customer:hotel_detail' hotel.id %}" class="btn-book">View Details</a>
-                    </div>
-                    {% endfor %}
-                    </div>
+                    <p><strong>Location:</strong> {{ hotel.address }}</p>
+                    <p><strong>Price ₹ {{ hotel.min_price }}</strong></p>
+                    <p> Totals ₹ {{ hotel.max_price }} </p>
+                    <p><strong> Total Rooms:</strong> {{ hotel.total_rooms }}</p>
+                    <p><strong>Available Rooms:</strong> {{ hotel.available_rooms }}</p>
+                    <a href="{% url 'customer:hotel_detail' hotel.id %}" class="btn-book">View Details</a>
+                </div>
+                {% endfor %}
                 {% else %}
                 <p>No hotels found.</p>
                 {% endif %}
@@ -68,19 +45,20 @@
 
             {% if hotels|length > 8 %}
             <div style="text-align: center; margin-top: 40px;">
-                <button id="show-more-btn" class="btn-book" style="border: none; cursor: pointer; padding: 12px 25px;">+ Show More</button>
+                <button id="show-more-btn" type="button" class="btn-book" style="border: none; cursor: pointer; padding: 12px 25px;">+
+                    Show More</button>
             </div>
 
             <script>
                 document.getElementById('show-more-btn').addEventListener('click', function () {
-                    const extraHotels = document.getElementById('extra-hotels');
-                    if (extraHotels.style.display === 'none') {
-                        extraHotels.style.display = 'contents';
-                        this.textContent = '- Show Less';
-                    } else {
-                        extraHotels.style.display = 'none';
-                        this.textContent = '+ Show More';
-                    }
+                    const hiddenHotels = document.querySelectorAll('.hidden-hotel');
+                    const isHidden = hiddenHotels[0].style.display === 'none' || hiddenHotels[0].style.display === '';
+                    
+                    hiddenHotels.forEach(hotel => {
+                        hotel.style.display = isHidden ? 'block' : 'none';
+                    });
+                    
+                    this.textContent = isHidden ? '- Show Less' : '+ Show More';
                 });
             </script>
             {% endif %}

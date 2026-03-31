@@ -65,14 +65,21 @@ def customer_search(request):
             hotel.available_rooms = total_available
     else:
         for hotel in hotels:
-            hotel.available_rooms = sum(
+            hotel.total_rooms = sum(
                 room.total_rooms for room in hotel.rooms.all()
             )
+            hotel.available_rooms = hotel.total_rooms
+
+    # ✅ DYNAMIC STATS
+    total_hotels = Hotel.objects.filter(status="LIVE").count()
+    total_bookings = Booking.objects.count()
 
     return render(request, "customer/search.html", {
         "hotels": hotels,
         "checkin": checkin,
-        "checkout": checkout
+        "checkout": checkout,
+        "total_hotels": total_hotels,
+        "total_bookings": total_bookings
     })
         
 @login_required
@@ -106,6 +113,10 @@ def search_results(request):
         max_price=Max("rooms__price_per_night")
     )
 
+    for hotel in hotels:
+        hotel.total_rooms = sum(room.total_rooms for room in hotel.rooms.all())
+        hotel.available_rooms = hotel.total_rooms
+
     return render(request, "customer/search_results.html", {
         "hotels": hotels
     })
@@ -138,8 +149,11 @@ def hotel_detail(request, pk):
         checkin = date.fromisoformat(checkin)
         checkout = date.fromisoformat(checkout)
 
-        for room in hotel.rooms.all():
+        for room in rooms:
             room.available = room.available_rooms(checkin, checkout)
+    else:
+        for room in rooms:
+            room.available = room.total_rooms
 
     return render(request, "customer/hotel_detail.html", {
         "hotel": hotel,

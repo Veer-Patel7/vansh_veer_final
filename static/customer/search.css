@@ -480,3 +480,6 @@ section {
 .contact-wrapper button:hover {
     background: #2563eb;
 }
+.hidden-hotel {
+    display: none;
+}

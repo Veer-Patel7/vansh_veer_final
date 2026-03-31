@@ -122,11 +122,11 @@
 
         <div class="stats-grid">
             <div class="stat-card">
-                <h3>500+</h3>
+                <h3>{{ total_hotels|default:"500" }}+</h3>
                 <p>Verified Hotels</p>
             </div>
             <div class="stat-card">
-                <h3>50,000+</h3>
+                <h3>{{ total_bookings|default:"50000" }}+</h3>
                 <p>Happy Guests</p>
             </div>
             <div class="stat-card">
