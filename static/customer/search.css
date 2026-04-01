@@ -46,6 +46,10 @@ body {
     overflow: hidden;
 }
 
+.dropdown-content.show {
+    display: block;
+}
+
 .dropdown-content a {
     color: black;
     padding: 12px;
@@ -60,9 +64,9 @@ body {
     border-radius: 10%;
 }
 
-.profile-dropdown:hover .dropdown-content {
+/* .profile-dropdown:hover .dropdown-content {
     display: block;
-}
+} */
 
 .navbar {
     position: fixed;
@@ -480,6 +484,7 @@ section {
 .contact-wrapper button:hover {
     background: #2563eb;
 }
+
 .hidden-hotel {
     display: none;
 }

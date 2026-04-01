@@ -26,11 +26,11 @@
         {% if user.is_authenticated %}
 
         <div class="profile-dropdown">
-            <button class="profile-btn">
+            <button class="profile-btn" id="profileBtn">
                 {{ user.first_name|default:"👤"|slice:":1"|upper }}
 
             </button>
-            <div class="dropdown-content">
+            <div class="dropdown-content" id="dropdownMenu">
                 <a href="{% url 'customer:profile' %}">Profile</a>
                 <a href="{% url 'customer:my_bookings' %}">My Bookings</a>
                 <a href="{% url 'accounts:logout' %}">Logout</a>
@@ -42,6 +42,16 @@
         {% endif %}
     </div>
 </div>
+
+
+
+<!-- HERO TEXT -->
+{% comment %} <div class="hero-content">
+    <h1>WELCOME TO HOTEL PRO</h1>
+    <br>
+    <h2>Find the best hotels at unbeatable prices. Book your stay with us today!</h2>
+</div> {% endcomment %}
+
 
 <div class="my-bookings">
     <h2>My Bookings</h2>
