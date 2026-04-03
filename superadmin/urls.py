@@ -14,7 +14,7 @@ urlpatterns = [
     path('enable-owner/<int:user_id>/', views.enable_owner),
     
     # HOTEL REGISTER APPROVAL
-    path('hotels/', views.hotels_approve),
+    path('hotels/', views.hotels_approve, name="hotels_approve"),
     path('hotel/<int:hotel_id>/', views.hotel_detail_view, name='hotel_detail'),
     path('approve-hotel/<int:hotel_id>/', views.approve_hotel),
     path('block-hotel/<int:hotel_id>/', views.block_hotel),
