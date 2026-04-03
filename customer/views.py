@@ -170,11 +170,38 @@ def booking_details(request, hotel_id, room_id):
     room = get_object_or_404(RoomType, id=room_id)
 
     if request.method == "POST":
+        checkin_date_str = request.POST.get("checkin_date")
+        checkout_date_str = request.POST.get("checkout_date")
+        
+        try:
+            checkin = date.fromisoformat(checkin_date_str)
+            checkout = date.fromisoformat(checkout_date_str)
+        except ValueError:
+            messages.error(request, "Invalid dates provided.")
+            return redirect("customer:booking_details", hotel_id=hotel.id, room_id=room.id)
+            
+        if checkin >= checkout:
+            messages.error(request, "Check-out date must be after check-in date.")
+            return redirect("customer:booking_details", hotel_id=hotel.id, room_id=room.id)
+
+        # Count existing bookings
+        booked_rooms = Booking.objects.filter(
+            room=room,
+            checkin_date__lt=checkout,
+            checkout_date__gt=checkin
+        ).count()
+
+        available = room.total_rooms - booked_rooms
+
+        if available <= 0:
+            messages.error(request, f"No room available for this selected date.")
+            return redirect("customer:booking_details", hotel_id=hotel.id, room_id=room.id)
+
         request.session["booking_data"] = {
             "hotel_id": hotel.id,
             "room_id": room.id,
-            "checkin_date": request.POST.get("checkin_date"),
-            "checkout_date": request.POST.get("checkout_date"),
+            "checkin_date": checkin_date_str,
+            "checkout_date": checkout_date_str,
             "total_guests": request.POST.get("total_guests"),
             "adults": request.POST.get("adults"),
             "children": request.POST.get("children"),

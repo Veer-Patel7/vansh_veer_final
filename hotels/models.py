@@ -157,7 +157,6 @@ class RoomType(models.Model):
     max_guest = models.PositiveIntegerField(default=2, verbose_name="Max Guests")
     total_rooms = models.PositiveIntegerField(help_text="Inventory count for this specific type")
     amenities = models.JSONField( default=list, blank=True )
-    room_image = models.ImageField(upload_to='room_categories/', null=True, blank=True )
     created_at = models.DateTimeField(auto_now_add=True)
 
     
@@ -173,6 +172,15 @@ class HotelImage(models.Model):
     class Meta:
         verbose_name = "Hotel Image"
         verbose_name_plural = "Hotel Images"
+
+class RoomImage(models.Model):
+    room = models.ForeignKey(RoomType, on_delete=models.CASCADE, related_name='room_photos')
+    media_file = models.ImageField(upload_to='room_photos/')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Room Photo"
+        verbose_name_plural = "Room Photos"
 
 class Offer(models.Model):
     OFFER_TYPES = [
@@ -357,12 +365,4 @@ class LocationHistory(models.Model):
 
     def __str__(self):
         return f"{self.location_name or self.city or 'Unknown Area'} - {self.user.email}"
-
-class RoomPhoto(models.Model):
-    room = models.ForeignKey(
-        RoomType,
-        on_delete=models.CASCADE,
-        related_name='photos'
-    )
-    media_file = models.FileField(upload_to='gallery/rooms/')
-    created_at = models.DateTimeField(auto_now_add=True)
+

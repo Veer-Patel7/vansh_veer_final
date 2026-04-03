@@ -6,7 +6,7 @@ from django.http import HttpResponseForbidden, JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from accounts.decorators import hotel_admin_required, super_admin_required
-from .models import Hotel, RoomPhoto, RoomType, HotelImage, Offer, ChangeRequest, LocationHistory
+from .models import Hotel, RoomType, HotelImage, Offer, ChangeRequest, LocationHistory, RoomImage
 from django.utils import timezone
 from datetime import datetime, timedelta
 from .forms import HotelDeploymentForm, RoomTypeForm, HotelPolicyForm, OfferForm
@@ -132,9 +132,8 @@ def add_hotel(request):
                         )
 
                         room_photos = request.FILES.getlist(f'room_photos_{room_idx}')
-                        if room_photos:
-                            room.room_image = room_photos[0]
-                            room.save()
+                        for photo in room_photos:
+                            RoomImage.objects.create(room=room, media_file=photo)
 
                         total_inventory += inventory
                         room_idx += 1
@@ -296,7 +295,7 @@ def edit_hotel(request, hotel_id):
                     # ROOM IMAGES
                     files = request.FILES.getlist(f'room_photos_{idx}')
                     for f in files:
-                        RoomPhoto.objects.create(room=room, media_file=f)
+                        RoomImage.objects.create(room=room, media_file=f)
             # DELETE OLD ROOMS
             if processed_room_ids:
                 hotel.rooms.exclude(id__in=processed_room_ids).delete()
@@ -312,7 +311,7 @@ def edit_hotel(request, hotel_id):
         except Exception as e:
             logger.error(f"[Edit Hotel Error] {str(e)}")
             messages.error(request, f"Error: {str(e)}")
-    rooms = hotel.rooms.all().prefetch_related('photos')
+    rooms = hotel.rooms.all().prefetch_related('room_photos')
     gallery = hotel.images.all()
 
     return render(request, 'hotels/edit_hotel.html', {
@@ -461,7 +460,7 @@ def add_room(request, hotel_id=None, room_id=None):
             room_photos = request.FILES.getlist("room_photos")
 
             for photo in room_photos:
-                RoomPhoto.objects.create(
+                RoomImage.objects.create(
                     room=room,
                     media_file=photo
                 )
@@ -491,7 +490,7 @@ def manage_rooms(request, hotel_id=None):
 
     rooms = []
     if hotel:
-        rooms = RoomType.objects.filter(hotel=hotel).prefetch_related('photos')
+        rooms = RoomType.objects.filter(hotel=hotel).prefetch_related('room_photos')
 
     return render(request, 'hotels/rooms.html', {
         'hotel': hotel,      # selected hotel

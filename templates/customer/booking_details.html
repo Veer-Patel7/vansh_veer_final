@@ -1,103 +1,111 @@
 {% load static %}
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Guest Details</title>
     <link rel="stylesheet" href="{% static 'customer/booking_details.css' %}">
 </head>
+
 <body>
 
-<!-- NAVBAR -->
-<div class="navbar">
-    <h2 class="logo"><a href="{% url 'customer:home' %}">HotelPro</a></h2>
-</div>
+    <!-- NAVBAR -->
+    <div class="navbar">
+        <h2 class="logo"><a href="{% url 'customer:home' %}">HotelPro</a></h2>
+    </div>
+    <!-- PAGE TITLE -->
+    <h2 class="page-title">Enter Guest Details</h2>
+{% if messages %}
+    <div class="booking_messages" style="color: #fdfafb; background-color: #ff0015; padding: 10px; border: 1px solid #f5c6cb;  border-radius: 5px;  margin: 15px auto;  max-width: 400px;  text-align: center;">
+        {% for message in messages %}
+        <p style="margin: 0; font-weight: bold;">{{ message }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+    <!-- FORM CARD -->
+    <form method="POST">
+        {% csrf_token %}
 
-<!-- PAGE TITLE -->
-<h2 class="page-title">Enter Guest Details</h2>
+        <label>Check-in:</label>
+        <input type="date" name="checkin_date" id="checkin_date" required>
 
-<!-- FORM CARD -->
-<form method="POST">
-{% csrf_token %}
+        <label>Check-out:</label>
+        <input type="date" name="checkout_date" id="checkout_date" required>
 
-<label>Check-in:</label>
-<input type="date" name="checkin_date" id="checkin_date" required>
+        <p class="max-guest">Maximum allowed guests: {{ room.max_guest }}</p>
 
-<label>Check-out:</label>
-<input type="date" name="checkout_date" id="checkout_date" required>
+        <label>Adults:</label>
+        <input type="number" id="adults" name="adults" min="1" max="{{ room.max_guest }}" required>
 
-<p class="max-guest">Maximum allowed guests: {{ room.max_guest }}</p>
+        <label>Children:</label>
+        <input type="number" id="children" name="children" min="0" max="{{ room.max_guest }}" required>
 
-<label>Adults:</label>
-<input type="number" id="adults" name="adults" min="1" max="{{ room.max_guest }}" required>
+        <label>Total Guests:</label>
+        <input type="number" name="total_guests" id="total" readonly>
 
-<label>Children:</label>
-<input type="number" id="children" name="children" min="0" max="{{ room.max_guest }}" required>
+        <label>Payment:</label>
+        <select name="payment_method">
+            <option value="cash">Cash</option>
+            <option value="card">Card</option>
+            <option value="upi">UPI</option>
+        </select>
 
-<label>Total Guests:</label>
-<input type="number" name="total_guests" id="total" readonly>
+        <button type="submit">Continue</button>
 
-<label>Payment:</label>
-<select name="payment_method">
-    <option value="cash">Cash</option>
-    <option value="card">Card</option>
-    <option value="upi">UPI</option>
-</select>
+    </form>
 
-<button type="submit">Continue</button>
+    <script>
 
-</form>
+        const checkin = document.getElementById("checkin_date");
+        const checkout = document.getElementById("checkout_date");
 
-<script>
+        // India date
+        const indiaDate = new Date().toLocaleDateString("en-CA", {
+            timeZone: "Asia/Kolkata"
+        });
 
-const checkin = document.getElementById("checkin_date");
-const checkout = document.getElementById("checkout_date");
+        checkin.min = indiaDate;
 
-// India date
-const indiaDate = new Date().toLocaleDateString("en-CA", {
-    timeZone: "Asia/Kolkata"
-});
+        checkin.addEventListener("change", function () {
+            if (!this.value) return;
 
-checkin.min = indiaDate;
+            let checkinDate = new Date(this.value);
+            checkinDate.setDate(checkinDate.getDate() + 1);
 
-checkin.addEventListener("change", function () {
-    if (!this.value) return;
+            let minCheckout = checkinDate.toLocaleDateString("en-CA", {
+                timeZone: "Asia/Kolkata"
+            });
 
-    let checkinDate = new Date(this.value);
-    checkinDate.setDate(checkinDate.getDate() + 1);
+            checkout.min = minCheckout;
 
-    let minCheckout = checkinDate.toLocaleDateString("en-CA", {
-        timeZone: "Asia/Kolkata"
-    });
+            if (checkout.value && checkout.value <= this.value) {
+                checkout.value = "";
+            }
+        });
 
-    checkout.min = minCheckout;
+        // Auto total
+        const maxGuests = parseInt("{{ room.max_guest }}");
 
-    if (checkout.value && checkout.value <= this.value) {
-        checkout.value = "";
-    }
-});
+        function updateTotal() {
+            let adults = parseInt(document.getElementById("adults").value) || 0;
+            let children = parseInt(document.getElementById("children").value) || 0;
 
-// Auto total
-const maxGuests = parseInt("{{ room.max_guest }}");
+            let total = adults + children;
 
-function updateTotal(){
-    let adults = parseInt(document.getElementById("adults").value) || 0;
-    let children = parseInt(document.getElementById("children").value) || 0;
+            if (total > maxGuests) {
+                alert("Total guests cannot exceed " + maxGuests);
+                document.getElementById("children").value = 0;
+                total = adults;
+            }
 
-    let total = adults + children;
+            document.getElementById("total").value = total;
+        }
 
-    if (total > maxGuests) {
-        alert("Total guests cannot exceed " + maxGuests);
-        document.getElementById("children").value = 0;
-        total = adults;
-    }
+        document.getElementById("adults").addEventListener("input", updateTotal);
+        document.getElementById("children").addEventListener("input", updateTotal);
 
-    document.getElementById("total").value = total;
-}
-
-document.getElementById("adults").addEventListener("input", updateTotal);
-document.getElementById("children").addEventListener("input", updateTotal);
-
-</script>
+    </script>
 
 </body>
+
 </html>

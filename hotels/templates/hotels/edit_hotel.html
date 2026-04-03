@@ -289,7 +289,7 @@
                                 class="text-[10px] font-black uppercase text-slate-400 mb-4 block tracking-[0.2em]">Asset
                                 Library: {{ room.name|default:"Room" }} Visuals</label>
                             <div class="gallery-grid grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4">
-                                {% for photo in room.photos.all %}
+                                {% for photo in room.room_photos.all %}
                                 <div
                                     class="media-item aspect-square group/photo relative overflow-hidden rounded-2xl border border-slate-100 bg-slate-50">
                                     <img src="{{ photo.media_file.url }}" class="w-full h-full object-cover"

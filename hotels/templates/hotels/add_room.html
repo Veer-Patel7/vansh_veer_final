@@ -264,7 +264,7 @@
 
                     <div id="roomMediaPreview" class="grid grid-cols-2 md:grid-cols-4 gap-4">
                         {% if room %}
-                        {% for photo in room.photos.all %}
+                        {% for photo in room.room_photos.all %}
                         <div
                             class="relative group aspect-square rounded-2xl overflow-hidden border-2 border-slate-100 shadow-sm">
                             <img src="{{ photo.media_file.url }}"
